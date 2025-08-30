@@ -3,6 +3,11 @@ This script trains a scOT or pretrains Poseidon on a PDE dataset.
 Can be also used for finetuning Poseidon.
 Can be used in a single config or sweep setup.
 """
+# scOT/train.py (your entry-point)
+# ── monkey-patch HF Trainer to skip RNG loading ──
+from transformers import Trainer as _HFTrainer
+_HFTrainer._load_rng_state = lambda self, resume_from_checkpoint: None
+
 
 import argparse
 import torch

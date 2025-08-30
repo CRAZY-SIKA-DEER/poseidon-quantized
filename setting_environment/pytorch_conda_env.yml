@@ -1,0 +1,9 @@
+name: pytorch_env
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.10
+  - pytorch=2.5.1
+  - torchvision
+  - transformers

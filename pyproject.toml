@@ -3,8 +3,8 @@ name = "scOT"
 version = "1.0.0"
 description = "Foundation models for PDEs based on a scalable Operator Transformer"
 dependencies = [
-    "torch == 2.0.1",
-    "torchvision == 0.15.2",
+    "torch >= 2.3.0",
+    "torchvision >= 0.18.0",
     "numpy",
     "transformers == 4.29.2",
     "matplotlib",

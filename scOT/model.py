@@ -54,6 +54,10 @@ import math
 import collections
 
 
+from physical.physicalloss import continuity_loss_torch, momentum_loss_torch, denormalize
+from scOT.problems.fluids.normalization_constants import CONSTANTS
+
+
 @dataclass
 class ScOTOutput(ModelOutput):
     loss: Optional[torch.FloatTensor] = None
@@ -98,6 +102,12 @@ class ScOTConfig(PretrainedConfig):
         residual_model="convnext",  # "convnext" or "resnet"
         use_conditioning=False,
         learn_residual=False,  # learn the residual for time-dependent problems
+
+        add_physical_loss: bool = False,
+        phys_loss_weight_cont: float = 0.5,
+        phys_loss_weight_mom:  float = 0.5,
+        Re: float = 2500.,
+
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -130,6 +140,15 @@ class ScOTConfig(PretrainedConfig):
         self.p = p
         self.channel_slice_list_normalized_loss = channel_slice_list_normalized_loss
         self.residual_model = residual_model
+
+
+
+        self.add_physical_loss = add_physical_loss
+        self.phys_loss_weight_cont = phys_loss_weight_cont
+        self.phys_loss_weight_mom  = phys_loss_weight_mom
+        self.Re = Re
+
+
 
 
 class LayerNorm(nn.LayerNorm):
@@ -1482,6 +1501,31 @@ class ScOT(Swinv2PreTrainedModel):
                 )
             else:
                 loss = loss_fn(prediction, labels)
+        # ——— Physical‐loss augmentation ———
+
+            if getattr(self.config, "add_physical_loss", False):
+                # first denormalize
+                pred_phys = denormalize(prediction, CONSTANTS)  # (B,C,H,W)
+                gt_phys   = denormalize(labels,     CONSTANTS)
+
+                # continuity (should be zero)
+                u_pred = pred_phys[:,1]  # the velocity‐component channels
+                v_pred = pred_phys[:,2]
+                cont_loss = continuity_loss_torch(u_pred, v_pred)
+
+                # momentum: compare model vs. ground‐truth integrals
+                p_pred     = pred_phys[:,3]
+                p_gt       = gt_phys[:,3]
+                mom_pred   = momentum_loss_torch(u_pred, v_pred, p_pred, Re=self.config.Re)
+                mom_gt     = momentum_loss_torch(gt_phys[:,1], gt_phys[:,2], p_gt,   Re=self.config.Re)
+                mom_loss   = torch.abs(mom_pred - mom_gt)
+
+                # combine (you can tweak the two weights)
+                loss = loss \
+                    + self.config.phys_loss_weight_cont * cont_loss \
+                    + self.config.phys_loss_weight_mom  * mom_loss
+
+
 
         if not return_dict:
             output = (prediction,) + decoder_output[1:] + encoder_outputs[1:]
