@@ -5,12 +5,48 @@
 import os, sys, time, random, numpy as np, torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from scOT.problems.fluids.normalization_constants import CONSTANTS
 
 # ==== EDIT THESE ====
 REPO_REPQ_CLASSIFICATION = "./RepQ-ViT/classification"   # path to the 'classification' dir of RepQ-ViT
+#for PwC_L
 MODEL_PATH   = "checkpoints/finetune_NS-PwC_L_2048/PoseidonFinetune_NS-PwC_L/finetune_NS-PwC_run_L_2048/checkpoint-368800"
 DATA_PATH    = "datasets/NS-PwC"
 DATASET_NAME = "fluids.incompressible.PiecewiseConstants"
+#for BB_L
+# MODEL_PATH   =  "checkpoints/finetune_NS-BB_L_2048/PoseidonFinetune_NS-BB_L/finetune_NS-BB_run_L_2048/checkpoint-368800"
+# DATA_PATH    = "datasets/NS-BB"
+# DATASET_NAME = "fluids.incompressible.BrownianBridge"
+#for SVS_L
+# MODEL_PATH = "checkpoints/finetune_NS-SVS_L_2048/PoseidonFinetune_NS-SVS_L/finetune_NS-SVS_run_L_2048/checkpoint-368800"
+# DATA_PATH        = "datasets/NS-SVS"
+# DATASET_NAME     = "fluids.incompressible.VortexSheet"
+#for SL_L
+# MODEL_PATH = "checkpoints/finetune_NS-SL_L_2048/PoseidonFinetune_NS-SL_L/finetune_NS-SL_run_L_2048/checkpoint-368800"
+# DATA_PATH        = "datasets/NS-SL"
+# DATASET_NAME     = "fluids.incompressible.ShearLayer"
+
+
+
+#for PwC_B
+# MODEL_PATH   = "checkpoints/finetune_NS-PwC_B_2048/PoseidonFinetune_NS-PwC_B/finetune_NS-PwC_run_B_2048/checkpoint-368800"
+# DATA_PATH    = "datasets/NS-PwC"
+# DATASET_NAME = "fluids.incompressible.PiecewiseConstants"
+#for BB_B
+# MODEL_PATH   =  "checkpoints/finetune_NS-BB_B_2048/PoseidonFinetune_NS-BB_B/finetune_NS-BB_run_B_2048/checkpoint-368800"
+# DATA_PATH    = "datasets/NS-BB"
+# DATASET_NAME = "fluids.incompressible.BrownianBridge"
+#for SVS_B
+# MODEL_PATH = "checkpoints/finetune_NS-SVS_B_2048/PoseidonFinetune_NS-SVS_B/finetune_NS-SVS_run_B_2048/checkpoint-368800"
+# DATA_PATH        = "datasets/NS-SVS"
+# DATASET_NAME     = "fluids.incompressible.VortexSheet"
+#for SL_L
+# MODEL_PATH = "checkpoints/finetune_NS-SL_B_2048/PoseidonFinetune_NS-SL_B/finetune_NS-SL_run_B_2048/checkpoint-368800"
+# DATA_PATH        = "datasets/NS-SL"
+# DATASET_NAME     = "fluids.incompressible.ShearLayer"
+
+
+
 W_BITS, A_BITS = 8, 8
 CALIB_BATCHSIZE = 8      # images per step for calib
 CALIB_STEPS     = 8      # how many batches for calib
@@ -18,6 +54,8 @@ VAL_BATCHSIZE   = 16
 VAL_STEPS       = 50
 DEVICE = "cuda"
 SEED   = 0
+NUM_TRAJECTORIES = 8    # <-- add this (test split size)
+BATCH_SIZE       = 16   # (you already use this below; keep it here with NUM_TRAJECTORIES)
 # ====================
 
 # import RepQ-ViT classification.quant
@@ -228,6 +266,47 @@ def main():
     # from torch.utils.data import DataLoader
     # from scOT.problems.base import get_dataset
 
+    def divergence_stats(preds: torch.Tensor):
+        """
+        preds2: torch.Tensor of shape (N, C_out, H, W)
+        """
+        device = preds.device
+        # 1) de-normalize u & v (channels 1,2)
+        means = torch.tensor(CONSTANTS["mean"][1:3], device=device).view(1,2,1,1)
+        stds  = torch.tensor(CONSTANTS["std" ][1:3], device=device).view(1,2,1,1)
+        uv_norm = preds[:, 1:3, :, :]       # (N,2,H,W)
+        uv      = uv_norm * stds + means    # broadcast
+
+        u = uv[:, 0].transpose(1,2)         # (N,W,H)
+        v = uv[:, 1].transpose(1,2)
+
+        # for NS-SL only
+        # u = uv[:, 0]       # (N,W,H)
+        # v = uv[:, 1]
+
+        # 2) grid spacing
+        N, W, H = u.shape
+        dx = 1.0/(W-1);  dy = 1.0/(H-1)
+
+        # 3) central differences
+        du_dx = (u[:, :, 2:] - u[:, :, :-2])/(2*dx)   # (N,W,H-2)
+        dv_dy = (v[:, 2:, :] - v[:, :-2, :])/(2*dy)   # (N,W-2,H)
+
+        # 4) crop to common interior (W-2,H-2)
+        du_dx = du_dx[:, 1:-1, :]
+        dv_dy = dv_dy[:, :, 1:-1]
+
+        # 5) divergence
+        div = du_dx + dv_dy                       # (N, W-2, H-2)
+
+        div_np   = div.cpu().numpy()             # shape (N, W-2, H-2)
+        abs_div  = np.abs(div_np).reshape(N, -1) # take absolute, then flatten each sample
+        m        = abs_div.mean(axis=1)          # per-sample mean(|∇·v|)
+        print("=== Divergence‐Free Check ===")
+        print(f"Mean abs ∇·v: {m.mean():.6e}")
+        print(f"Max  abs ∇·v: {m.max():.6e}")
+        print(f"Min  abs ∇·v: {m.min():.6e}")
+
     def eval_model_poseidon(model, dataset_name, data_path, num_traj=8, batch_size=16):
         device = next(model.parameters()).device
         model.eval()
@@ -257,6 +336,8 @@ def main():
     repq_loss, repq_preds = eval_model_poseidon(
         q_model, DATASET_NAME, DATA_PATH, NUM_TRAJECTORIES, BATCH_SIZE
     )
+    print("-----------------------------------------------------------------------------------------------------------------")
+    print(MODEL_PATH)
     print(f"[RepQ] dataset loss: {repq_loss:.6e}")
     divergence_stats(repq_preds)   # your function from earlier
 
