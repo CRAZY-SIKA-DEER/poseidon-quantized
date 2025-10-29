@@ -43,12 +43,62 @@ from __future__ import annotations
 import copy
 import math
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
+
+
+ModelInput = Union[Tensor, Dict[str, Tensor]]
+
+
+def _move_to_device(value, device: torch.device):
+    if isinstance(value, Tensor):
+        return value.to(device)
+    if isinstance(value, dict):
+        return {k: _move_to_device(v, device) for k, v in value.items()}
+    return value
+
+
+def _prepare_model_inputs(batch, device: torch.device) -> ModelInput:
+    """
+    Normalize dataloader batches so downstream code can call the model either with
+    positional tensors or keyword arguments.
+    """
+    if isinstance(batch, dict):
+        return {k: _move_to_device(v, device) for k, v in batch.items() if v is not None}
+    if isinstance(batch, (list, tuple)):
+        return _prepare_model_inputs(batch[0], device)
+    if isinstance(batch, Tensor):
+        return batch.to(device)
+    raise TypeError(f"Unsupported batch type {type(batch)}")
+
+
+def _forward_model(model: nn.Module, model_inputs: ModelInput) -> Tensor:
+    """
+    Call a model with either positional or keyword arguments and always return
+    the main tensor output.
+    """
+    if isinstance(model_inputs, dict):
+        outputs = model(**model_inputs)
+    else:
+        outputs = model(model_inputs)
+
+    if isinstance(outputs, Tensor):
+        return outputs
+
+    for attr in ("output", "logits"):
+        if hasattr(outputs, attr):
+            candidate = getattr(outputs, attr)
+            if isinstance(candidate, Tensor):
+                return candidate
+
+    raise TypeError(
+        f"Model returned unsupported output type {type(outputs)} – expected Tensor "
+        "or an object with `.output`/`.logits` tensor attributes."
+    )
 
 
 class _RoundSTE(torch.autograd.Function):
@@ -154,9 +204,11 @@ class ClippingSelector:
         self.model.eval()
         with torch.no_grad():
             for batch_idx, batch in enumerate(dataloader):
-                inputs = batch[0] if isinstance(batch, (list, tuple)) else batch
-                inputs = inputs.to(self.device)
-                _ = self.model(inputs)
+                model_inputs = _prepare_model_inputs(batch, self.device)
+                if isinstance(model_inputs, dict):
+                    _ = self.model(**model_inputs)
+                else:
+                    _ = self.model(model_inputs)
                 if max_batches is not None and (batch_idx + 1) >= max_batches:
                     break
         for handle in handles:
@@ -197,7 +249,8 @@ class ClippingSelector:
 
 class ProbabilisticQuantizer(nn.Module):
     """
-    Uniform symmetric quantiser with additive noise sampling and MDL prior.
+    Uniform symmetric quantizer with additive-noise surrogate (MAP)
+    and real quantize-dequantize for deployment/validation.
     """
 
     def __init__(
@@ -219,34 +272,64 @@ class ProbabilisticQuantizer(nn.Module):
         initial_step = range_span / (2 ** bit_width - 1)
         initial_step = float(min(max(initial_step, s_min), s_max))
 
+        # Non-trainable buffers (move with .to(device), saved in state_dict)
         self.register_buffer("alpha", torch.tensor(alpha, dtype=torch.float32, device=device))
         self.register_buffer("beta", torch.tensor(beta, dtype=torch.float32, device=device))
         self.register_buffer("range_span", torch.tensor(range_span, dtype=torch.float32, device=device))
+
+        # Symmetric signed integer range (e.g., 4-bit -> ±7)
         self.qmax = float(2 ** (bit_width - 1) - 1)
+
+        # Hyper-params
         self.gamma = gamma
         self.s_min = s_min
         self.s_max = s_max
+
+        # Toggle: True during MC/MAP; False for validation/deploy
         self.sample_noise = True
 
+        # Learnable step size (scalar here; can extend to per-channel)
         self.step = nn.Parameter(torch.tensor(initial_step, dtype=torch.float32, device=device))
 
     def clamp_step_(self) -> None:
+        # Projected gradient step: keep S within [s_min, s_max]
         with torch.no_grad():
             self.step.clamp_(self.s_min, self.s_max)
 
-    def log_prior(self) -> Tensor:
+    def log_prior(self) -> torch.Tensor:
+        # MDL prior:  -gamma * log2(R / S)
         eps = 1e-12
         return -self.gamma * torch.log2(self.range_span / (self.step.abs() + eps))
 
-    def forward(self, x: Tensor) -> Tensor:
-        step = self.step.abs()
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        - Training/MAP (self.sample_noise == True):
+            x_tilde = clip(x + S * U(-0.5, 0.5), alpha, beta)
+            (no rounding; differentiable surrogate)
+        - Validation/Deploy (self.sample_noise == False):
+            Real quantize-dequantize with rounding.
+        """
+        S = self.step.abs()
+
         if self.sample_noise:
-            noise = step * (torch.rand_like(x) - 0.5)
-            x = x + noise
-        x = torch.clamp(x, self.alpha, self.beta)
-        scaled = x / (step + 1e-12)
-        quantised = torch.clamp(_RoundSTE.apply(scaled), -self.qmax, self.qmax)
-        return quantised * step
+            # ---- MC/MAP mode: additive-noise surrogate only ----
+            # ε ~ Uniform(-S/2, S/2) via reparameterization
+            x = x + S * (torch.rand_like(x) - 0.5)
+            # Percentile clipping
+            x = torch.clamp(x, self.alpha, self.beta)
+            # Return the (continuous) surrogate output (no rounding in MAP)
+            return x
+        else:
+            # ---- Validation/Deploy: real quantize-dequantize ----
+            # Clip first
+            x = torch.clamp(x, self.alpha, self.beta)
+            # Scale to grid
+            z = x / (S + 1e-12)
+            # Hard rounding (no STE needed here; typically eval/no_grad)
+            z_q = torch.clamp(torch.round(z), -self.qmax, self.qmax)
+            # De-normalize back
+            return z_q * S
+
 
 
 class PPQLayerWrapper(nn.Module):
@@ -336,17 +419,16 @@ class MAPOptimizer:
             processed_batches = 0
 
             for batch_idx, batch in enumerate(calib_loader):
-                inputs = batch[0] if isinstance(batch, (list, tuple)) else batch
-                inputs = inputs.to(self.device)
+                model_inputs = _prepare_model_inputs(batch, self.device)
 
                 with torch.no_grad():
-                    fp_outputs = self.fp_model(inputs)
+                    fp_outputs = _forward_model(self.fp_model, model_inputs)
 
                 mc_outputs = []
                 for _ in range(self.config.num_mc_samples):
                     for quantiser in self.quantisers:
                         quantiser.sample_noise = True
-                    mc_outputs.append(self.quant_model(inputs))
+                    mc_outputs.append(_forward_model(self.quant_model, model_inputs))
 
                 stacked = torch.stack(mc_outputs, dim=0)  # (M, B, ...)
                 fp_expanded = fp_outputs.unsqueeze(0)
@@ -407,11 +489,10 @@ class MAPOptimizer:
         self.fp_model.eval()
         with torch.no_grad():
             for batch_idx, batch in enumerate(dataloader):
-                inputs = batch[0] if isinstance(batch, (list, tuple)) else batch
-                inputs = inputs.to(self.device)
+                model_inputs = _prepare_model_inputs(batch, self.device)
 
-                fp_outputs = self.fp_model(inputs)
-                quant_outputs = self.quant_model(inputs)
+                fp_outputs = _forward_model(self.fp_model, model_inputs)
+                quant_outputs = _forward_model(self.quant_model, model_inputs)
 
                 mse = F.mse_loss(quant_outputs, fp_outputs, reduction="sum")
                 total_loss += float(mse.item())

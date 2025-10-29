@@ -5,6 +5,8 @@ wandb/
 QAT/
 tmp/
 uploading/
+dataset/
+models/
 
 # Slurm / job outputs
 *.out
