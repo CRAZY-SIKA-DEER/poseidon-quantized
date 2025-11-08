@@ -1,0 +1,3371 @@
+{
+  "embeddings.patch_embeddings.projection": {
+    "type": "Conv2d",
+    "in_channels": 4,
+    "out_channels": 192,
+    "kernel_size": [
+      4,
+      4
+    ],
+    "stride": [
+      4,
+      4
+    ],
+    "padding": [
+      0,
+      0
+    ],
+    "groups": 1,
+    "num_parameters": 12480
+  },
+  "encoder.layers.0.blocks.0.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.0.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.0.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.0.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "encoder.layers.0.blocks.0.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.0.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.0.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "encoder.layers.0.blocks.0.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "encoder.layers.0.blocks.1.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.1.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.1.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.1.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "encoder.layers.0.blocks.1.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.1.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.1.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "encoder.layers.0.blocks.1.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "encoder.layers.0.blocks.2.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.2.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.2.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.2.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "encoder.layers.0.blocks.2.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.2.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.2.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "encoder.layers.0.blocks.2.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "encoder.layers.0.blocks.3.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.3.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.3.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.3.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "encoder.layers.0.blocks.3.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.3.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.3.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "encoder.layers.0.blocks.3.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "encoder.layers.0.blocks.4.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.4.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.4.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.4.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "encoder.layers.0.blocks.4.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.4.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.4.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "encoder.layers.0.blocks.4.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "encoder.layers.0.blocks.5.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.5.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.5.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.5.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "encoder.layers.0.blocks.5.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.5.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.5.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "encoder.layers.0.blocks.5.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "encoder.layers.0.blocks.6.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.6.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.6.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.6.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "encoder.layers.0.blocks.6.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.6.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.6.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "encoder.layers.0.blocks.6.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "encoder.layers.0.blocks.7.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.7.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "encoder.layers.0.blocks.7.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.7.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "encoder.layers.0.blocks.7.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.7.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "encoder.layers.0.blocks.7.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "encoder.layers.0.blocks.7.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "encoder.layers.0.downsample.reduction": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 384,
+    "num_parameters": 294912
+  },
+  "encoder.layers.1.blocks.0.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.1.blocks.0.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "encoder.layers.1.blocks.0.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.0.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "encoder.layers.1.blocks.0.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.0.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.0.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "encoder.layers.1.blocks.0.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "encoder.layers.1.blocks.1.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.1.blocks.1.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "encoder.layers.1.blocks.1.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.1.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "encoder.layers.1.blocks.1.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.1.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.1.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "encoder.layers.1.blocks.1.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "encoder.layers.1.blocks.2.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.1.blocks.2.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "encoder.layers.1.blocks.2.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.2.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "encoder.layers.1.blocks.2.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.2.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.2.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "encoder.layers.1.blocks.2.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "encoder.layers.1.blocks.3.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.1.blocks.3.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "encoder.layers.1.blocks.3.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.3.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "encoder.layers.1.blocks.3.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.3.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.3.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "encoder.layers.1.blocks.3.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "encoder.layers.1.blocks.4.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.1.blocks.4.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "encoder.layers.1.blocks.4.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.4.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "encoder.layers.1.blocks.4.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.4.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.4.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "encoder.layers.1.blocks.4.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "encoder.layers.1.blocks.5.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.1.blocks.5.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "encoder.layers.1.blocks.5.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.5.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "encoder.layers.1.blocks.5.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.5.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.5.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "encoder.layers.1.blocks.5.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "encoder.layers.1.blocks.6.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.1.blocks.6.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "encoder.layers.1.blocks.6.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.6.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "encoder.layers.1.blocks.6.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.6.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.6.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "encoder.layers.1.blocks.6.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "encoder.layers.1.blocks.7.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.1.blocks.7.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "encoder.layers.1.blocks.7.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.7.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "encoder.layers.1.blocks.7.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.7.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "encoder.layers.1.blocks.7.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "encoder.layers.1.blocks.7.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "encoder.layers.1.downsample.reduction": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 768,
+    "num_parameters": 1179648
+  },
+  "encoder.layers.2.blocks.0.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.2.blocks.0.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "encoder.layers.2.blocks.0.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.0.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "encoder.layers.2.blocks.0.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.0.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.0.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "encoder.layers.2.blocks.0.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "encoder.layers.2.blocks.1.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.2.blocks.1.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "encoder.layers.2.blocks.1.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.1.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "encoder.layers.2.blocks.1.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.1.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.1.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "encoder.layers.2.blocks.1.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "encoder.layers.2.blocks.2.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.2.blocks.2.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "encoder.layers.2.blocks.2.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.2.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "encoder.layers.2.blocks.2.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.2.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.2.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "encoder.layers.2.blocks.2.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "encoder.layers.2.blocks.3.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.2.blocks.3.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "encoder.layers.2.blocks.3.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.3.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "encoder.layers.2.blocks.3.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.3.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.3.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "encoder.layers.2.blocks.3.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "encoder.layers.2.blocks.4.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.2.blocks.4.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "encoder.layers.2.blocks.4.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.4.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "encoder.layers.2.blocks.4.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.4.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.4.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "encoder.layers.2.blocks.4.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "encoder.layers.2.blocks.5.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.2.blocks.5.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "encoder.layers.2.blocks.5.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.5.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "encoder.layers.2.blocks.5.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.5.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.5.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "encoder.layers.2.blocks.5.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "encoder.layers.2.blocks.6.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.2.blocks.6.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "encoder.layers.2.blocks.6.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.6.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "encoder.layers.2.blocks.6.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.6.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.6.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "encoder.layers.2.blocks.6.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "encoder.layers.2.blocks.7.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.2.blocks.7.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "encoder.layers.2.blocks.7.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.7.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "encoder.layers.2.blocks.7.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.7.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "encoder.layers.2.blocks.7.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "encoder.layers.2.blocks.7.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "encoder.layers.2.downsample.reduction": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 1536,
+    "num_parameters": 4718592
+  },
+  "encoder.layers.3.blocks.0.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.3.blocks.0.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "encoder.layers.3.blocks.0.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.0.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "encoder.layers.3.blocks.0.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.0.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.0.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "encoder.layers.3.blocks.0.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "encoder.layers.3.blocks.1.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.3.blocks.1.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "encoder.layers.3.blocks.1.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.1.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "encoder.layers.3.blocks.1.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.1.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.1.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "encoder.layers.3.blocks.1.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "encoder.layers.3.blocks.2.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.3.blocks.2.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "encoder.layers.3.blocks.2.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.2.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "encoder.layers.3.blocks.2.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.2.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.2.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "encoder.layers.3.blocks.2.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "encoder.layers.3.blocks.3.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.3.blocks.3.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "encoder.layers.3.blocks.3.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.3.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "encoder.layers.3.blocks.3.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.3.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.3.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "encoder.layers.3.blocks.3.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "encoder.layers.3.blocks.4.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.3.blocks.4.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "encoder.layers.3.blocks.4.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.4.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "encoder.layers.3.blocks.4.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.4.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.4.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "encoder.layers.3.blocks.4.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "encoder.layers.3.blocks.5.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.3.blocks.5.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "encoder.layers.3.blocks.5.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.5.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "encoder.layers.3.blocks.5.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.5.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.5.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "encoder.layers.3.blocks.5.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "encoder.layers.3.blocks.6.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.3.blocks.6.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "encoder.layers.3.blocks.6.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.6.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "encoder.layers.3.blocks.6.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.6.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.6.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "encoder.layers.3.blocks.6.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "encoder.layers.3.blocks.7.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "encoder.layers.3.blocks.7.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "encoder.layers.3.blocks.7.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.7.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "encoder.layers.3.blocks.7.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.7.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "encoder.layers.3.blocks.7.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "encoder.layers.3.blocks.7.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "decoder.layers.0.blocks.0.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.0.blocks.0.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "decoder.layers.0.blocks.0.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.0.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "decoder.layers.0.blocks.0.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.0.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.0.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "decoder.layers.0.blocks.0.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "decoder.layers.0.blocks.1.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.0.blocks.1.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "decoder.layers.0.blocks.1.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.1.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "decoder.layers.0.blocks.1.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.1.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.1.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "decoder.layers.0.blocks.1.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "decoder.layers.0.blocks.2.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.0.blocks.2.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "decoder.layers.0.blocks.2.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.2.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "decoder.layers.0.blocks.2.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.2.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.2.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "decoder.layers.0.blocks.2.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "decoder.layers.0.blocks.3.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.0.blocks.3.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "decoder.layers.0.blocks.3.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.3.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "decoder.layers.0.blocks.3.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.3.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.3.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "decoder.layers.0.blocks.3.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "decoder.layers.0.blocks.4.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.0.blocks.4.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "decoder.layers.0.blocks.4.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.4.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "decoder.layers.0.blocks.4.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.4.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.4.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "decoder.layers.0.blocks.4.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "decoder.layers.0.blocks.5.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.0.blocks.5.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "decoder.layers.0.blocks.5.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.5.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "decoder.layers.0.blocks.5.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.5.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.5.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "decoder.layers.0.blocks.5.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "decoder.layers.0.blocks.6.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.0.blocks.6.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "decoder.layers.0.blocks.6.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.6.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "decoder.layers.0.blocks.6.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.6.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.6.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "decoder.layers.0.blocks.6.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "decoder.layers.0.blocks.7.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.0.blocks.7.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 24,
+    "num_parameters": 12288
+  },
+  "decoder.layers.0.blocks.7.attention.self.query": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.7.attention.self.key": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2359296
+  },
+  "decoder.layers.0.blocks.7.attention.self.value": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.7.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 1536,
+    "num_parameters": 2360832
+  },
+  "decoder.layers.0.blocks.7.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 6144,
+    "num_parameters": 9443328
+  },
+  "decoder.layers.0.blocks.7.output.dense": {
+    "type": "Linear",
+    "in_features": 6144,
+    "out_features": 1536,
+    "num_parameters": 9438720
+  },
+  "decoder.layers.0.upsample.upsample": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 3072,
+    "num_parameters": 4718592
+  },
+  "decoder.layers.0.upsample.mixup": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "decoder.layers.1.blocks.0.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.1.blocks.0.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "decoder.layers.1.blocks.0.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.0.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "decoder.layers.1.blocks.0.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.0.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.0.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "decoder.layers.1.blocks.0.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "decoder.layers.1.blocks.1.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.1.blocks.1.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "decoder.layers.1.blocks.1.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.1.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "decoder.layers.1.blocks.1.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.1.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.1.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "decoder.layers.1.blocks.1.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "decoder.layers.1.blocks.2.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.1.blocks.2.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "decoder.layers.1.blocks.2.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.2.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "decoder.layers.1.blocks.2.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.2.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.2.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "decoder.layers.1.blocks.2.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "decoder.layers.1.blocks.3.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.1.blocks.3.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "decoder.layers.1.blocks.3.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.3.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "decoder.layers.1.blocks.3.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.3.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.3.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "decoder.layers.1.blocks.3.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "decoder.layers.1.blocks.4.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.1.blocks.4.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "decoder.layers.1.blocks.4.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.4.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "decoder.layers.1.blocks.4.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.4.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.4.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "decoder.layers.1.blocks.4.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "decoder.layers.1.blocks.5.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.1.blocks.5.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "decoder.layers.1.blocks.5.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.5.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "decoder.layers.1.blocks.5.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.5.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.5.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "decoder.layers.1.blocks.5.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "decoder.layers.1.blocks.6.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.1.blocks.6.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "decoder.layers.1.blocks.6.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.6.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "decoder.layers.1.blocks.6.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.6.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.6.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "decoder.layers.1.blocks.6.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "decoder.layers.1.blocks.7.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.1.blocks.7.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 12,
+    "num_parameters": 6144
+  },
+  "decoder.layers.1.blocks.7.attention.self.query": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.7.attention.self.key": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 589824
+  },
+  "decoder.layers.1.blocks.7.attention.self.value": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.7.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 768,
+    "num_parameters": 590592
+  },
+  "decoder.layers.1.blocks.7.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "decoder.layers.1.blocks.7.output.dense": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "decoder.layers.1.upsample.upsample": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 1536,
+    "num_parameters": 1179648
+  },
+  "decoder.layers.1.upsample.mixup": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "decoder.layers.2.blocks.0.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.2.blocks.0.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "decoder.layers.2.blocks.0.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.0.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "decoder.layers.2.blocks.0.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.0.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.0.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "decoder.layers.2.blocks.0.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "decoder.layers.2.blocks.1.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.2.blocks.1.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "decoder.layers.2.blocks.1.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.1.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "decoder.layers.2.blocks.1.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.1.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.1.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "decoder.layers.2.blocks.1.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "decoder.layers.2.blocks.2.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.2.blocks.2.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "decoder.layers.2.blocks.2.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.2.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "decoder.layers.2.blocks.2.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.2.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.2.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "decoder.layers.2.blocks.2.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "decoder.layers.2.blocks.3.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.2.blocks.3.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "decoder.layers.2.blocks.3.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.3.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "decoder.layers.2.blocks.3.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.3.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.3.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "decoder.layers.2.blocks.3.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "decoder.layers.2.blocks.4.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.2.blocks.4.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "decoder.layers.2.blocks.4.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.4.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "decoder.layers.2.blocks.4.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.4.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.4.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "decoder.layers.2.blocks.4.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "decoder.layers.2.blocks.5.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.2.blocks.5.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "decoder.layers.2.blocks.5.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.5.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "decoder.layers.2.blocks.5.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.5.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.5.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "decoder.layers.2.blocks.5.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "decoder.layers.2.blocks.6.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.2.blocks.6.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "decoder.layers.2.blocks.6.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.6.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "decoder.layers.2.blocks.6.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.6.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.6.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "decoder.layers.2.blocks.6.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "decoder.layers.2.blocks.7.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.2.blocks.7.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 6,
+    "num_parameters": 3072
+  },
+  "decoder.layers.2.blocks.7.attention.self.query": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.7.attention.self.key": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147456
+  },
+  "decoder.layers.2.blocks.7.attention.self.value": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.7.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 384,
+    "num_parameters": 147840
+  },
+  "decoder.layers.2.blocks.7.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "decoder.layers.2.blocks.7.output.dense": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "decoder.layers.2.upsample.upsample": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 768,
+    "num_parameters": 294912
+  },
+  "decoder.layers.2.upsample.mixup": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "decoder.layers.3.blocks.0.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.0.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.0.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.0.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "decoder.layers.3.blocks.0.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.0.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.0.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "decoder.layers.3.blocks.0.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "decoder.layers.3.blocks.1.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.1.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.1.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.1.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "decoder.layers.3.blocks.1.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.1.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.1.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "decoder.layers.3.blocks.1.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "decoder.layers.3.blocks.2.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.2.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.2.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.2.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "decoder.layers.3.blocks.2.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.2.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.2.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "decoder.layers.3.blocks.2.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "decoder.layers.3.blocks.3.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.3.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.3.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.3.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "decoder.layers.3.blocks.3.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.3.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.3.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "decoder.layers.3.blocks.3.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "decoder.layers.3.blocks.4.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.4.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.4.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.4.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "decoder.layers.3.blocks.4.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.4.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.4.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "decoder.layers.3.blocks.4.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "decoder.layers.3.blocks.5.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.5.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.5.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.5.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "decoder.layers.3.blocks.5.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.5.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.5.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "decoder.layers.3.blocks.5.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "decoder.layers.3.blocks.6.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.6.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.6.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.6.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "decoder.layers.3.blocks.6.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.6.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.6.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "decoder.layers.3.blocks.6.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "decoder.layers.3.blocks.7.attention.self.continuous_position_bias_mlp.0": {
+    "type": "Linear",
+    "in_features": 2,
+    "out_features": 512,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.7.attention.self.continuous_position_bias_mlp.2": {
+    "type": "Linear",
+    "in_features": 512,
+    "out_features": 3,
+    "num_parameters": 1536
+  },
+  "decoder.layers.3.blocks.7.attention.self.query": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.7.attention.self.key": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 36864
+  },
+  "decoder.layers.3.blocks.7.attention.self.value": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.7.attention.output.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 192,
+    "num_parameters": 37056
+  },
+  "decoder.layers.3.blocks.7.intermediate.dense": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "decoder.layers.3.blocks.7.output.dense": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "patch_recovery.projection": {
+    "type": "ConvTranspose2d",
+    "in_channels": 192,
+    "out_channels": 4,
+    "kernel_size": [
+      4,
+      4
+    ],
+    "stride": [
+      4,
+      4
+    ],
+    "padding": [
+      0,
+      0
+    ],
+    "groups": 1,
+    "num_parameters": 12292
+  },
+  "patch_recovery.mixup": {
+    "type": "Conv2d",
+    "in_channels": 4,
+    "out_channels": 4,
+    "kernel_size": [
+      5,
+      5
+    ],
+    "stride": [
+      1,
+      1
+    ],
+    "padding": [
+      2,
+      2
+    ],
+    "groups": 1,
+    "num_parameters": 400
+  },
+  "residual_blocks.0.0.dwconv": {
+    "type": "Conv2d",
+    "in_channels": 192,
+    "out_channels": 192,
+    "kernel_size": [
+      7,
+      7
+    ],
+    "stride": [
+      1,
+      1
+    ],
+    "padding": [
+      3,
+      3
+    ],
+    "groups": 192,
+    "num_parameters": 9600
+  },
+  "residual_blocks.0.0.pwconv1": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "residual_blocks.0.0.pwconv2": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "residual_blocks.0.1.dwconv": {
+    "type": "Conv2d",
+    "in_channels": 192,
+    "out_channels": 192,
+    "kernel_size": [
+      7,
+      7
+    ],
+    "stride": [
+      1,
+      1
+    ],
+    "padding": [
+      3,
+      3
+    ],
+    "groups": 192,
+    "num_parameters": 9600
+  },
+  "residual_blocks.0.1.pwconv1": {
+    "type": "Linear",
+    "in_features": 192,
+    "out_features": 768,
+    "num_parameters": 148224
+  },
+  "residual_blocks.0.1.pwconv2": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 192,
+    "num_parameters": 147648
+  },
+  "residual_blocks.1.0.dwconv": {
+    "type": "Conv2d",
+    "in_channels": 384,
+    "out_channels": 384,
+    "kernel_size": [
+      7,
+      7
+    ],
+    "stride": [
+      1,
+      1
+    ],
+    "padding": [
+      3,
+      3
+    ],
+    "groups": 384,
+    "num_parameters": 19200
+  },
+  "residual_blocks.1.0.pwconv1": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "residual_blocks.1.0.pwconv2": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "residual_blocks.1.1.dwconv": {
+    "type": "Conv2d",
+    "in_channels": 384,
+    "out_channels": 384,
+    "kernel_size": [
+      7,
+      7
+    ],
+    "stride": [
+      1,
+      1
+    ],
+    "padding": [
+      3,
+      3
+    ],
+    "groups": 384,
+    "num_parameters": 19200
+  },
+  "residual_blocks.1.1.pwconv1": {
+    "type": "Linear",
+    "in_features": 384,
+    "out_features": 1536,
+    "num_parameters": 591360
+  },
+  "residual_blocks.1.1.pwconv2": {
+    "type": "Linear",
+    "in_features": 1536,
+    "out_features": 384,
+    "num_parameters": 590208
+  },
+  "residual_blocks.2.0.dwconv": {
+    "type": "Conv2d",
+    "in_channels": 768,
+    "out_channels": 768,
+    "kernel_size": [
+      7,
+      7
+    ],
+    "stride": [
+      1,
+      1
+    ],
+    "padding": [
+      3,
+      3
+    ],
+    "groups": 768,
+    "num_parameters": 38400
+  },
+  "residual_blocks.2.0.pwconv1": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "residual_blocks.2.0.pwconv2": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  },
+  "residual_blocks.2.1.dwconv": {
+    "type": "Conv2d",
+    "in_channels": 768,
+    "out_channels": 768,
+    "kernel_size": [
+      7,
+      7
+    ],
+    "stride": [
+      1,
+      1
+    ],
+    "padding": [
+      3,
+      3
+    ],
+    "groups": 768,
+    "num_parameters": 38400
+  },
+  "residual_blocks.2.1.pwconv1": {
+    "type": "Linear",
+    "in_features": 768,
+    "out_features": 3072,
+    "num_parameters": 2362368
+  },
+  "residual_blocks.2.1.pwconv2": {
+    "type": "Linear",
+    "in_features": 3072,
+    "out_features": 768,
+    "num_parameters": 2360064
+  }
+}
