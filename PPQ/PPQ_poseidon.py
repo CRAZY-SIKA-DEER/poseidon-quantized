@@ -139,15 +139,22 @@ def add_quantization_noise(tensor, step_sizes, channel_axis):
         → noise shape: [1, 1, 192] broadcasted over all batch/seq positions
         → result: [16, 256, 192] with noise scaled by step_sizes per feature
     """
+
+    assert step_sizes.numel() == tensor.shape[channel_axis], f"step_sizes ({step_sizes.numel()}) does not match tensor shape at channel_axis ({tensor.shape[channel_axis]})"
     # Create broadcast shape: put 1s everywhere except channel axis
     shape = [1] * tensor.dim()
     shape[channel_axis] = tensor.size(channel_axis)
+
+    # print(f"[DEBUG1] tensor.shape = {tensor.shape}, step_sizes.shape = {step_sizes.shape}, channel_axis = {channel_axis}")
+    # print(f"[DEBUG2] intended shape for broadcast = {shape}")
+
     
     # Reshape step_sizes to match broadcast shape
     step_sizes_broadcast = step_sizes.view(shape)
     
     # Sample uniform noise in [-0.5, 0.5] LSB
     # This represents ±0.5 quantization error from rounding
+    # This step can be improved later by setting the value of dynamic quantization
     noise = (torch.rand_like(tensor) - 0.5) * step_sizes_broadcast
     
     return tensor + noise
@@ -588,6 +595,115 @@ def find_best_percentile_poseidon(model, dataloader, device, layer_names,
     return best_percentile
 
 
+
+# ========================
+# Adapted: Compute the MDL prior
+# ========================
+def compute_mdl_prior(step_sizes_dict, ranges_dict, gamma=0.001, eps=1e-8):
+    """
+    MDL prior: gamma * sum_k log2(R_k / S_k), over weight and activation step sizes.
+    Encourages larger step sizes (fewer bits) and penalizes over-precision.
+    - step_sizes_dict: {layer_name: (weight_step_sizes, activation_step_sizes)}
+    - ranges_dict: same as from compute_data_ranges_poseidon
+    """
+    # Find a device from any parameter
+    try:
+        some_param = next(p for pair in step_sizes_dict.values() for p in pair if p is not None)
+        device = some_param.device
+    except StopIteration:
+        device = torch.device('cpu')
+
+    prior_loss = torch.zeros((), device=device)
+
+    for name, (weight_step_sizes, activation_step_sizes) in step_sizes_dict.items():
+        rec = ranges_dict.get(name)
+        if rec is None:
+            continue
+        # -- Weights
+        w_ranges = rec['weight_ranges']
+        if w_ranges is not None:
+            w_ranges = w_ranges.to(device)
+            assert w_ranges.numel() == weight_step_sizes.numel(), f"[{name}] weight: {w_ranges.shape} vs step: {weight_step_sizes.shape}"
+            w_term = torch.log2(torch.clamp(w_ranges, min=eps) / torch.clamp(weight_step_sizes, min=eps))
+            prior_loss = prior_loss + gamma * torch.sum(w_term)
+        # -- Activations
+        a_ranges = rec.get('activation_ranges', None)
+        if a_ranges is not None:
+            a_ranges = a_ranges.to(device)
+            assert a_ranges.numel() == activation_step_sizes.numel(), f"[{name}] act: {a_ranges.shape} vs step: {activation_step_sizes.shape}"
+            a_term = torch.log2(torch.clamp(a_ranges, min=eps) / torch.clamp(activation_step_sizes, min=eps))
+            prior_loss = prior_loss + gamma * torch.sum(a_term)
+    return prior_loss
+
+
+
+# ========================
+# Adapted: Compute the mc loss(likelihood)
+# ========================
+
+def compute_mc_loss(model, dataloader, step_sizes_dict, clean_outputs, 
+                    num_mc_samples=10, eta=1e-4, device='cpu'):
+    """
+    Run Monte Carlo estimate of likelihood loss:
+    Loss = mean over MC samples of [mean squared error vs. clean outputs].
+    """
+    if model is not None:
+        model.eval()
+    total_loss = 0.0
+    count = 0
+
+    if callable(dataloader):
+        dataloader = dataloader()
+
+    # Only Linear layers as in adaptation
+    for batch_idx, batch in enumerate(dataloader):
+        x = batch["pixel_values"].to(device)
+        t = batch["time"].to(device)
+        pm = batch["pixel_mask"].to(device)
+        y = batch["labels"].to(device)
+        # For each layer, sample MC quantized outputs and compare to clean
+        batch_loss = 0.0
+        for name, (w_step, a_step) in step_sizes_dict.items():
+            # Get clean outputs for this batch (list of shape per MC sample)
+            reference = clean_outputs[name][batch_idx].to(device)
+            # MC samples: average loss with noise added
+            mc_losses = []
+
+            print(f"[DEBUG] Layer: {name}")
+            print(f"  step_sizes.shape: {a_step.shape}")
+            print(f"  reference.shape: {reference.shape}")
+            print(f"  reference.shape[channel_axis]: {reference.shape[-1]}")
+
+            for s in range(num_mc_samples):
+                # For activations (typically last dim)
+                noisy_ref = add_quantization_noise(reference, a_step, channel_axis=-1)
+                # Likelihood loss: squared error (normalized)
+                mse = torch.mean((noisy_ref - reference) ** 2)
+                mc_losses.append(mse)
+            # Average MC losses for this layer+batch
+            batch_loss += torch.stack(mc_losses).mean()
+        batch_loss = batch_loss / max(1, len(step_sizes_dict))
+        total_loss += batch_loss.item()
+        count += 1
+    return total_loss / max(1, count)
+
+
+def compute_mc_loss_with_prior(model, dataloader, step_sizes_dict, clean_outputs, 
+                               ranges_dict, num_mc_samples=10, eta=1e-4, 
+                               gamma=0.005, device='cpu'):
+    """
+    Monte Carlo likelihood loss + MDL prior.
+    Returns total MAP (regularized) loss, plus likelihood/prior for diagnostics.
+    """
+
+    likelihood_loss = compute_mc_loss(model, dataloader, step_sizes_dict, 
+                                     clean_outputs, num_mc_samples, eta, device)
+    prior_loss = compute_mdl_prior(step_sizes_dict, ranges_dict, gamma)
+    total_loss = likelihood_loss + prior_loss
+    return total_loss, likelihood_loss, prior_loss
+
+
+
 # ============================================================================================
 # Test Functions
 # ============================================================================================
@@ -833,6 +949,137 @@ def test_find_best_percentile():
     return best_P
 
 
+
+
+# ========================
+# Test Functions for computing mdl prior
+# ========================
+def test_compute_mdl_prior():
+    print("\n==== TESTING compute_mdl_prior ====")
+    rng = torch.Generator().manual_seed(0)
+    # Simulate two layers with different shapes
+    w1 = torch.tensor([2.0, 4.0, 8.0])      # weight ranges (ch1, ch2, ch3)
+    a1 = torch.tensor([1.0, 3.0, 5.0])      # activation ranges
+    w1_step = torch.tensor([0.5, 1.0, 2.0], requires_grad=True)
+    a1_step = torch.tensor([0.2, 1.0, 2.0], requires_grad=True)
+    w2 = torch.tensor([4.0, 8.0])
+    a2 = torch.tensor([2.0, 10.0])
+    w2_step = torch.tensor([1.0, 3.0], requires_grad=True)
+    a2_step = torch.tensor([0.5, 1.0], requires_grad=True)
+    # Ranges dict format as in compute_data_ranges_poseidon
+    ranges_dict = {
+        'layer1': {'weight_ranges': w1, 'activation_ranges': a1},
+        'layer2': {'weight_ranges': w2, 'activation_ranges': a2}
+    }
+    step_sizes_dict = {
+        'layer1': (w1_step, a1_step),
+        'layer2': (w2_step, a2_step)
+    }
+    gamma = 0.01
+    prior = compute_mdl_prior(step_sizes_dict, ranges_dict, gamma=gamma)
+    print(f"Prior loss: {prior.item():.6f}")
+    # Do an optimizer step
+    prior.backward()
+    print("Gradient wrt step sizes, layer1-w:", w1_step.grad)
+    print("Gradient wrt step sizes, layer2-a:", a2_step.grad)
+    print("✓ MDL prior runs and matches shape requirements!")
+
+
+
+# ========================
+# Test Functions for computing loss with prior
+# ========================
+def test_mc_loss_with_prior():
+    print("\n==== TEST MC LOSS WITH PRIOR ====")
+    # # Dummy setup for 2 layers, batchsize 1, MC samples 3
+    # device = torch.device('cpu')
+    # batch_size = 2
+    # seq = 5
+    # features = 3
+    # # Fake clean outputs: each layer, list of tensors per batch
+    # clean_outputs = {
+    #     'layer1': [torch.randn(batch_size, seq, features), torch.randn(batch_size, seq, features)],
+    #     'layer2': [torch.randn(batch_size, seq, features), torch.randn(batch_size, seq, features)]
+    # }
+    # # Step sizes dict: two layers
+    # step_sizes_dict = {
+    #     'layer1': (torch.ones(features) * 0.05, torch.ones(features) * 0.05),
+    #     'layer2': (torch.ones(features) * 0.08, torch.ones(features) * 0.08)
+    # }
+    # # Ranges dict: two layers
+    # ranges_dict = {
+    #     'layer1': {'weight_ranges': torch.ones(features) * 1.0, 'activation_ranges': torch.ones(features) * 1.0},
+    #     'layer2': {'weight_ranges': torch.ones(features) * 1.5, 'activation_ranges': torch.ones(features) * 1.5}
+    # }
+    # # Dummy dataloader: just pass batch idx & dummy batch dict
+    # class DummyLoader:
+    #     def __iter__(self):
+    #         for i in range(2):
+    #             yield {
+    #                 'pixel_values': torch.randn(batch_size, seq, features),
+    #                 'time': torch.zeros(batch_size),
+    #                 'pixel_mask': torch.zeros(batch_size, 4).bool(),
+    #                 'labels': torch.randn(batch_size, seq, features)
+    #             }
+    # dataloader = DummyLoader()
+    # # MC loss with prior (simulates MC)
+    # total_loss, likelihood_loss, prior_loss = compute_mc_loss_with_prior(
+    #     None, dataloader, step_sizes_dict, clean_outputs, ranges_dict, num_mc_samples=3, device=device)
+    # print(f"Total loss: {total_loss:.6f}\nLikelihood loss: {likelihood_loss:.6f}\nPrior loss: {prior_loss:.6f}")
+    # print("✓ MC loss with prior computes without error.")
+
+
+    model_path = "models/NS-PwC"
+    data_path = "dataset/NS-PwC"
+    dataset_name = "fluids.incompressible.PiecewiseConstants"
+    # Load model and device
+    model, device = load_poseidon_model(model_path, device="cuda")
+    # Build calibration loader
+    _, _, calib_iter, _ = build_poseidon_loaders(dataset_name, data_path, calib_batchsize=2, calib_steps=2)
+    # Load layer names (or filter to only Linear)
+    layer_data = torch.load('quantize_layers.pt')
+    quantize_layers = [name for name in layer_data['quantize_layers'] if "projection" not in name]
+    test_layers = quantize_layers[:10]  # For speed, try with 10 layers first
+    # Compute ranges
+    ranges_dict = compute_data_ranges_poseidon(model, calib_iter, device, test_layers, percentile_prob=1e-4)
+    # Initialize step sizes as uniform fractions of range
+
+    # Get clean outputs
+    clean_outputs = get_clean_outputs_poseidon(model, calib_iter, device, test_layers)
+
+    compatible_layers = []
+    for name in test_layers:
+        act_shape = ranges_dict[name]['activation_ranges'].shape
+        out_shape = clean_outputs[name][0].shape
+        if act_shape[0] != out_shape[-1]:
+            print(f"[SKIP] {name} -- activation ranges {act_shape[0]} vs output features {out_shape[-1]}")
+            continue
+        compatible_layers.append(name)
+    print(f"Quantizing {len(compatible_layers)} compatible layers.")
+
+
+
+    step_sizes_dict = {name: (ranges_dict[name]['weight_ranges'].clone() * 0.1,
+                              ranges_dict[name]['activation_ranges'].clone() * 0.1)
+                       for name in compatible_layers}
+    
+
+
+    for name in test_layers:
+        act_shape = ranges_dict[name]['activation_ranges'].shape
+        out_shape = clean_outputs[name][0].shape
+        print(f"Layer: {name} | activation_ranges.shape={act_shape} | clean_output.shape={out_shape}")
+        if act_shape[0] != out_shape[-1]:
+            print(f"[ERROR] Feature mismatch for {name}: activation ranges ({act_shape[0]}) vs output features ({out_shape[-1]})")
+
+    # Compute MC loss with prior
+    total_loss, likelihood_loss, prior_loss = compute_mc_loss_with_prior(
+        model, calib_iter, step_sizes_dict, clean_outputs, ranges_dict, num_mc_samples=3, device=device)
+    print(f"\nTotal MC Loss: {total_loss:.6f}\nLikelihood part: {likelihood_loss:.6f}\nPrior part: {prior_loss:.6f}")
+
+
+
+
 if __name__ == "__main__":
     # ... (your existing main code)
     
@@ -850,7 +1097,15 @@ if __name__ == "__main__":
 
     # Test adding noise
     # print("\n\n")
-    test_add_quantization_noise()
+    #test_add_quantization_noise()
 
+    # Test computing mdl prior
+    # print("\n\n")
+    #test_compute_mdl_prior()
+
+
+    # Test computing mdl prior
+    # print("\n\n")
+    test_mc_loss_with_prior()
 
 
