@@ -11,12 +11,21 @@ import torch
 from scOT.problems.base import get_dataset
 from torch.utils.data import DataLoader
 import torch.nn as nn  
-
+import torch.optim as optim
+import json
 
 
 model_path   = "models/NS-PwC"
 data_path    = "dataset/NS-PwC"
 dataset_name = "fluids.incompressible.PiecewiseConstants"
+
+# ==================================================================================================================================
+# ==================================================================================================================================
+# ==================================================================================================================================
+# PPQ Functions
+# ==================================================================================================================================
+# ==================================================================================================================================
+# ==================================================================================================================================
 
 
 def load_poseidon_model(model_path: str, device: str = "cuda"):
@@ -163,81 +172,83 @@ def add_quantization_noise(tensor, step_sizes, channel_axis):
 # ========================
 # Adapted get_clean_output Functions for Poseidon
 # ========================
-
 def get_clean_outputs_poseidon(model, dataloader, device, layer_names):
     """
-    Run the clean (full-precision) model and store outputs for each Linear layer.
-    
-    Args:
-        model: Poseidon/ScOT model
-        dataloader: DataLoader or callable that yields dictionary batches
-        device: torch device
-        layer_names: List of layer names to track (from layer inspection)
-    
+    Run the clean model and store both input (pre-op) and output (post-op) activations
+    for each target Linear layer.
+
     Returns:
-        clean_outputs: Dictionary mapping layer names to list of output tensors
-                      Each list contains outputs from each batch
+        clean_inputs:  {layer_name: [X_batch_0, X_batch_1, ...], ...}   # pre-op, last dim = in_features
+        clean_outputs: {layer_name: [Y_batch_0, Y_batch_1, ...], ...}   # post-op, last dim = out_features
     """
     model.eval()
-    
-    # Initialize storage for each layer
+
+    clean_inputs  = {name: [] for name in layer_names}
     clean_outputs = {name: [] for name in layer_names}
-    
-    # Get iterator if dataloader is callable
+
+    # allow callable iterator (e.g., calib_iter)
     if callable(dataloader):
         dataloader = dataloader()
-    
-    with torch.no_grad():
+
+    # (optional) map name -> module for quick checks
+    name2mod = dict(model.named_modules())
+
+    with torch.inference_mode():
+        any_batch = False
         for batch_idx, batch in enumerate(dataloader):
-            # Extract all required fields from batch
-            x = batch["pixel_values"].to(device)
-            t = batch["time"].to(device)
-            pm = batch["pixel_mask"].to(device)
-            y = batch["labels"].to(device)  # ADD THIS!
-            
-            # Storage for this batch
-            layer_outputs = {}
-            
-            # Hook function factory
+            any_batch = True
+            x  = batch["pixel_values"].to(device)
+            t  = batch.get("time", None)
+            pm = batch.get("pixel_mask", None)
+            y  = batch.get("labels", None)
+
+            layer_io = {}  # layer_name -> (X_pre, Y_post)
+
             def get_hook(name):
-                def hook(module, input, output):
-                    # Store output on CPU to save GPU memory
-                    layer_outputs[name] = output.detach().cpu()
+                def hook(mod, inp, out):
+                    X_pre = inp[0]
+                    Y_post = out
+                    # (optional) sanity check: last dim of X equals in_features
+                    if hasattr(mod, "in_features"):
+                        if X_pre.shape[-1] != mod.in_features:
+                            print(f"[WARN] {name}: X_pre last dim {X_pre.shape[-1]} != in_features {mod.in_features}")
+                    layer_io[name] = (X_pre.detach().cpu(), Y_post.detach().cpu())
                 return hook
-            
-            # Register hooks on target layers
+
             handles = []
-            for name, module in model.named_modules():
-                if name in layer_names and isinstance(module, torch.nn.Linear):
-                    handles.append(module.register_forward_hook(get_hook(name)))
-            
-            # Trigger forward pass with ALL required inputs
+            for name, mod in model.named_modules():
+                if name in layer_names and isinstance(mod, torch.nn.Linear):
+                    handles.append(mod.register_forward_hook(get_hook(name)))
+
             _ = model(
                 pixel_values=x,
-                time=t,
-                pixel_mask=pm,
-                labels=y,  # ADD THIS!
+                time=(t.to(device) if t is not None else None),
+                pixel_mask=(pm.to(device) if pm is not None else None),
+                labels=(y.to(device) if y is not None else None),
             )
-            
-            # Store outputs for each layer
+
             for name in layer_names:
-                if name in layer_outputs:
-                    clean_outputs[name].append(layer_outputs[name])
+                if name in layer_io:
+                    X_pre, Y_post = layer_io[name]
+                    clean_inputs[name].append(X_pre)
+                    clean_outputs[name].append(Y_post)
                 else:
-                    # If hook didn't fire, append None
+                    clean_inputs[name].append(None)
                     clean_outputs[name].append(None)
-            
-            # Clean up hooks
+
             for h in handles:
                 h.remove()
-    
-    print(f"\n✓ Collected clean outputs for {len(layer_names)} layers from {batch_idx+1} batches")
-    
-    # Check which layers produced outputs
-    active_layers = sum(1 for outputs in clean_outputs.values() if outputs[0] is not None)
-    print(f"✓ {active_layers}/{len(layer_names)} layers produced outputs")
-    
-    return clean_outputs
+
+    if any_batch:
+        print(f"\n✓ Collected clean inputs/outputs for {len(layer_names)} layers from {batch_idx+1} batches")
+        active_layers = sum(1 for outs in clean_outputs.values() if outs and outs[0] is not None)
+        print(f"✓ {active_layers}/{len(layer_names)} layers produced outputs")
+    else:
+        print("\n[WARN] get_clean_outputs_poseidon: dataloader yielded no batches.")
+
+    return clean_inputs, clean_outputs
+
+
 
 
 
@@ -641,74 +652,374 @@ def compute_mdl_prior(step_sizes_dict, ranges_dict, gamma=0.001, eps=1e-8):
 # Adapted: Compute the mc loss(likelihood)
 # ========================
 
-def compute_mc_loss(model, dataloader, step_sizes_dict, clean_outputs, 
+def compute_mc_loss(model, dataloader, step_sizes_dict, clean_inputs, clean_outputs,
                     num_mc_samples=10, eta=1e-4, device='cpu'):
-    """
-    Run Monte Carlo estimate of likelihood loss:
-    Loss = mean over MC samples of [mean squared error vs. clean outputs].
-    """
     if model is not None:
         model.eval()
-    total_loss = 0.0
-    count = 0
 
-    if callable(dataloader):
-        dataloader = dataloader()
+    # Build a stable layer list that exists in both dicts
+    target_layers = [name for name in step_sizes_dict.keys()
+                     if name in clean_inputs and name in clean_outputs]
 
-    # Only Linear layers as in adaptation
-    for batch_idx, batch in enumerate(dataloader):
-        x = batch["pixel_values"].to(device)
-        t = batch["time"].to(device)
-        pm = batch["pixel_mask"].to(device)
-        y = batch["labels"].to(device)
-        # For each layer, sample MC quantized outputs and compare to clean
-        batch_loss = 0.0
-        for name, (w_step, a_step) in step_sizes_dict.items():
-            # Get clean outputs for this batch (list of shape per MC sample)
-            reference = clean_outputs[name][batch_idx].to(device)
-            # MC samples: average loss with noise added
+    # How many batches were recorded? (take the min across layers to be safe)
+    # Assumes all layers used the same calibration iterator length.
+    if not target_layers:
+        raise ValueError("No overlapping layers between step_sizes_dict and clean IO caches.")
+
+    num_batches = min(len(clean_inputs[name]) for name in target_layers)
+
+    name2module = dict(model.named_modules())
+
+    total_loss = None  # tensor accumulator
+
+    for batch_idx in range(num_batches):
+        batch_loss = None
+        layer_contrib = 0
+
+        for name in target_layers:
+            module = name2module.get(name)
+            if module is None or not isinstance(module, torch.nn.Linear):
+                continue
+
+            Xb = clean_inputs[name][batch_idx]
+            Yb = clean_outputs[name][batch_idx]
+            if (Xb is None) or (Yb is None):
+                continue  # layer didn't fire for this batch
+
+            X_clean = Xb.to(device)
+            Y_clean = Yb.to(device)
+            W_clean = module.weight.to(device)
+
+            w_step, a_step = step_sizes_dict[name]
+            a_step = a_step.to(device)
+            w_step = w_step.to(device)
+
+            # Optional: shape checks
+            assert X_clean.shape[-1] == W_clean.shape[1], \
+                f"{name}: X in_features {X_clean.shape[-1]} vs W in_features {W_clean.shape[1]}"
+            assert w_step.numel() == W_clean.shape[0], \
+                f"{name}: w_step {w_step.numel()} vs out_features {W_clean.shape[0]}"
+            assert a_step.numel() == X_clean.shape[-1], \
+                f"{name}: a_step {a_step.numel()} vs in_features {X_clean.shape[-1]}"
+
             mc_losses = []
+            for _ in range(num_mc_samples):
+                X_noisy = add_quantization_noise(X_clean, a_step, channel_axis=-1)
+                W_noisy = add_quantization_noise(W_clean, w_step, channel_axis=0)
+                Y_noisy = torch.nn.functional.linear(X_noisy, W_noisy, module.bias)
+                # elementwise Gaussian (normalized version; use .sum()/(2*eta) if you want exact NLL)
+                loss_elem = torch.mean((Y_noisy - Y_clean) ** 2) / (2 * eta)
+                mc_losses.append(loss_elem)
 
-            print(f"[DEBUG] Layer: {name}")
-            print(f"  step_sizes.shape: {a_step.shape}")
-            print(f"  reference.shape: {reference.shape}")
-            print(f"  reference.shape[channel_axis]: {reference.shape[-1]}")
+            layer_loss = torch.stack(mc_losses).mean()  # avg over MC
+            batch_loss = layer_loss if batch_loss is None else (batch_loss + layer_loss)
+            layer_contrib += 1
 
-            for s in range(num_mc_samples):
-                # For activations (typically last dim)
-                noisy_ref = add_quantization_noise(reference, a_step, channel_axis=-1)
-                # Likelihood loss: squared error (normalized)
-                mse = torch.mean((noisy_ref - reference) ** 2)
-                mc_losses.append(mse)
-            # Average MC losses for this layer+batch
-            batch_loss += torch.stack(mc_losses).mean()
-        batch_loss = batch_loss / max(1, len(step_sizes_dict))
-        total_loss += batch_loss.item()
-        count += 1
-    return total_loss / max(1, count)
+        if layer_contrib > 0:
+            batch_loss = batch_loss / layer_contrib     # avg over layers
+            total_loss = batch_loss if total_loss is None else (total_loss + batch_loss)
+
+    # avg over batches
+    num_effective_batches = num_batches if total_loss is not None else 1
+    return total_loss / num_effective_batches
 
 
-def compute_mc_loss_with_prior(model, dataloader, step_sizes_dict, clean_outputs, 
-                               ranges_dict, num_mc_samples=10, eta=1e-4, 
-                               gamma=0.005, device='cpu'):
+
+
+
+def compute_mc_loss_with_prior(model,
+                               dataloader,              # kept for signature compatibility (not used if your compute_mc_loss ignores it)
+                               step_sizes_dict,
+                               clean_inputs,
+                               clean_outputs,
+                               ranges_dict,
+                               num_mc_samples=10,
+                               eta=1e-4,
+                               gamma=0.005,
+                               device='cpu'):
     """
-    Monte Carlo likelihood loss + MDL prior.
-    Returns total MAP (regularized) loss, plus likelihood/prior for diagnostics.
+    Monte Carlo likelihood loss (PPQ) + MDL prior.
+    Returns: total_loss, likelihood_loss, prior_loss   (all tensors with grad)
     """
+    # Likelihood (uses cached clean X/Y; no fresh dataloader pass required)
+    likelihood_loss = compute_mc_loss(model, dataloader, step_sizes_dict,
+                                      clean_inputs, clean_outputs,
+                                      num_mc_samples=num_mc_samples,
+                                      eta=eta, device=device)
 
-    likelihood_loss = compute_mc_loss(model, dataloader, step_sizes_dict, 
-                                     clean_outputs, num_mc_samples, eta, device)
-    prior_loss = compute_mdl_prior(step_sizes_dict, ranges_dict, gamma)
+    # MDL prior on step sizes
+    prior_loss = compute_mdl_prior(step_sizes_dict, ranges_dict, gamma=gamma)
+
     total_loss = likelihood_loss + prior_loss
     return total_loss, likelihood_loss, prior_loss
 
+# ========================
+# Adapted: Optimization over step size/ scaler
+# ========================
+
+def optimize_step_sizes(
+    model,
+    dataloader,                         # use calib_iter (callable) or a DataLoader
+    ranges_dict=None,
+    num_epochs=50,                       
+    num_mc_samples=10,                   
+    lr=1e-2,
+    eta=1e-4,
+    gamma=0.001,
+    device="cuda",
+    percentile_prob=1e-4,
+    layer_names=None,                   # optional: restrict to a precomputed Linear list
+    init_scale=0.1,                     # initialize step sizes as fraction of range
+    log_every=10
+):
+    """
+    Optimize per-channel step sizes (weights & activations) via PPQ Monte Carlo + MDL prior,
+    **consistent** with get_clean_outputs_poseidon / compute_mc_loss / compute_mc_loss_with_prior.
+
+    - Freezes a copy of the calibration batches (no shuffling), then uses that SAME set:
+        1) to cache clean inputs/outputs
+        2) to compute ranges (if not provided)
+        3) for every MC loss evaluation across epochs
+    """
+
+    # ---- 0) Setup
+    device = torch.device(device if torch.cuda.is_available() else "cpu")
+    model = model.to(device).eval()
+
+    # ---- 1) Freeze calibration batches to preserve alignment
+    if callable(dataloader):
+        frozen_batches = list(dataloader())       # materialize once
+        def frozen_iter():                        # re-iterable
+            for b in frozen_batches:
+                yield b
+        cal_iter = frozen_iter
+    else:
+        # If a plain DataLoader is given, materialize it once as well
+        frozen_batches = list(iter(dataloader))
+        def frozen_iter():
+            for b in frozen_batches:
+                yield b
+        cal_iter = frozen_iter
+
+    # ---- 2) Candidate Linear layers
+    name2mod = dict(model.named_modules())
+    if layer_names is None:
+        cand_layers = [n for n,m in name2mod.items() if isinstance(m, nn.Linear)]
+    else:
+        cand_layers = [n for n in layer_names if isinstance(name2mod.get(n, None), nn.Linear)]
+
+    print(f"Candidate Linear layers: {len(cand_layers)}")
+
+    # ---- 3) Compute ranges (or use provided)
+    if ranges_dict is None:
+        print(f"Computing ranges with percentile_prob={percentile_prob}...")
+        ranges_dict = compute_data_ranges_poseidon(
+            model=model,
+            dataloader=cal_iter,      # SAME frozen iterator
+            device=device,
+            layer_names=cand_layers,
+            percentile_prob=percentile_prob
+        )
+    else:
+        print("Using provided ranges_dict...")
+
+    # ---- 4) Cache clean inputs/outputs (pre-op X, post-op Y) on SAME batches
+    print("Caching clean inputs/outputs...")
+    clean_inputs, clean_outputs = get_clean_outputs_poseidon(
+        model=model,
+        dataloader=cal_iter,          # SAME frozen iterator
+        device=device,
+        layer_names=cand_layers
+    )
+
+    # ---- 5) Build a stable target layer list (intersection & channel-match)
+    target_layers = []
+    for name in cand_layers:
+        if (name in ranges_dict) and (name in clean_inputs) and (name in clean_outputs):
+            # require batch 0 present & channel match
+            x0 = clean_inputs[name][0]
+            y0 = clean_outputs[name][0]
+            if (x0 is None) or (y0 is None): 
+                continue
+            a_ranges = ranges_dict[name].get("activation_ranges", None)
+            w_ranges = ranges_dict[name].get("weight_ranges", None)
+            if a_ranges is None or w_ranges is None:
+                continue
+            if a_ranges.numel() == x0.shape[-1] and w_ranges.numel() == y0.shape[-1]:
+                target_layers.append(name)
+
+    print(f"Optimizing {len(target_layers)} compatible layers (out of {len(cand_layers)} candidates).")
+
+    if not target_layers:
+        raise ValueError("No compatible layers with aligned channels found.")
+
+    # ---- 6) Initialize per-channel step sizes as parameters
+    step_sizes_dict = {}
+    params = []
+    for name in target_layers:
+        mod = name2mod[name]
+        in_ch  = mod.in_features
+        out_ch = mod.out_features
+
+        w_ranges = ranges_dict[name]["weight_ranges"].to(device)
+        a_ranges = ranges_dict[name]["activation_ranges"].to(device)
+
+        # init from ranges (scaled)
+        w_init = torch.clamp(w_ranges * init_scale, min=1e-5)
+        a_init = torch.clamp(a_ranges * init_scale, min=1e-5)
+
+        w_step = nn.Parameter(w_init.clone().detach())  # [out_features]
+        a_step = nn.Parameter(a_init.clone().detach())  # [in_features]
+
+        step_sizes_dict[name] = (w_step, a_step)
+        params += [w_step, a_step]
+
+    optimizer = optim.Adam(params, lr=lr)
+
+    # ---- 7) Training loop
+    print(f"\nStarting optimization: epochs={num_epochs}, mc_samples={num_mc_samples}, "
+          f"eta={eta}, gamma={gamma}, lr={lr}")
+
+    for epoch in range(1, num_epochs + 1):
+        optimizer.zero_grad()
+
+        total_loss, likelihood_loss, prior_loss = compute_mc_loss_with_prior(
+            model=model,
+            dataloader=cal_iter,              # SAME frozen iterator
+            step_sizes_dict=step_sizes_dict,
+            clean_inputs=clean_inputs,
+            clean_outputs=clean_outputs,
+            ranges_dict=ranges_dict,
+            num_mc_samples=num_mc_samples,
+            eta=eta,
+            gamma=gamma,
+            device=device
+        )
+
+        total_loss.backward()
+        optimizer.step()
+
+        # Keep step sizes positive
+        with torch.no_grad():
+            for w_step, a_step in step_sizes_dict.values():
+                w_step.clamp_(min=1e-6)
+                a_step.clamp_(min=1e-6)
+
+        if (epoch % log_every) == 0 or epoch == 1 or epoch == num_epochs:
+            # Monitor average implied bits
+            with torch.no_grad():
+                sum_bits, sum_ch = 0.0, 0
+                for name in target_layers:
+                    w_ranges = ranges_dict[name]["weight_ranges"].to(device)
+                    a_ranges = ranges_dict[name]["activation_ranges"].to(device)
+                    w_step, a_step = step_sizes_dict[name]
+                    w_bits = torch.log2((w_ranges + 1e-8) / (w_step + 1e-8))
+                    a_bits = torch.log2((a_ranges + 1e-8) / (a_step + 1e-8))
+                    sum_bits += w_bits.sum().item() + a_bits.sum().item()
+                    sum_ch   += w_bits.numel() + a_bits.numel()
+                avg_bits = (sum_bits / max(1, sum_ch)) if sum_ch else float("nan")
+
+            print(f"[Epoch {epoch:3d}] "
+                  f"Total={total_loss.item():.6f} | "
+                  f"Like={likelihood_loss.item():.6f} | "
+                  f"Prior={prior_loss.item():.6f} | "
+                  f"AvgBits={avg_bits:.2f}")
+
+    return step_sizes_dict
 
 
-# ============================================================================================
+
+def main():
+    # --- Paths / config
+    model_path   = "models/NS-PwC"
+    data_path    = "dataset/NS-PwC"
+    dataset_name = "fluids.incompressible.PiecewiseConstants"
+
+    # PPQ hyperparams
+    num_epochs      = 100      # originally 10
+    num_mc_samples  = 2      # origianlly 4
+    lr              = 1e-2
+    eta             = 1e-4
+    gamma           = 0.001
+    percentile_prob = 1e-4
+    init_scale      = 0.1
+    device          = "cuda"
+
+    # --- 1) Load model
+    model, device = load_poseidon_model(model_path, device=device)
+
+    # --- 2) Build a small, frozen calibration iterator (deterministic)
+    # NOTE: we use calib_iter (callable) so optimize_step_sizes can reuse the EXACT same batches
+    _, _, calib_iter, _ = build_poseidon_loaders(
+        dataset_name=dataset_name,
+        data_path=data_path,
+        calib_batchsize=1,
+        calib_steps=1,          # small set is fine for PPQ optimization
+        val_batchsize=1,        # 16
+        val_steps=1             #50
+    )
+
+    # --- 3) Candidate Linear layer names (from your inspection file)
+    layer_data = torch.load('quantize_layers.pt')
+    # keep only layers that actually exist and are Linear in this model
+    name2mod = dict(model.named_modules())
+    cand_layers = [n for n in layer_data['quantize_layers'] if isinstance(name2mod.get(n, None), nn.Linear)]
+    print(f"Candidate Linear layers (from file & present in model): {len(cand_layers)}")
+
+    # --- 4) Run PPQ optimization (this will: freeze batches → compute ranges → cache clean IO → optimize)
+    step_sizes_dict = optimize_step_sizes(
+        model=model,
+        dataloader=calib_iter,           # SAME frozen batches used throughout
+        ranges_dict=None,                # let it compute ranges from calib_iter
+        num_epochs=num_epochs,
+        num_mc_samples=num_mc_samples,
+        lr=lr,
+        eta=eta,
+        gamma=gamma,
+        device=device,
+        percentile_prob=percentile_prob,
+        layer_names=cand_layers,
+        init_scale=init_scale,
+        log_every=1
+    )
+
+    # --- 5) Save learned step sizes for later use
+    save_obj = {
+        "step_sizes": {k: (v[0].detach().cpu(), v[1].detach().cpu()) for k, v in step_sizes_dict.items()},
+        "meta": {
+            "model_path": model_path,
+            "dataset_name": dataset_name,
+            "eta": eta,
+            "gamma": gamma,
+            "percentile_prob": percentile_prob,
+            "num_epochs": num_epochs,
+            "num_mc_samples": num_mc_samples,
+            "init_scale": init_scale,
+        }
+    }
+    os.makedirs("ppq_artifacts", exist_ok=True)
+    torch.save(save_obj, "ppq_artifacts/ppq_step_sizes.pt")
+    print("✓ Saved learned step sizes → ppq_artifacts/ppq_step_sizes.pt")
+
+
+    # Convert tensors in save_obj to lists for JSON encoding
+    json_ready = {
+        'step_sizes': {k: (v[0].tolist(), v[1].tolist()) for k, v in save_obj['step_sizes'].items()},
+        'meta': save_obj['meta']
+    }
+    with open("ppq_artifacts/ppq_step_sizes.json", "w") as f_json:
+        json.dump(json_ready, f_json, indent=2)
+    print("✓ Also saved learned step sizes → ppq_artifacts/ppq_step_sizes.json")
+
+
+
+# ==================================================================================================================================
+# ==================================================================================================================================
+# ==================================================================================================================================
 # Test Functions
-# ============================================================================================
-
-
+# ==================================================================================================================================
+# ==================================================================================================================================
+# ==================================================================================================================================
 
 # ========================
 # Test Function for Add Quantization Noise
@@ -1029,6 +1340,10 @@ def test_mc_loss_with_prior():
     # print("✓ MC loss with prior computes without error.")
 
 
+
+
+    '''
+    # this version of test failed casue the channel is not algined, mixing the input and output
     model_path = "models/NS-PwC"
     data_path = "dataset/NS-PwC"
     dataset_name = "fluids.incompressible.PiecewiseConstants"
@@ -1039,13 +1354,18 @@ def test_mc_loss_with_prior():
     # Load layer names (or filter to only Linear)
     layer_data = torch.load('quantize_layers.pt')
     quantize_layers = [name for name in layer_data['quantize_layers'] if "projection" not in name]
-    test_layers = quantize_layers[:10]  # For speed, try with 10 layers first
+    test_layers = quantize_layers[:823]  # For speed, try with 10 layers first
+
+
     # Compute ranges
     ranges_dict = compute_data_ranges_poseidon(model, calib_iter, device, test_layers, percentile_prob=1e-4)
     # Initialize step sizes as uniform fractions of range
 
+    
+
     # Get clean outputs
     clean_outputs = get_clean_outputs_poseidon(model, calib_iter, device, test_layers)
+    test_layers = [name for name in test_layers if name in ranges_dict and name in clean_outputs]
 
     compatible_layers = []
     for name in test_layers:
@@ -1068,22 +1388,510 @@ def test_mc_loss_with_prior():
     for name in test_layers:
         act_shape = ranges_dict[name]['activation_ranges'].shape
         out_shape = clean_outputs[name][0].shape
-        print(f"Layer: {name} | activation_ranges.shape={act_shape} | clean_output.shape={out_shape}")
-        if act_shape[0] != out_shape[-1]:
-            print(f"[ERROR] Feature mismatch for {name}: activation ranges ({act_shape[0]}) vs output features ({out_shape[-1]})")
+        #print(f"Layer: {name} | activation_ranges.shape={act_shape} | clean_output.shape={out_shape}")
+        #if act_shape[0] != out_shape[-1]:
+            #print(f"[ERROR] Feature mismatch for {name}: activation ranges ({act_shape[0]}) vs output features ({out_shape[-1]})")
 
     # Compute MC loss with prior
     total_loss, likelihood_loss, prior_loss = compute_mc_loss_with_prior(
         model, calib_iter, step_sizes_dict, clean_outputs, ranges_dict, num_mc_samples=3, device=device)
     print(f"\nTotal MC Loss: {total_loss:.6f}\nLikelihood part: {likelihood_loss:.6f}\nPrior part: {prior_loss:.6f}")
+    '''
+    # ===== PPQ verification: load -> ranges -> clean IO -> alignment checks -> MC loss (+prior) =====
+    # -------------------------
+    # Config
+    # -------------------------
+    MODEL_PATH   = "models/NS-PwC"
+    DATA_PATH    = "dataset/NS-PwC"
+    DATASET_NAME = "fluids.incompressible.PiecewiseConstants"
+    PERCENTILE   = 1e-4
+    CALIB_BS     = 2
+    CALIB_STEPS  = 2
+    NUM_MC       = 3
+    DEVICE_STR   = "cuda"
 
+    # -------------------------
+    # 1) Load model & calib iterator
+    # -------------------------
+    model, device = load_poseidon_model(MODEL_PATH, device=DEVICE_STR)
+    _, _, calib_iter, _ = build_poseidon_loaders(
+        dataset_name=DATASET_NAME, data_path=DATA_PATH,
+        calib_batchsize=CALIB_BS, calib_steps=CALIB_STEPS,
+        val_batchsize=16, val_steps=50
+    )
+
+    # -------------------------
+    # 2) Pick target Linear layers
+    # -------------------------
+    layer_data = torch.load('quantize_layers.pt')
+    # optional filter to avoid odd utility layers
+    quantize_layers = [n for n in layer_data['quantize_layers'] if "projection" not in n]
+
+    # Keep only real Linear modules that exist in the model
+    name2mod = dict(model.named_modules())
+    target_layers = [n for n in quantize_layers if (n in name2mod and isinstance(name2mod[n], nn.Linear))]
+    print(f"Candidate Linear layers: {len(target_layers)}")
+
+    # -------------------------
+    # 3) Compute ranges (weights + activations for pre-op inputs)
+    # -------------------------
+    ranges_dict = compute_data_ranges_poseidon(
+        model, calib_iter, device, target_layers, percentile_prob=PERCENTILE
+    )
+
+    # -------------------------
+    # 4) Capture clean inputs & outputs (same calibration iterator length)
+    # -------------------------
+    clean_inputs, clean_outputs = get_clean_outputs_poseidon(
+        model, calib_iter, device, target_layers
+    )
+
+    # -------------------------
+    # 5) Alignment/shape checks and compatible layer set
+    #    We require:
+    #      - activation_ranges.size == X_clean.last_dim (in_features)
+    #      - weight_ranges.size     == W.out_features   == Y_clean.last_dim
+    # -------------------------
+    compatible_layers, skipped = [], []
+    for name in target_layers:
+        if name not in ranges_dict: 
+            skipped.append((name, "no ranges")); continue
+        if not clean_inputs[name] or clean_inputs[name][0] is None:
+            skipped.append((name, "no clean X")); continue
+        if not clean_outputs[name] or clean_outputs[name][0] is None:
+            skipped.append((name, "no clean Y")); continue
+
+        mod = name2mod[name]
+        X0  = clean_inputs[name][0]      # [B, ..., in_features]
+        Y0  = clean_outputs[name][0]     # [B, ..., out_features]
+        ar  = ranges_dict[name]['activation_ranges']  # [in_features]
+        wr  = ranges_dict[name]['weight_ranges']      # [out_features]
+
+        in_feat  = X0.shape[-1]
+        out_feat = Y0.shape[-1]
+        w_out    = mod.weight.size(0)
+
+        ok = True
+        if ar.numel() != in_feat:
+            skipped.append((name, f"act_ranges {ar.numel()} != in_features {in_feat}")); ok = False
+        if wr.numel() != w_out:
+            skipped.append((name, f"weight_ranges {wr.numel()} != weight_out {w_out}")); ok = False
+        if wr.numel() != out_feat:
+            skipped.append((name, f"weight_ranges {wr.numel()} != Y_out {out_feat}")); ok = False
+
+        if ok:
+            compatible_layers.append(name)
+
+    # Debug print: any mismatches
+    if skipped:
+        print("\n[DEBUG] Skipped layers due to shape/channel mismatch:")
+        for n, why in skipped[:30]:
+            print(f"  [SKIP] {n} -- {why}")
+        if len(skipped) > 30:
+            print(f"  ... and {len(skipped)-30} more")
+
+    print(f"\nQuantizing {len(compatible_layers)} compatible layers (out of {len(target_layers)} candidates).")
+
+    # -------------------------
+    # 6) Build initial step sizes (0.1 * ranges as a simple start)
+    # -------------------------
+    step_sizes_dict = {
+        name: (
+            ranges_dict[name]['weight_ranges'].clone().to(device) * 0.1,      # per-out-channel step for W
+            ranges_dict[name]['activation_ranges'].clone().to(device) * 0.1   # per-in-channel step for X
+        )
+        for name in compatible_layers
+    }
+
+    if compatible_layers:
+        ln = compatible_layers[0]
+        print(f"\n[CHECK] {ln}")
+        print("  X_clean[0].shape:", clean_inputs[ln][0].shape)
+        print("  Y_clean[0].shape:", clean_outputs[ln][0].shape)
+        print("  act_ranges.shape:", ranges_dict[ln]['activation_ranges'].shape)
+        print("  wgt_ranges.shape:", ranges_dict[ln]['weight_ranges'].shape)
+
+
+    # -------------------------
+    # 7) Compute MC loss + MDL prior (no extra dataloader pass used)
+    # -------------------------
+    total_loss, likelihood_loss, prior_loss = compute_mc_loss_with_prior(
+        model=model,
+        dataloader=None,                  # not used by compute_mc_loss (we use cached IO)
+        step_sizes_dict=step_sizes_dict,
+        clean_inputs=clean_inputs,
+        clean_outputs=clean_outputs,
+        ranges_dict=ranges_dict,
+        num_mc_samples=NUM_MC,
+        eta=1e-4,
+        gamma=0.005,
+        device=device
+    )
+
+    print("\n===== PPQ Verification (Poseidon) =====")
+    print(f"Compatible layers: {len(compatible_layers)}")
+    print(f"Likelihood loss:   {float(likelihood_loss):.6e}")
+    print(f"MDL prior loss:    {float(prior_loss):.6e}")
+    print(f"TOTAL (MAP) loss:  {float(total_loss):.6e}")
+    print("=======================================\n")
+
+
+    
+# ========================
+# Test Functions for noise/activation channel aligned
+# ========================
+@torch.no_grad()
+def debug_noise_alignment_single_layer(
+    model,
+    layer_name: str,
+    step_sizes_dict,
+    clean_inputs,
+    clean_outputs,
+    device="cuda",
+    mc_seed=0,
+):
+    """
+    Show that:
+      - X_noisy - X_clean broadcasts along last dim (in_features) for activations
+      - W_noisy - W_clean broadcasts along dim 0 (out_features) for weights
+      - Noise scale matches the step sizes (strong correlation)
+    """
+    # Find the layer module and step sizes
+    mod = dict(model.named_modules()).get(layer_name, None)
+    assert isinstance(mod, torch.nn.Linear), f"{layer_name} is not a Linear"
+    w_step, a_step = step_sizes_dict[layer_name]
+    w_step = w_step.to(device)
+    a_step = a_step.to(device)
+
+    # Use batch 0 for display (change if you like)
+    Xb = clean_inputs[layer_name][0]
+    Yb = clean_outputs[layer_name][0]
+    assert Xb is not None and Yb is not None, "No cached clean IO for this layer/batch"
+
+    X_clean = Xb.to(device)                 # shape [..., in_features]
+    Y_clean = Yb.to(device)                 # shape [..., out_features]
+    W_clean = mod.weight.to(device)         # shape [out_features, in_features]
+
+    print(f"\n[NOISE-DEBUG] {layer_name}")
+    print(f"  X_clean.shape={tuple(X_clean.shape)}  (last dim = in_features={mod.in_features})")
+    print(f"  Y_clean.shape={tuple(Y_clean.shape)}  (last dim = out_features={mod.out_features})")
+    print(f"  a_step.shape={tuple(a_step.shape)}    (should be in_features)")
+    print(f"  w_step.shape={tuple(w_step.shape)}    (should be out_features)")
+
+    # One MC draw with fixed seed for reproducibility
+    g = torch.Generator(device=device).manual_seed(mc_seed)
+    # override rand_like inside add_quantization_noise by generating our own noise:
+    # but easier: temporarily monkeypatch torch.rand_like via a context? Instead, we just call once.
+
+    X_noisy = add_quantization_noise(X_clean, a_step, channel_axis=-1)
+    W_noisy = add_quantization_noise(W_clean, w_step, channel_axis=0)
+    Y_noisy = torch.nn.functional.linear(X_noisy, W_noisy, mod.bias)
+
+    # Activation noise stats per input channel (collapse all non-channel dims)
+    X_noise = (X_noisy - X_clean).detach()
+    # reshape to [N_all, in_features]
+    X_view = X_noise.reshape(-1, X_noise.shape[-1])
+    x_abs_max = X_view.abs().max(dim=0).values
+    x_std = X_view.std(dim=0, unbiased=False)
+
+    # Weight noise stats per output channel (collapse input dim)
+    W_noise = (W_noisy - W_clean).detach()  # [out_features, in_features]
+    w_abs_max = W_noise.abs().amax(dim=1)   # max across input dim
+    w_std = W_noise.std(dim=1, unbiased=False)
+
+    # Quick sanity: expected max ≈ 0.5 * step; std ≈ step / sqrt(12)
+    exp_x_max = 0.5 * a_step
+    exp_x_std = a_step / (12.0 ** 0.5)
+    exp_w_max = 0.5 * w_step
+    exp_w_std = w_step / (12.0 ** 0.5)
+
+    # Correlation (how well per-channel noise scale tracks per-channel step)
+    def corr(a, b):
+        a = a.float(); b = b.float()
+        a = (a - a.mean()) / (a.std() + 1e-12)
+        b = (b - b.mean()) / (b.std() + 1e-12)
+        return (a * b).mean().item()
+
+    print("\n  — Activation noise (per in_channel) —")
+    print(f"    corr(x_abs_max, 0.5*a_step): {corr(x_abs_max, exp_x_max):.3f}")
+    print(f"    corr(x_std,     a_step/√12): {corr(x_std,     exp_x_std):.3f}")
+    print(f"    x_abs_max median: {x_abs_max.median().item():.4e} | expected median: {exp_x_max.median().item():.4e}")
+    print(f"    x_std     median: {x_std.median().item():.4e}     | expected median: {exp_x_std.median().item():.4e}")
+
+    print("\n  — Weight noise (per out_channel) —")
+    print(f"    corr(w_abs_max, 0.5*w_step): {corr(w_abs_max, exp_w_max):.3f}")
+    print(f"    corr(w_std,     w_step/√12): {corr(w_std,     exp_w_std):.3f}")
+    print(f"    w_abs_max median: {w_abs_max.median().item():.4e} | expected median: {exp_w_max.median().item():.4e}")
+    print(f"    w_std     median: {w_std.median().item():.4e}     | expected median: {exp_w_std.median().item():.4e}")
+
+    # Show effect on output once
+    y_diff = (Y_noisy - Y_clean).abs()
+    print(f"\n  — Output delta —")
+    print(f"    |Y_noisy - Y_clean| max: {y_diff.max().item():.4e}")
+    print(f"    MSE(Y_noisy, Y_clean): {torch.mean((Y_noisy - Y_clean)**2).item():.6e}")
+
+    print("\n  ✓ Noise aligns with channels and scales by step sizes.")
+
+# ========================
+# Test Functions for noise/activation channel added
+# ========================
+
+def debug_noise_adding_values(
+    model,
+    clean_inputs, clean_outputs,
+    step_sizes_dict, ranges_dict,
+    layer_name: str,
+    batch_idx: int = 0,
+    seed: int = 123,
+    k: int = 8,          # how many elements to show
+    device: str = "cuda"
+):
+    """
+    Print elementwise values for a single layer to verify:
+      noisy = clean + noise
+    for both weights (one out-channel) and activations (one spatial slice).
+    """
+    import torch
+    torch.manual_seed(seed)
+
+    name2module = dict(model.named_modules())
+    mod = name2module.get(layer_name, None)
+    assert isinstance(mod, torch.nn.Linear), f"{layer_name} is not a Linear."
+
+    # --- Fetch clean X/Y for the chosen batch
+    X_clean = clean_inputs[layer_name][batch_idx]
+    Y_clean = clean_outputs[layer_name][batch_idx]
+    assert X_clean is not None and Y_clean is not None, "No cached IO for this batch/layer."
+
+    X_clean = X_clean.to(device)
+    W_clean = mod.weight.to(device)
+    b = (mod.bias.to(device) if mod.bias is not None else None)
+
+    # --- Step sizes
+    w_step, a_step = step_sizes_dict[layer_name]
+    w_step = w_step.to(device)          # [out_features]
+    a_step = a_step.to(device)          # [in_features]
+
+    # ===== 1) Weights: per out_channel on dim 0 =====
+    out_ch = 0  # show first output channel (change if you like)
+    # broadcast step sizes
+    w_shape = [1] * W_clean.dim()
+    w_shape[0] = W_clean.size(0)
+    w_step_b = w_step.view(w_shape)     # [out_features, 1]
+
+    # build noise explicitly (same as add_quantization_noise)
+    w_noise = (torch.rand_like(W_clean) - 0.5) * w_step_b
+    W_noisy = W_clean + w_noise
+
+    # slice one row (out_ch) and print first k elements
+    w_row_clean = W_clean[out_ch, :].detach().cpu()
+    w_row_noise = w_noise[out_ch, :].detach().cpu()
+    w_row_noisy = W_noisy[out_ch, :].detach().cpu()
+
+    print(f"\n[WEIGHT CHANNEL CHECK] {layer_name}  (out_channel={out_ch})")
+    print("  step size (this out_channel):", float(w_step[out_ch].detach().cpu()))
+    torch.set_printoptions(precision=6, sci_mode=False)
+    print("  W_clean[:k] =", w_row_clean[:k])
+    print("  noise   [:k] =", w_row_noise[:k])
+    print("  W_noisy [:k] =", w_row_noisy[:k])
+    # verify equality on the shown slice
+    ok_w = torch.allclose(w_row_noisy[:k], w_row_clean[:k] + w_row_noise[:k], atol=1e-7, rtol=0)
+    print("  ✓ noisy == clean + noise (slice):", ok_w)
+
+    # ===== 2) Activations: per input channel on last dim =====
+    # We’ll take a single spatial position/slice depending on rank and show last-dim elements.
+    X = X_clean
+    in_feat = X.shape[-1]
+    assert a_step.numel() == in_feat, f"a_step ({a_step.numel()}) != in_features ({in_feat})"
+
+    # Build activation noise (same broadcasting as add_quantization_noise)
+    a_shape = [1] * X.dim()
+    a_shape[-1] = X.size(-1)
+    a_step_b = a_step.view(a_shape)
+    x_noise = (torch.rand_like(X) - 0.5) * a_step_b
+    X_noisy = X + x_noise
+
+    # Choose a simple slice along batch/sequence/spatial to make it 1D over features
+    if X.dim() == 2:        # [B, C]
+        x_slice_clean = X[0, :]
+        x_slice_noise = x_noise[0, :]
+        x_slice_noisy = X_noisy[0, :]
+    elif X.dim() == 3:      # [B, seq, C]
+        x_slice_clean = X[0, 0, :]
+        x_slice_noise = x_noise[0, 0, :]
+        x_slice_noisy = X_noisy[0, 0, :]
+    elif X.dim() == 4:      # [B, H, W, C]
+        x_slice_clean = X[0, 0, 0, :]
+        x_slice_noise = x_noise[0, 0, 0, :]
+        x_slice_noisy = X_noisy[0, 0, 0, :]
+    else:
+        # fallback: flatten all but last dim and take the first row
+        Xf = X.reshape(-1, X.shape[-1])
+        x_noisef = x_noise.reshape(-1, X.shape[-1])
+        x_slice_clean = Xf[0, :]
+        x_slice_noise = x_noisef[0, :]
+        x_slice_noisy = (Xf + x_noisef)[0, :]
+
+    x_slice_clean = x_slice_clean.detach().cpu()
+    x_slice_noise = x_slice_noise.detach().cpu()
+    x_slice_noisy = x_slice_noisy.detach().cpu()
+
+    print(f"\n[ACTIVATION SLICE CHECK] {layer_name}  (one spatial position, all features)")
+    print("  a_step[:k]   =", a_step.detach().cpu()[:k])
+    print("  X_clean[:k]  =", x_slice_clean[:k])
+    print("  noise  [:k]  =", x_slice_noise[:k])
+    print("  X_noisy[:k]  =", x_slice_noisy[:k])
+    ok_x = torch.allclose(x_slice_noisy[:k], x_slice_clean[:k] + x_slice_noise[:k], atol=1e-7, rtol=0)
+    print("  ✓ noisy == clean + noise (slice):", ok_x)
+
+    # ===== 3) Optional: compute Y_noisy for the same slice to see effect on outputs =====
+    # (This part is optional; it just shows that the noisy input changes the layer output.)
+    with torch.no_grad():
+        Y_noisy = torch.nn.functional.linear(X_noisy.to(device), W_noisy.to(device), b)
+        # align the same spatial slice on output
+        if Y_noisy.dim() == 2:
+            y_slice_noisy = Y_noisy[0, :]
+        elif Y_noisy.dim() == 3:
+            y_slice_noisy = Y_noisy[0, 0, :]
+        elif Y_noisy.dim() == 4:
+            y_slice_noisy = Y_noisy[0, 0, 0, :]
+        else:
+            Yf = Y_noisy.reshape(-1, Y_noisy.shape[-1])
+            y_slice_noisy = Yf[0, :]
+        print("\n[OUTPUT EFFECT] Show first k outputs after noise:")
+        print("  Y_noisy[:k] =", y_slice_noisy.detach().cpu()[:k])
+
+
+def test_noise_activation_aligned():
+        # -------------------------
+    # Config
+    # -------------------------
+    MODEL_PATH   = "models/NS-PwC"
+    DATA_PATH    = "dataset/NS-PwC"
+    DATASET_NAME = "fluids.incompressible.PiecewiseConstants"
+    PERCENTILE   = 1e-4
+    CALIB_BS     = 2
+    CALIB_STEPS  = 2
+    NUM_MC       = 3
+    DEVICE_STR   = "cuda"
+
+    # -------------------------
+    # 1) Load model & calib iterator
+    # -------------------------
+    model, device = load_poseidon_model(MODEL_PATH, device=DEVICE_STR)
+    _, _, calib_iter, _ = build_poseidon_loaders(
+        dataset_name=DATASET_NAME, data_path=DATA_PATH,
+        calib_batchsize=CALIB_BS, calib_steps=CALIB_STEPS,
+        val_batchsize=16, val_steps=50
+    )
+
+    # -------------------------
+    # 2) Pick target Linear layers
+    # -------------------------
+    layer_data = torch.load('quantize_layers.pt')
+    # optional filter to avoid odd utility layers
+    quantize_layers = [n for n in layer_data['quantize_layers'] if "projection" not in n]
+
+    # Keep only real Linear modules that exist in the model
+    name2mod = dict(model.named_modules())
+    target_layers = [n for n in quantize_layers if (n in name2mod and isinstance(name2mod[n], nn.Linear))]
+    print(f"Candidate Linear layers: {len(target_layers)}")
+
+    # -------------------------
+    # 3) Compute ranges (weights + activations for pre-op inputs)
+    # -------------------------
+    ranges_dict = compute_data_ranges_poseidon(
+        model, calib_iter, device, target_layers, percentile_prob=PERCENTILE
+    )
+
+    # -------------------------
+    # 4) Capture clean inputs & outputs (same calibration iterator length)
+    # -------------------------
+    clean_inputs, clean_outputs = get_clean_outputs_poseidon(
+        model, calib_iter, device, target_layers
+    )
+
+    # -------------------------
+    # 5) Alignment/shape checks and compatible layer set
+    #    We require:
+    #      - activation_ranges.size == X_clean.last_dim (in_features)
+    #      - weight_ranges.size     == W.out_features   == Y_clean.last_dim
+    # -------------------------
+    compatible_layers, skipped = [], []
+    for name in target_layers:
+        if name not in ranges_dict: 
+            skipped.append((name, "no ranges")); continue
+        if not clean_inputs[name] or clean_inputs[name][0] is None:
+            skipped.append((name, "no clean X")); continue
+        if not clean_outputs[name] or clean_outputs[name][0] is None:
+            skipped.append((name, "no clean Y")); continue
+
+        mod = name2mod[name]
+        X0  = clean_inputs[name][0]      # [B, ..., in_features]
+        Y0  = clean_outputs[name][0]     # [B, ..., out_features]
+        ar  = ranges_dict[name]['activation_ranges']  # [in_features]
+        wr  = ranges_dict[name]['weight_ranges']      # [out_features]
+
+        in_feat  = X0.shape[-1]
+        out_feat = Y0.shape[-1]
+        w_out    = mod.weight.size(0)
+
+        ok = True
+        if ar.numel() != in_feat:
+            skipped.append((name, f"act_ranges {ar.numel()} != in_features {in_feat}")); ok = False
+        if wr.numel() != w_out:
+            skipped.append((name, f"weight_ranges {wr.numel()} != weight_out {w_out}")); ok = False
+        if wr.numel() != out_feat:
+            skipped.append((name, f"weight_ranges {wr.numel()} != Y_out {out_feat}")); ok = False
+
+        if ok:
+            compatible_layers.append(name)
+
+    # Debug print: any mismatches
+    if skipped:
+        print("\n[DEBUG] Skipped layers due to shape/channel mismatch:")
+        for n, why in skipped[:30]:
+            print(f"  [SKIP] {n} -- {why}")
+        if len(skipped) > 30:
+            print(f"  ... and {len(skipped)-30} more")
+
+    print(f"\nQuantizing {len(compatible_layers)} compatible layers (out of {len(target_layers)} candidates).")
+
+    # -------------------------
+    # 6) Build initial step sizes (0.1 * ranges as a simple start)
+    # -------------------------
+    step_sizes_dict = {
+        name: (
+            ranges_dict[name]['weight_ranges'].clone().to(device) * 0.1,      # per-out-channel step for W
+            ranges_dict[name]['activation_ranges'].clone().to(device) * 0.1   # per-in-channel step for X
+        )
+        for name in compatible_layers
+    }
+
+    # Choose a layer to inspect:
+    layer_to_check = compatible_layers[0]  # or paste the string you printed earlier
+    debug_noise_alignment_single_layer(
+        model, layer_to_check, step_sizes_dict, clean_inputs, clean_outputs, device=device
+    )
+
+    debug_noise_adding_values(
+    model=model,
+    clean_inputs=clean_inputs,
+    clean_outputs=clean_outputs,
+    step_sizes_dict=step_sizes_dict,
+    ranges_dict=ranges_dict,
+    layer_name="encoder.layers.0.blocks.0.attention.self.continuous_position_bias_mlp.0",
+    batch_idx=0,
+    seed=123,
+    k=8,
+    device=device
+)
 
 
 
 if __name__ == "__main__":
-    # ... (your existing main code)
     
-    # NEW: Test clean outputs collection
+    # Test clean outputs collection
     #print("\n\n")
     #test_clean_outputs()
 
@@ -1106,6 +1914,21 @@ if __name__ == "__main__":
 
     # Test computing mdl prior
     # print("\n\n")
-    test_mc_loss_with_prior()
+    #test_mc_loss_with_prior()
+
+    # Test noise_activation_aligned
+    # print("\n\n")
+    #test_noise_activation_aligned()
+
+    main()
+
+
+    #empty the gpu
+    #import torch
+    #torch.cuda.empty_cache()
+    # import gc
+    # gc.collect()
+    # torch.cuda.empty_cache()
+
 
 
