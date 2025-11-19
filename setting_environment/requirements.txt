@@ -1,0 +1,11 @@
+torch
+torchvision
+huggingface-hub
+wandb
+numpy
+tqdm
+xarray
+netCDF4
+scipy
+matplotlib
+accelerate
