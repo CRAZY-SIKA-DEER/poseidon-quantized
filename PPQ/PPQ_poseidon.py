@@ -15,6 +15,12 @@ import torch.optim as optim
 import json
 
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))          # main/PPQ
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))   # main
+INSPECT_DIR = os.path.join(PROJECT_ROOT, "inspect_layers")       # main/inspect_layers
+
+
+
 model_path   = "models/NS-PwC"
 data_path    = "dataset/NS-PwC"
 dataset_name = "fluids.incompressible.PiecewiseConstants"
@@ -721,6 +727,7 @@ def compute_mc_loss(model, dataloader, step_sizes_dict, clean_inputs, clean_outp
 
     # avg over batches
     num_effective_batches = num_batches if total_loss is not None else 1
+    # print(num_effective_batches)
     return total_loss / num_effective_batches
 
 
@@ -759,18 +766,20 @@ def compute_mc_loss_with_prior(model,
 
 def optimize_step_sizes(
     model,
-    dataloader,                         # use calib_iter (callable) or a DataLoader
+    dataloader,
     ranges_dict=None,
-    num_epochs=50,                       
-    num_mc_samples=10,                   
+    num_epochs=50,
+    num_mc_samples=10,
     lr=1e-2,
     eta=1e-4,
     gamma=0.001,
     device="cuda",
     percentile_prob=1e-4,
-    layer_names=None,                   # optional: restrict to a precomputed Linear list
-    init_scale=0.1,                     # initialize step sizes as fraction of range
-    log_every=10
+    layer_names=None,
+    init_scale=0.1,            # (kept for backward-compat) ignored if init_bits is not None
+    log_every=10,
+    init_bits=8,               # NEW: target starting bits (e.g., 8)
+    bmax_bits=16               # NEW: relative floor = R / 2**bmax_bits
 ):
     """
     Optimize per-channel step sizes (weights & activations) via PPQ Monte Carlo + MDL prior,
@@ -853,26 +862,69 @@ def optimize_step_sizes(
     if not target_layers:
         raise ValueError("No compatible layers with aligned channels found.")
 
-    # ---- 6) Initialize per-channel step sizes as parameters
+    # ---- 6) Initialize per-channel quantization step sizes (weights & activations)
+
+    # These parameters decide how "wide" each quantization bin is per channel.
+    # Smaller step → finer quantization (more bits)
+    # Larger step → coarser quantization (fewer bits)
+
     step_sizes_dict = {}
     params = []
+
     for name in target_layers:
         mod = name2mod[name]
-        in_ch  = mod.in_features
-        out_ch = mod.out_features
+        in_ch, out_ch = mod.in_features, mod.out_features
 
-        w_ranges = ranges_dict[name]["weight_ranges"].to(device)
-        a_ranges = ranges_dict[name]["activation_ranges"].to(device)
+        # Channel-wise ranges R = β - α  (from percentile clipping)
+        w_range = ranges_dict[name]["weight_ranges"].to(device)
+        a_range = ranges_dict[name]["activation_ranges"].to(device)
 
-        # init from ranges (scaled)
-        w_init = torch.clamp(w_ranges * init_scale, min=1e-5)
-        a_init = torch.clamp(a_ranges * init_scale, min=1e-5)
+        # ---- (1) Decide the target starting bit-width, e.g. 8 bits
+        target_bits = init_bits        # e.g., 8
+        max_bits    = bmax_bits        # e.g., 12  (used for floor clamp)
 
-        w_step = nn.Parameter(w_init.clone().detach())  # [out_features]
-        a_step = nn.Parameter(a_init.clone().detach())  # [in_features]
+        # ---- (2) Compute desired initial step sizes:
+        # Each channel will start with step = range / 2**bits
+        # so that we have exactly 2**bits quantization bins.
+        w_step_init = w_range / (2 ** target_bits)
+        a_step_init = a_range / (2 ** target_bits)
+
+        # ---- (3) Define a RELATIVE minimum step (the smallest allowed bin width)
+        # Prevent extremely tiny steps (would cause exploding gradients).
+        w_step_min = w_range / (2 ** max_bits)
+        a_step_min = a_range / (2 ** max_bits)
+
+        # Also add a small absolute epsilon so even if range≈0, it stays positive
+        EPS_ABS = 1e-8
+        w_step_min = torch.maximum(w_step_min, torch.full_like(w_step_min, EPS_ABS))
+        a_step_min = torch.maximum(a_step_min, torch.full_like(a_step_min, EPS_ABS))
+
+        # ---- (4) Clamp to [S_min, S_max]
+        # Step must not exceed the channel range (otherwise <1 bin, i.e. 0 bits)
+        # nor go below the relative floor.
+        w_step_init = torch.clamp(w_step_init, min=w_step_min, max=w_range)
+        a_step_init = torch.clamp(a_step_init, min=a_step_min, max=a_range)
+
+        # ---- (5) Make them learnable parameters
+        w_step = nn.Parameter(w_step_init.clone().detach())
+        a_step = nn.Parameter(a_step_init.clone().detach())
 
         step_sizes_dict[name] = (w_step, a_step)
         params += [w_step, a_step]
+
+
+    # test the inital average bitwidths
+    with torch.no_grad():
+        num = 0; s = 0.0
+        for name, (w_step, a_step) in step_sizes_dict.items():
+            w_range = ranges_dict[name]["weight_ranges"].to(w_step.device)
+            a_range = ranges_dict[name]["activation_ranges"].to(a_step.device)
+            w_bits = torch.log2((w_range / (w_step + 1e-12)).clamp(min=1.0)).mean()
+            a_bits = torch.log2((a_range / (a_step + 1e-12)).clamp(min=1.0)).mean()
+            s += (w_bits + a_bits).item() / 2.0
+            num += 1
+        print(f"[Init] AvgBits≈{s/num:.2f} (target {init_bits})")
+
 
     optimizer = optim.Adam(params, lr=lr)
 
@@ -899,11 +951,28 @@ def optimize_step_sizes(
         total_loss.backward()
         optimizer.step()
 
-        # Keep step sizes positive
+        # ---- 8) Project step sizes back to valid range after each optimizer step
         with torch.no_grad():
-            for w_step, a_step in step_sizes_dict.values():
-                w_step.clamp_(min=1e-6)
-                a_step.clamp_(min=1e-6)
+            EPS_ABS = 1e-8  # tiny guard for degenerate channels
+
+            for layer_name, (w_step, a_step) in step_sizes_dict.items():
+                # Get corresponding channel-wise ranges
+                w_range = ranges_dict[layer_name]["weight_ranges"].to(device)
+                a_range = ranges_dict[layer_name]["activation_ranges"].to(device)
+
+                # Compute relative minimum allowed step (to avoid exploding gradients)
+                w_step_min = w_range / (2 ** bmax_bits)
+                a_step_min = a_range / (2 ** bmax_bits)
+
+                # Add tiny absolute safeguard for near-zero ranges
+                w_step_min = torch.maximum(w_step_min, torch.full_like(w_step_min, EPS_ABS))
+                a_step_min = torch.maximum(a_step_min, torch.full_like(a_step_min, EPS_ABS))
+
+                # Clamp each step into [S_min, S_max]
+                #   - S_min = relative floor (ensures ≥ 2**bmax_bits bins)
+                #   - S_max = range span (ensures ≥ 1 quantization bin)
+                w_step.clamp_(min=w_step_min, max=w_range)
+                a_step.clamp_(min=a_step_min, max=a_range)
 
         if (epoch % log_every) == 0 or epoch == 1 or epoch == num_epochs:
             # Monitor average implied bits
@@ -931,18 +1000,31 @@ def optimize_step_sizes(
 
 def main():
     # --- Paths / config
-    model_path   = "models/NS-PwC"
-    data_path    = "dataset/NS-PwC"
-    dataset_name = "fluids.incompressible.PiecewiseConstants"
+    # model_path   = "models/NS-PwC-B"
+    # data_path    = "dataset/NS-PwC"
+    # dataset_name = "fluids.incompressible.PiecewiseConstants"
+
+    # model_path   = "models/NS-SVS-B"
+    # data_path    = "dataset/NS-SVS"
+    # dataset_name = "fluids.incompressible.VortexSheet"
+
+    model_path   = "models/NS-BB-B"
+    data_path    = "dataset/NS-BB"
+    dataset_name = "fluids.incompressible.BrownianBridge"
+
+
 
     # PPQ hyperparams
-    num_epochs      = 100      # originally 10
-    num_mc_samples  = 2      # origianlly 4
+    num_epochs      = 30      # originally 10
+    num_mc_samples  = 5      # origianlly 4
     lr              = 1e-2
-    eta             = 1e-4
-    gamma           = 0.001
+    eta             = 1e-5
+    gamma           = 0.00001
     percentile_prob = 1e-4
-    init_scale      = 0.1
+    # #init_scale      = 0.0625  # this makes our average bit wdith at about 4 bit S= R/16, 
+    # init_scale      = 0.00390625  # this makes our average bit wdith at about 8 bit S= R/256, 
+    init_bits = 8
+    bmax_bits = 12
     device          = "cuda"
 
     # --- 1) Load model
@@ -953,14 +1035,16 @@ def main():
     _, _, calib_iter, _ = build_poseidon_loaders(
         dataset_name=dataset_name,
         data_path=data_path,
-        calib_batchsize=1,
-        calib_steps=1,          # small set is fine for PPQ optimization
+        calib_batchsize=2,
+        calib_steps=8,          # small set is fine for PPQ optimization
         val_batchsize=1,        # 16
         val_steps=1             #50
     )
 
     # --- 3) Candidate Linear layer names (from your inspection file)
-    layer_data = torch.load('quantize_layers.pt')
+    b_quant_path = os.path.join(INSPECT_DIR, 'B_quantize_layers.pt')
+    print(f"Loading quantize layer list from: {b_quant_path}")
+    layer_data = torch.load(b_quant_path)
     # keep only layers that actually exist and are Linear in this model
     name2mod = dict(model.named_modules())
     cand_layers = [n for n in layer_data['quantize_layers'] if isinstance(name2mod.get(n, None), nn.Linear)]
@@ -969,8 +1053,8 @@ def main():
     # --- 4) Run PPQ optimization (this will: freeze batches → compute ranges → cache clean IO → optimize)
     step_sizes_dict = optimize_step_sizes(
         model=model,
-        dataloader=calib_iter,           # SAME frozen batches used throughout
-        ranges_dict=None,                # let it compute ranges from calib_iter
+        dataloader=calib_iter,            # same frozen batches used throughout
+        ranges_dict=None,                   # let it compute ranges from calib_iter
         num_epochs=num_epochs,
         num_mc_samples=num_mc_samples,
         lr=lr,
@@ -979,7 +1063,8 @@ def main():
         device=device,
         percentile_prob=percentile_prob,
         layer_names=cand_layers,
-        init_scale=init_scale,
+        init_bits=init_bits,          # initialize step sizes to correspond to 8 bits
+        bmax_bits=bmax_bits,         # relative floor limiting min step size
         log_every=1
     )
 
@@ -994,22 +1079,62 @@ def main():
             "percentile_prob": percentile_prob,
             "num_epochs": num_epochs,
             "num_mc_samples": num_mc_samples,
-            "init_scale": init_scale,
+            "init_bits": init_bits,
+            "bmax_bits": bmax_bits
         }
     }
-    os.makedirs("ppq_artifacts", exist_ok=True)
-    torch.save(save_obj, "ppq_artifacts/ppq_step_sizes.pt")
-    print("✓ Saved learned step sizes → ppq_artifacts/ppq_step_sizes.pt")
 
+    # Build artifacts directory: <PROJECT_ROOT>/ppq_artifacts/<model_name>/
+    model_name = os.path.basename(model_path.rstrip("/"))
+    artifacts_root = os.path.join(PROJECT_ROOT, "ppq_artifacts")
+    artifacts_dir = os.path.join(artifacts_root, model_name)
+    os.makedirs(artifacts_dir, exist_ok=True)
+
+    step_pt_path = os.path.join(artifacts_dir, "ppq_step_sizes.pt")
+    step_json_path = os.path.join(artifacts_dir, "ppq_step_sizes.json")
+
+    torch.save(save_obj, step_pt_path)
+    print(f"✓ Saved learned step sizes → {step_pt_path}")
 
     # Convert tensors in save_obj to lists for JSON encoding
     json_ready = {
         'step_sizes': {k: (v[0].tolist(), v[1].tolist()) for k, v in save_obj['step_sizes'].items()},
         'meta': save_obj['meta']
     }
-    with open("ppq_artifacts/ppq_step_sizes.json", "w") as f_json:
+    with open(step_json_path, "w") as f_json:
         json.dump(json_ready, f_json, indent=2)
-    print("✓ Also saved learned step sizes → ppq_artifacts/ppq_step_sizes.json")
+    print(f"✓ Also saved learned step sizes → {step_json_path}")
+
+
+    # # --- 5) Save learned step sizes for later use
+    # save_obj = {
+    #     "step_sizes": {k: (v[0].detach().cpu(), v[1].detach().cpu()) for k, v in step_sizes_dict.items()},
+    #     "meta": {
+    #         "model_path": model_path,
+    #         "dataset_name": dataset_name,
+    #         "eta": eta,
+    #         "gamma": gamma,
+    #         "percentile_prob": percentile_prob,
+    #         "num_epochs": num_epochs,
+    #         "num_mc_samples": num_mc_samples,
+    #         "init_bits": init_bits,
+    #         "bmax_bits": bmax_bits
+    #     }
+    # }
+
+    # os.makedirs("ppq_artifacts", exist_ok=True)
+    # torch.save(save_obj, "ppq_artifacts/ppq_step_sizes.pt")
+    # print("✓ Saved learned step sizes → ppq_artifacts/ppq_step_sizes.pt")
+
+
+    # # Convert tensors in save_obj to lists for JSON encoding
+    # json_ready = {
+    #     'step_sizes': {k: (v[0].tolist(), v[1].tolist()) for k, v in save_obj['step_sizes'].items()},
+    #     'meta': save_obj['meta']
+    # }
+    # with open("ppq_artifacts/ppq_step_sizes.json", "w") as f_json:
+    #     json.dump(json_ready, f_json, indent=2)
+    # print("✓ Also saved learned step sizes → ppq_artifacts/ppq_step_sizes.json")
 
 
 
@@ -1110,7 +1235,9 @@ def test_clean_outputs():
     
     # Load layer names from inspection
     print("\nLoading layer names from 'quantize_layers.pt'...")
-    layer_data = torch.load('quantize_layers.pt')
+    b_quant_path = os.path.join(INSPECT_DIR, 'B_quantize_layers.pt')
+    layer_data = torch.load(b_quant_path)
+    #layer_data = torch.load('quantize_layers.pt')
     quantize_layers = layer_data['quantize_layers']
     print(f"Found {len(quantize_layers)} layers to quantize")
     
@@ -1176,7 +1303,9 @@ def test_compute_ranges():
     )
     
     # Load layer names
-    layer_data = torch.load('quantize_layers.pt')
+    #layer_data = torch.load('quantize_layers.pt')
+    b_quant_path = os.path.join(INSPECT_DIR, 'B_quantize_layers.pt')
+    layer_data = torch.load(b_quant_path)
     quantize_layers = layer_data['quantize_layers']
     
     # Test with first 10 Linear layers
@@ -1239,7 +1368,9 @@ def test_find_best_percentile():
     )
     
     # Load layer names
-    layer_data = torch.load('quantize_layers.pt')
+    b_quant_path = os.path.join(INSPECT_DIR, 'B_quantize_layers.pt')
+    layer_data = torch.load(b_quant_path)
+    #layer_data = torch.load('quantize_layers.pt')
     quantize_layers = layer_data['quantize_layers']
     
     # Test with first 10 Linear layers (small for speed)
@@ -1401,7 +1532,7 @@ def test_mc_loss_with_prior():
     # -------------------------
     # Config
     # -------------------------
-    MODEL_PATH   = "models/NS-PwC"
+    MODEL_PATH   = "models/NS-PwC-B"
     DATA_PATH    = "dataset/NS-PwC"
     DATASET_NAME = "fluids.incompressible.PiecewiseConstants"
     PERCENTILE   = 1e-4
@@ -1423,7 +1554,10 @@ def test_mc_loss_with_prior():
     # -------------------------
     # 2) Pick target Linear layers
     # -------------------------
-    layer_data = torch.load('quantize_layers.pt')
+
+    b_quant_path = os.path.join(INSPECT_DIR, 'B_quantize_layers.pt')
+    layer_data = torch.load(b_quant_path)
+    #layer_data = torch.load('quantize_layers.pt')
     # optional filter to avoid odd utility layers
     quantize_layers = [n for n in layer_data['quantize_layers'] if "projection" not in n]
 
@@ -1788,7 +1922,9 @@ def test_noise_activation_aligned():
     # -------------------------
     # 2) Pick target Linear layers
     # -------------------------
-    layer_data = torch.load('quantize_layers.pt')
+    b_quant_path = os.path.join(INSPECT_DIR, 'B_quantize_layers.pt')
+    layer_data = torch.load(b_quant_path)
+    #layer_data = torch.load('quantize_layers.pt')
     # optional filter to avoid odd utility layers
     quantize_layers = [n for n in layer_data['quantize_layers'] if "projection" not in n]
 
