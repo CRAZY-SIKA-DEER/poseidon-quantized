@@ -197,7 +197,8 @@ def select_layers_for_quantization(layer_info, exclude_additional=None):
 if __name__ == "__main__":
     # Configuration
     #model_path = "models/NS-PwC"
-    model_path = "models/NS-PwC-B"
+    #model_path = "models/NS-PwC-B"
+    model_path = "models/NS-PwC-T"
 
     device = "cuda"
     
@@ -235,10 +236,10 @@ if __name__ == "__main__":
     print("\nSaving detailed layer info to JSON files...")
 
     # Build full paths under the script directory (inspect_layers/)
-    all_path = os.path.join(SCRIPT_DIR, 'B_layer_info_all.json')
-    filtered_path = os.path.join(SCRIPT_DIR, 'B_layer_info_filtered.json')
-    quant_list_path = os.path.join(SCRIPT_DIR, 'B_quantize_layers.json')
-    quant_pt_path = os.path.join(SCRIPT_DIR, 'B_quantize_layers.pt')
+    all_path = os.path.join(SCRIPT_DIR, 'T_layer_info_all.json')
+    filtered_path = os.path.join(SCRIPT_DIR, 'T_layer_info_filtered.json')
+    quant_list_path = os.path.join(SCRIPT_DIR, 'T_quantize_layers.json')
+    quant_pt_path = os.path.join(SCRIPT_DIR, 'T_quantize_layers.pt')
 
     # Save all layers
     with open(all_path, 'w') as f:
@@ -267,9 +268,9 @@ if __name__ == "__main__":
     
     print("\n" + "="*80)
     print("DONE! Files created:")
-    print("  - B_layer_info_all.json (full details, all layers)")
-    print("  - B_layer_info_filtered.json (full details, filtered)")
-    print("  - B_quantize_layers.json (list of layer names to quantize)")
-    print("  - B_quantize_layers.pt (lightweight, for code use)")
+    print("  - T_layer_info_all.json (full details, all layers)")
+    print("  - T_layer_info_filtered.json (full details, filtered)")
+    print("  - T_quantize_layers.json (list of layer names to quantize)")
+    print("  - T_quantize_layers.pt (lightweight, for code use)")
     print("\nYou can open the JSON files in any text editor to see all layers!")
     print("="*80 + "\n")

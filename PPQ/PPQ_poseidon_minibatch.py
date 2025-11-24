@@ -1046,7 +1046,8 @@ def optimize_step_sizes(
 def main():
     # --- Paths / config
 
-    model_path   = "models/NS-PwC-B"
+    #model_path   = "models/NS-PwC-B"
+    model_path   = "models/NS-PwC-T"
     data_path    = "dataset/NS-PwC"
     dataset_name = "fluids.incompressible.PiecewiseConstants"
 
@@ -1059,7 +1060,7 @@ def main():
     # dataset_name = "fluids.incompressible.BrownianBridge"
 
     # PPQ hyperparams
-    num_epochs      = 30      # number of passes over frozen calib set
+    num_epochs      = 1000      # number of passes over frozen calib set
     num_mc_samples  = 5
     lr              = 1e-2
     eta             = 1e-5
@@ -1084,7 +1085,7 @@ def main():
     )
 
     # --- 3) Candidate Linear layer names (from your inspection file)
-    b_quant_path = os.path.join(INSPECT_DIR, 'B_quantize_layers.pt')
+    b_quant_path = os.path.join(INSPECT_DIR, 'T_quantize_layers.pt')
     print(f"Loading quantize layer list from: {b_quant_path}")
     layer_data = torch.load(b_quant_path)
     name2mod = dict(model.named_modules())
