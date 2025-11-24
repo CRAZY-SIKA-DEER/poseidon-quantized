@@ -14,6 +14,8 @@ import torch.nn as nn
 import torch.optim as optim
 import json
 from scOT.metrics import relative_lp_error, lp_error
+import numpy as np
+
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))          # main/PPQ
 PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))   # main
@@ -1289,9 +1291,12 @@ def evaluate_with_stepsizes(
             pred_np = pred.detach().cpu().numpy()
             y_np    = y.detach().cpu().numpy()
 
-            rel_l1 = float(relative_lp_error(pred_np, y_np, p=1))
-            abs_l1 = float(lp_error(pred_np, y_np, p=1))
+            # relative_lp_error / lp_error return per-sample arrays → take batch mean
+            batch_rel = relative_lp_error(pred_np, y_np, p=1, return_percent=True)
+            batch_abs = lp_error(pred_np, y_np, p=1)
 
+            rel_l1 = float(np.mean(batch_rel))
+            abs_l1 = float(np.mean(batch_abs))
 
             rel_l1_list.append(rel_l1)
             abs_l1_list.append(abs_l1)
@@ -1323,7 +1328,7 @@ def main():
     dataset_name = "fluids.incompressible.PiecewiseConstants"
 
     # PPQ hyperparams
-    num_epochs      = 4
+    num_epochs      = 1000
     num_mc_samples  = 5
     lr              = 1e-2
     eta             = 1e-5
@@ -1333,7 +1338,7 @@ def main():
     bmax_bits       = 20
     device          = "cuda"
 
-    eval_every      = 2                  # ← evaluate every 50 epochs
+    eval_every      = 4                  # ← evaluate every 50 epochs
 
     # --- 1) Load Poseidon model ---
     model, device = load_poseidon_model(model_path, device=device)
