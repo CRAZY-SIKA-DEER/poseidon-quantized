@@ -56,8 +56,8 @@ from scOT.model import ScOT  # type: ignore
 
 MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "NS-PwC-T")  # adjust if different
 LAYER_LIST_PATH = os.path.join(INSPECT_DIR, "T_quantize_layers.pt")
-OUTPUT_BASENAME = "NS-PwC-T-dynamic-stepsizes"
-NUM_BITS = 4  # dynamic quantization bit-width for weights
+OUTPUT_BASENAME = "NS-PwC-T-dynamic-stepsizes-14"
+NUM_BITS = 14  # dynamic quantization bit-width for weights
 
 
 # --------------------------------------------------------------------------

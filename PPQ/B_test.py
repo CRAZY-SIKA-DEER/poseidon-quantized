@@ -33,17 +33,17 @@ from DynamicQ.dynamic_weight_activation import make_dynamic_weight_activation_qu
 # =============================================================================
 # Configuration
 # =============================================================================
-model_path   = "models/NS-PwC-B"
-data_path    = "dataset/NS-PwC"
-dataset_name = "fluids.incompressible.PiecewiseConstants"
+# model_path   = "models/NS-PwC-B"
+# data_path    = "dataset/NS-PwC"
+# dataset_name = "fluids.incompressible.PiecewiseConstants"
 
 # model_path   = "models/NS-SVS-B"
 # data_path    = "dataset/NS-SVS"
 # dataset_name = "fluids.incompressible.VortexSheet"
 
-# model_path   = "models/NS-BB-B"
-# data_path    = "dataset/NS-BB"
-# dataset_name = "fluids.incompressible.BrownianBridge"
+model_path   = "models/NS-BB-B"
+data_path    = "dataset/NS-BB"
+dataset_name = "fluids.incompressible.BrownianBridge"
 
 
 

@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # RepQ-ViT style PTQ for Poseidon / ScOT (no Poseidon source edits)
 
+import sys
+import os
 
+# Add parent directory to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import os, sys, time, random, numpy as np, torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -10,8 +14,8 @@ from scOT.problems.fluids.normalization_constants import CONSTANTS
 # ==== EDIT THESE ====
 REPO_REPQ_CLASSIFICATION = "./RepQ-ViT/classification"   # path to the 'classification' dir of RepQ-ViT
 #for PwC_L
-MODEL_PATH   = "checkpoints/finetune_NS-PwC_L_2048/PoseidonFinetune_NS-PwC_L/finetune_NS-PwC_run_L_2048/checkpoint-368800"
-DATA_PATH    = "datasets/NS-PwC"
+MODEL_PATH   = "models/NS-PwC-B"
+DATA_PATH    = "dataset/NS-PwC"
 DATASET_NAME = "fluids.incompressible.PiecewiseConstants"
 #for BB_L
 # MODEL_PATH   =  "checkpoints/finetune_NS-BB_L_2048/PoseidonFinetune_NS-BB_L/finetune_NS-BB_run_L_2048/checkpoint-368800"
@@ -307,39 +311,103 @@ def main():
         print(f"Max  abs ∇·v: {m.max():.6e}")
         print(f"Min  abs ∇·v: {m.min():.6e}")
 
+
+
+
     def eval_model_poseidon(model, dataset_name, data_path, num_traj=8, batch_size=16):
         device = next(model.parameters()).device
         model.eval()
+
         ds = get_dataset(dataset=dataset_name, which="test",
                         num_trajectories=num_traj, data_path=data_path)
         dl = DataLoader(ds, batch_size=batch_size, shuffle=False)
-        total_loss_elems, total_nel = 0.0, 0
-        preds_all = []
+
+        total_rel_l1, num_batches = 0.0, 0
+        preds_all, labels_all = [], []
+
         with torch.no_grad():
             for batch in dl:
                 xb = batch["pixel_values"].to(device)
                 yb = batch["labels"].to(device)
                 tm = batch["time"].to(device)
                 pm = batch["pixel_mask"].to(device)
-                out = model(pixel_values=xb, time=tm, pixel_mask=pm, labels=yb)
-                loss  = out.loss          # Poseidon’s own per-element MSE
-                preds = out.output        # predictions
-                n_elems = preds.numel()
-                total_loss_elems += loss.item() * n_elems
-                total_nel        += n_elems
-                preds_all.append(preds.cpu())
-        dataset_loss = total_loss_elems / total_nel
-        preds_all = torch.cat(preds_all, dim=0)
-        return dataset_loss, preds_all
 
-    # 1) Evaluate quantized model with Poseidon’s loss + your divergence metric
-    repq_loss, repq_preds = eval_model_poseidon(
-        q_model, DATASET_NAME, DATA_PATH, NUM_TRAJECTORIES, BATCH_SIZE
-    )
-    print("-----------------------------------------------------------------------------------------------------------------")
-    print(MODEL_PATH)
-    print(f"[RepQ] dataset loss: {repq_loss:.6e}")
-    divergence_stats(repq_preds)   # your function from earlier
+                out = model(pixel_values=xb, time=tm, pixel_mask=pm, labels=yb)
+
+                preds = out.output   # (N, C, H, W)
+                true  = yb           # (N, C, H, W)
+
+                # ---- Relative L1 per batch ----
+                l1_num = torch.sum(torch.abs(preds - true))
+                l1_den = torch.sum(torch.abs(true)) + 1e-12
+                rel_l1_batch = l1_num / l1_den
+
+                total_rel_l1 += rel_l1_batch.item()
+                num_batches  += 1
+
+                preds_all.append(preds.cpu())
+                labels_all.append(true.cpu())
+
+        dataset_rel_l1 = total_rel_l1 / max(1, num_batches)
+        preds_all  = torch.cat(preds_all,  dim=0)
+        labels_all = torch.cat(labels_all, dim=0)
+
+        # return mean relative L1 over batches, plus full preds/labels for divergence stats
+        return dataset_rel_l1, preds_all, labels_all
+
+
+
+
+
+
+
+
+
+
+
+   # this is the MSE evaluation
+
+
+    # def eval_model_poseidon(model, dataset_name, data_path, num_traj=8, batch_size=16):
+    #     device = next(model.parameters()).device
+    #     model.eval()
+    #     ds = get_dataset(dataset=dataset_name, which="test",
+    #                     num_trajectories=num_traj, data_path=data_path)
+    #     dl = DataLoader(ds, batch_size=batch_size, shuffle=False)
+    #     total_loss_elems, total_nel = 0.0, 0
+    #     preds_all = []
+    #     with torch.no_grad():
+    #         for batch in dl:
+    #             xb = batch["pixel_values"].to(device)
+    #             yb = batch["labels"].to(device)
+    #             tm = batch["time"].to(device)
+    #             pm = batch["pixel_mask"].to(device)
+    #             out = model(pixel_values=xb, time=tm, pixel_mask=pm, labels=yb)
+    #             loss  = out.loss          # Poseidon’s own per-element MSE
+    #             preds = out.output        # predictions
+    #             n_elems = preds.numel()
+    #             total_loss_elems += loss.item() * n_elems
+    #             total_nel        += n_elems
+    #             preds_all.append(preds.cpu())
+    #     dataset_loss = total_loss_elems / total_nel
+    #     preds_all = torch.cat(preds_all, dim=0)
+    #     return dataset_loss, preds_all
+
+    # # 1) Evaluate quantized model with Poseidon’s loss + your divergence metric
+    # repq_loss, repq_preds = eval_model_poseidon(
+    #     q_model, DATASET_NAME, DATA_PATH, NUM_TRAJECTORIES, BATCH_SIZE
+    # )
+    # print("-----------------------------------------------------------------------------------------------------------------")
+    # print(MODEL_PATH)
+    # print(f"[RepQ] dataset loss: {repq_loss:.6e}")
+    # divergence_stats(repq_preds)   # your function from earlier
+
+
+
+
+
+
+
 
 
 

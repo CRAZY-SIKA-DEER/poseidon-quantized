@@ -1,5 +1,14 @@
 # DynamicQ/dynamic_weight.py
 
+'''
+Defines a quantized linear layer (DynamicWeightLinear).
+
+Provides a helper to create a quantized copy of the model (make_dynamic_weight_quantized_copy).
+
+'''
+
+
+
 import copy
 from typing import Iterable, Union, Set, Dict
 
@@ -27,7 +36,7 @@ class DynamicWeightLinear(nn.Module):
         self,
         base_linear: nn.Linear,
         #bitwidth: int = 8,
-        bitwidth: int = 4,
+        bitwidth: int = 5,
         qmin: int = QMIN,
         qmax: int = QMAX,
     ):

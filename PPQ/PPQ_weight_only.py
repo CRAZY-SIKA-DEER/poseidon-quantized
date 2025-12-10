@@ -812,26 +812,51 @@ def compute_mc_loss_with_prior(
 
 
 
-def compute_avg_bits(step_sizes_dict, ranges_dict, eps: float = 1e-8) -> float:
+
+def build_channel_param_weights(model: nn.Module, layer_names):
     """
-    Compute the average effective bit-width over all channels and layers.
+    For each Linear layer, build a 1D tensor of length out_features where
+    each element is the number of weights controlled by that output channel.
 
-    For each layer:
-        bits_w = log2( R_w / S_w )
-        bits_a = log2( R_a / S_a )   (if activation step sizes are present & aligned)
-
-    Then average over all channels (weights and optionally activations).
-
-    Args:
-        step_sizes_dict: { layer_name: (w_step, a_step) }
-        ranges_dict:     { layer_name: { 'weight_ranges': ..., 'activation_ranges': ... } }
-        eps:             small epsilon for numerical stability
-
-    Returns:
-        avg_bits (float)
+    For Linear: n_{l,k} = in_features (size of that row).
     """
-    total_bits = 0.0
-    total_channels = 0
+    name2mod = dict(model.named_modules())
+    channel_weights = {}
+
+    for name in layer_names:
+        mod = name2mod.get(name, None)
+        if not isinstance(mod, nn.Linear):
+            continue
+
+        in_f  = mod.in_features
+        out_f = mod.out_features
+
+        # each out_channel row has in_f parameters
+        w = torch.full((out_f,), float(in_f))  # on CPU is fine
+        channel_weights[name] = w
+
+    return channel_weights
+
+
+
+def compute_avg_bits(
+    step_sizes_dict,
+    ranges_dict,
+    channel_weights=None,
+    eps: float = 1e-8,
+) -> float:
+    """
+    Parameter-weighted average effective bit-width over all *weight* channels.
+
+    bits_{l,k} = log2(R_{l,k} / S_{l,k})
+
+    If channel_weights is provided:
+        weight per channel = channel_weights[name][k]
+    Else:
+        weight per channel = 1 (reduces to simple mean over channels).
+    """
+    total_bits_weighted = 0.0
+    total_weight = 0.0
 
     for name, wa in step_sizes_dict.items():
         if name not in ranges_dict:
@@ -840,36 +865,32 @@ def compute_avg_bits(step_sizes_dict, ranges_dict, eps: float = 1e-8) -> float:
         w_step, a_step = wa
         rec = ranges_dict[name]
 
-        # ---------------- Weights ----------------
-        if "weight_ranges" in rec and w_step is not None:
-            w_range = rec["weight_ranges"].to(w_step.device)
-            # broadcast-safe: w_step is [out_features]
-            w_bits = torch.log2((w_range + eps) / (w_step + eps))
-            total_bits += w_bits.sum().item()
-            total_channels += w_bits.numel()
+        # weights only
+        if "weight_ranges" not in rec or w_step is None:
+            continue
 
-        # ---------------- Activations (optional) ----------------
-        # Only include if:
-        #   - activation_ranges exist
-        #   - a_step is a tensor / Parameter
-        #   - shapes match
-        if "activation_ranges" in rec and a_step is not None:
-            if isinstance(a_step, torch.nn.Parameter):
-                a_step_t = a_step.detach()
-            else:
-                a_step_t = a_step
+        w_range = rec["weight_ranges"].to(w_step.device)  # [out_features]
+        # protect against zeros
+        bits = torch.log2(
+            (w_range + eps) / (w_step + eps)
+        )  # [out_features]
 
-            if isinstance(a_step_t, torch.Tensor):
-                a_range = rec["activation_ranges"].to(a_step_t.device)
-                if a_range.numel() == a_step_t.numel():
-                    a_bits = torch.log2((a_range + eps) / (a_step_t + eps))
-                    total_bits += a_bits.sum().item()
-                    total_channels += a_bits.numel()
+        if channel_weights is not None and name in channel_weights:
+            w = channel_weights[name].to(bits.device)  # [out_features]
+            # safety: broadcast scalar if someone passed a scalar
+            if w.numel() == 1:
+                w = w.expand_as(bits)
+        else:
+            w = torch.ones_like(bits)
 
-    if total_channels == 0:
+        total_bits_weighted += float((bits * w).sum().item())
+        total_weight        += float(w.sum().item())
+
+    if total_weight == 0.0:
         return float("nan")
 
-    return total_bits / float(total_channels)
+    return total_bits_weighted / total_weight
+
 
 
 
@@ -909,7 +930,7 @@ def optimize_step_sizes(
     Updated optimize_step_sizes with:
       - return_ranges=True → returns (step_sizes_dict, ranges_dict)
       - MDL *only* affects weights (activation prior removed)
-      - Everything else unchanged from your base implementation
+      - AvgBits is a parameter-weighted bitwidth
     """
 
     # ---- 0) Setup ----
@@ -964,9 +985,12 @@ def optimize_step_sizes(
     # ---- 5) Find compatible layers ----
     target_layers = []
     for name in cand_layers:
-        if name not in ranges_dict: continue
-        if clean_inputs[name][0] is None: continue
-        if clean_outputs[name][0] is None: continue
+        if name not in ranges_dict:
+            continue
+        if clean_inputs[name][0] is None:
+            continue
+        if clean_outputs[name][0] is None:
+            continue
 
         x0 = clean_inputs[name][0]
         y0 = clean_outputs[name][0]
@@ -985,14 +1009,15 @@ def optimize_step_sizes(
     if len(target_layers) == 0:
         raise ValueError("No compatible layers found.")
 
+    # ---- 5.5) Precompute parameter counts per channel (n_k) ----
+    channel_weights = build_channel_param_weights(model, target_layers)
+
     # ---- 6) Initialize step sizes ----
     step_sizes_dict = {}
     params = []
 
     for name in target_layers:
         mod = name2mod[name]
-        in_features = mod.in_features
-        out_features = mod.out_features
 
         w_range = ranges_dict[name]["weight_ranges"].to(device)
         a_range = ranges_dict[name]["activation_ranges"].to(device)
@@ -1019,9 +1044,9 @@ def optimize_step_sizes(
         step_sizes_dict[name] = (w_step, a_step)
         params.extend([w_step, a_step])
 
-    # ---- Initial log of bitwidth ----
+    # ---- Initial log of bitwidth (parameter-weighted) ----
     with torch.no_grad():
-        avg_bits = compute_avg_bits(step_sizes_dict, ranges_dict)
+        avg_bits = compute_avg_bits(step_sizes_dict, ranges_dict, channel_weights)
         print(f"[Init] AvgBits≈{avg_bits:.2f} (target={init_bits})")
 
     # ---- Optimizer ----
@@ -1077,7 +1102,7 @@ def optimize_step_sizes(
         # ---- Logging ----
         if epoch % log_every == 0 or epoch == 1 or epoch == num_epochs:
             with torch.no_grad():
-                avg_bits = compute_avg_bits(step_sizes_dict, ranges_dict)
+                avg_bits = compute_avg_bits(step_sizes_dict, ranges_dict, channel_weights)
 
             print(f"[Epoch {epoch:4d}] "
                   f"Total={total_loss.item():.6f} | "
@@ -1097,6 +1122,7 @@ def optimize_step_sizes(
         return step_sizes_dict, ranges_dict
     else:
         return step_sizes_dict
+
 
 
 def compute_dynamic_stepsizes(
@@ -1328,11 +1354,11 @@ def main():
     dataset_name = "fluids.incompressible.PiecewiseConstants"
 
     # PPQ hyperparams
-    num_epochs      = 1000
+    num_epochs      = 400
     num_mc_samples  = 5
-    lr              = 1e-2
-    eta             = 1e-5
-    gamma           = 0.0                 # ← no MDL prior for now
+    lr              = 1e-4
+    eta             = 1e-6
+    gamma           = 1e-4               # ← no MDL prior for now
     percentile_prob = 1e-4
     init_bits       = 4                   # ← match dynamic-4 init
     bmax_bits       = 20
@@ -1368,7 +1394,7 @@ def main():
     # (A) Load precomputed 4-bit dynamic step sizes (weights-only)
     # ================================================================================
     dyn_stats_dir = os.path.join(PROJECT_ROOT, "dynamic_stats")
-    dyn4_file = os.path.join(dyn_stats_dir, "NS-PwC-T-dynamic-stepsizes.json")
+    dyn4_file = os.path.join(dyn_stats_dir, "NS-PwC-T-dynamic-stepsizes-4.json")
 
     with open(dyn4_file, "r") as f:
         dyn4_raw = json.load(f)["step_sizes"]    # {layer_name: [S_out_channels]}
@@ -1390,13 +1416,17 @@ def main():
     # ================================================================================
     # (C) Prepare results storage (for per-epoch eval)
     # ================================================================================
-    model_name    = os.path.basename(model_path.rstrip("/"))
+    model_name     = os.path.basename(model_path.rstrip("/"))
     artifacts_root = os.path.join(PROJECT_ROOT, "ppq_artifacts")
     artifacts_dir  = os.path.join(artifacts_root, model_name)
     os.makedirs(artifacts_dir, exist_ok=True)
 
-    results_path = os.path.join(artifacts_dir, "PwC-T-results.json")
+    results_path = os.path.join(artifacts_dir, "PwC-T-results-1-4.json")
     results = {}
+
+    # --- NEW: precompute parameter counts per channel for all cand_layers ---
+    # This must match what you use inside optimize_step_sizes.
+    channel_weights = build_channel_param_weights(model, cand_layers)
 
     # ================================================================================
     # (D) Define evaluation callback (called from inside optimize_step_sizes)
@@ -1407,8 +1437,8 @@ def main():
 
         print(f"\n================ EVALUATION @ epoch {epoch} ================")
 
-        # 1) Average bits for current PPQ state
-        avg_bits = compute_avg_bits(step_sizes_dict, ranges_dict)
+        # 1) Average bits for current PPQ state (parameter-weighted)
+        avg_bits = compute_avg_bits(step_sizes_dict, ranges_dict, channel_weights)
         print(f"[INFO] AvgBits (PPQ) @ epoch {epoch}: {avg_bits:.3f}")
 
         # 2) Evaluate PPQ (current learned steps)
@@ -1484,10 +1514,11 @@ def main():
         bmax_bits=bmax_bits,
         log_every=1,
         updates_per_batch=1,
-        return_ranges=True,            # make sure your implementation returns (steps, ranges)
-        eval_every=eval_every,         # ← NEW: evaluation frequency
-        eval_callback=eval_callback,   # ← NEW: callback defined above
+        return_ranges=True,
+        eval_every=eval_every,
+        eval_callback=eval_callback,
     )
+
 
     # ================================================================================
     # (F) Save final learned PPQ step sizes
@@ -1510,8 +1541,8 @@ def main():
         },
     }
 
-    step_pt_path   = os.path.join(artifacts_dir, "ppq_step_sizes.pt")
-    step_json_path = os.path.join(artifacts_dir, "ppq_step_sizes.json")
+    step_pt_path   = os.path.join(artifacts_dir, "ppq_step_sizes-1-4.pt")
+    step_json_path = os.path.join(artifacts_dir, "ppq_step_sizes-1-4.json")
 
     torch.save(save_obj, step_pt_path)
     with open(step_json_path, "w") as f:
