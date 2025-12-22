@@ -897,6 +897,24 @@ def compute_avg_bits(
 
 
 
+def get_lr_for_epoch(epoch: int, base_lr: float = 1e-4, num_epochs: int = 400) -> float:
+    """
+    Piecewise LR schedule over [1, num_epochs].
+
+    Default: 400 epochs
+      1–100: 3 * base_lr
+    101–200: 1 * base_lr
+    201–300: 3e-1 * base_lr
+    301–400: 1e-1 * base_lr
+    """
+    if epoch <= num_epochs * 0.25:       # 1–100
+        return 3.0 * base_lr
+    elif epoch <= num_epochs * 0.50:     # 101–200
+        return 1.0 * base_lr
+    elif epoch <= num_epochs * 0.75:     # 201–300
+        return 3.0e-1 * base_lr
+    else:                                # 301–400
+        return 1.0e-1 * base_lr
 
 
 
@@ -908,13 +926,13 @@ def compute_avg_bits(
 
 def optimize_step_sizes(
     model,
-    dataloader,             # calib_iter or a DataLoader; used only to FREEZE batches
+    dataloader,
     ranges_dict=None,
     num_epochs=50,
     num_mc_samples=10,
     lr=1e-2,
     eta=1e-4,
-    gamma=0.0,              # MDL (weights only)
+    gamma=0.0,
     device="cuda",
     percentile_prob=1e-4,
     layer_names=None,
@@ -922,10 +940,11 @@ def optimize_step_sizes(
     bmax_bits=16,
     log_every=10,
     updates_per_batch=1,
-    return_ranges=False,    
-    eval_every=None,        # ← NEW
-    eval_callback=None,     # ← NEW
+    return_ranges=False,
+    eval_every=None,          # <--- NEW
+    eval_callback=None,       # <--- NEW
 ):
+
     """
     Updated optimize_step_sizes with:
       - return_ranges=True → returns (step_sizes_dict, ranges_dict)
@@ -1052,21 +1071,28 @@ def optimize_step_sizes(
     # ---- Optimizer ----
     optimizer = optim.Adam(params, lr=lr)
 
+    # --- history over epochs (for saving) ---
+    history = []
+
     # ---- Number of calibration batches ----
     num_batches = min(len(clean_inputs[name]) for name in target_layers)
     print(f"Number of cached calibration batches: {num_batches}")
 
     print(f"\nStarting optimization: epochs={num_epochs}, mc_samples={num_mc_samples}, "
-          f"eta={eta}, gamma={gamma}, lr={lr}, updates_per_batch={updates_per_batch}")
+          f"eta={eta}, gamma={gamma}, base_lr={lr}, updates_per_batch={updates_per_batch}")
 
     # ---- Main training loop ----
     for epoch in range(1, num_epochs + 1):
+        # update LR according to schedule
+        lr_epoch = get_lr_for_epoch(epoch, base_lr=lr, num_epochs=num_epochs)
+        for pg in optimizer.param_groups:
+            pg["lr"] = lr_epoch
+
         for batch_idx in range(num_batches):
             for _ in range(updates_per_batch):
 
                 optimizer.zero_grad()
 
-                # Compute likelihood + weight-prior (activation prior removed)
                 total_loss, like_loss, prior_loss = compute_mc_loss_with_prior(
                     model=model,
                     step_sizes_dict=step_sizes_dict,
@@ -1076,7 +1102,7 @@ def optimize_step_sizes(
                     batch_idx=batch_idx,
                     num_mc_samples=num_mc_samples,
                     eta=eta,
-                    gamma=gamma,     # now only affects weights
+                    gamma=gamma,
                     device=device,
                 )
 
@@ -1099,29 +1125,42 @@ def optimize_step_sizes(
                         w_step.clamp_(min=w_min, max=w_range)
                         a_step.clamp_(min=a_min, max=a_range)
 
+        # ---- compute avg bits every epoch (for history) ----
+        with torch.no_grad():
+            avg_bits = compute_avg_bits(step_sizes_dict, ranges_dict, channel_weights)
+
         # ---- Logging ----
         if epoch % log_every == 0 or epoch == 1 or epoch == num_epochs:
-            with torch.no_grad():
-                avg_bits = compute_avg_bits(step_sizes_dict, ranges_dict, channel_weights)
-
             print(f"[Epoch {epoch:4d}] "
+                  f"LR={lr_epoch:.3e} | "
                   f"Total={total_loss.item():.6f} | "
                   f"Like={like_loss.item():.6f} | "
                   f"Prior={prior_loss.item():.6f} | "
                   f"AvgBits={avg_bits:.2f}")
 
-        # ---- Evaluation callback (NEW) ----
+        # ---- Save per-epoch to history ----
+        history.append({
+            "epoch": epoch,
+            "lr": float(lr_epoch),
+            "total_loss": float(total_loss.item()),
+            "likelihood_loss": float(like_loss.item()),
+            "prior_loss": float(prior_loss.item()),
+            "avg_bits": float(avg_bits),
+        })
+
+        # ---- Optional: evaluation callback (e.g. PPQ every N epochs) ----
         if eval_every is not None and eval_callback is not None:
             if epoch % eval_every == 0:
                 eval_callback(epoch, step_sizes_dict, ranges_dict)
 
     # ------------------------------
-    # Return updated step_sizes_dict
+    # Return updated step_sizes_dict + ranges + history
     # ------------------------------
     if return_ranges:
-        return step_sizes_dict, ranges_dict
+        return step_sizes_dict, ranges_dict, history
     else:
-        return step_sizes_dict
+        return step_sizes_dict, history
+
 
 
 
@@ -1347,39 +1386,37 @@ def evaluate_with_stepsizes(
 
 
 def main():
-
     # --- Paths / config ---
     model_path   = "models/NS-PwC-T"
     data_path    = "dataset/NS-PwC"
     dataset_name = "fluids.incompressible.PiecewiseConstants"
 
-    # PPQ hyperparams
-    num_epochs      = 400
+    num_epochs      = 400      # <<< use 400 later
     num_mc_samples  = 5
-    lr              = 1e-4
+    base_lr         = 1e-4
     eta             = 1e-6
-    gamma           = 1e-4               # ← no MDL prior for now
     percentile_prob = 1e-4
-    init_bits       = 4                   # ← match dynamic-4 init
+    init_bits       = 4
     bmax_bits       = 20
     device          = "cuda"
 
-    eval_every      = 4                  # ← evaluate every 50 epochs
+    # gamma sweep
+    gamma_list = [1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9]
 
-    # --- 1) Load Poseidon model ---
+    # --- 1) Load model ---
     model, device = load_poseidon_model(model_path, device=device)
 
-    # --- 2) Build calibration + validation data ---
+    # --- 2) Data loaders ---
     calib_loader, val_loader, calib_iter, val_iter = build_poseidon_loaders(
         dataset_name=dataset_name,
         data_path=data_path,
         calib_batchsize=2,
         calib_steps=64,
-        val_batchsize=4,                  # stable for evaluation
-        val_steps=40
+        val_batchsize=4,
+        val_steps=40,
     )
 
-    # --- 3) Load quantizable Linear layers ---
+    # --- 3) Candidate Linear layers ---
     b_quant_path = os.path.join(INSPECT_DIR, 'T_quantize_layers.pt')
     print(f"[INFO] Loading quantize layer list from: {b_quant_path}")
     layer_data = torch.load(b_quant_path)
@@ -1390,68 +1427,98 @@ def main():
     ]
     print(f"[INFO] {len(cand_layers)} candidate Linear layers")
 
-    # ================================================================================
-    # (A) Load precomputed 4-bit dynamic step sizes (weights-only)
-    # ================================================================================
+    # --- 4) dynamic baselines (once) ---
     dyn_stats_dir = os.path.join(PROJECT_ROOT, "dynamic_stats")
     dyn4_file = os.path.join(dyn_stats_dir, "NS-PwC-T-dynamic-stepsizes-4.json")
-
     with open(dyn4_file, "r") as f:
-        dyn4_raw = json.load(f)["step_sizes"]    # {layer_name: [S_out_channels]}
-
-    # convert lists → tensors on same device as model
+        dyn4_raw = json.load(f)["step_sizes"]
     dyn4_steps = {
         name: torch.tensor(s, dtype=torch.float32, device=device)
         for name, s in dyn4_raw.items()
     }
-    print(f"[INFO] Loaded 4-bit dynamic steps from: {dyn4_file}")
 
-    # ================================================================================
-    # (B) Compute dynamic-8 and dynamic-16 step sizes on the fly
-    # ================================================================================
     print("[INFO] Computing 8-bit and 16-bit dynamic step sizes...")
     dyn8_steps  = compute_dynamic_stepsizes(model, cand_layers, num_bits=8,  device=device)
     dyn16_steps = compute_dynamic_stepsizes(model, cand_layers, num_bits=16, device=device)
 
-    # ================================================================================
-    # (C) Prepare results storage (for per-epoch eval)
-    # ================================================================================
+    # --- 5) artifacts paths ---
     model_name     = os.path.basename(model_path.rstrip("/"))
     artifacts_root = os.path.join(PROJECT_ROOT, "ppq_artifacts")
     artifacts_dir  = os.path.join(artifacts_root, model_name)
-    os.makedirs(artifacts_dir, exist_ok=True)
+    lr_dir         = os.path.join(artifacts_dir, "lr")
+    os.makedirs(lr_dir, exist_ok=True)
 
-    results_path = os.path.join(artifacts_dir, "PwC-T-results-1-4.json")
-    results = {}
-
-    # --- NEW: precompute parameter counts per channel for all cand_layers ---
-    # This must match what you use inside optimize_step_sizes.
+    # --- 6) precompute channel weights (for avg bits) ---
+    global channel_weights
     channel_weights = build_channel_param_weights(model, cand_layers)
 
-    # ================================================================================
-    # (D) Define evaluation callback (called from inside optimize_step_sizes)
-    # ================================================================================
-    def eval_callback(epoch: int,
-                      step_sizes_dict: dict[str, tuple[torch.nn.Parameter, torch.Tensor]],
-                      ranges_dict: dict[str, dict[str, torch.Tensor]]):
+    # --- 7) Gamma sweep ---
+    for gamma in gamma_list:
+        print("\n" + "=" * 80)
+        print(f"   STARTING PPQ TRAINING FOR gamma={gamma:.0e}")
+        print("=" * 80)
 
-        print(f"\n================ EVALUATION @ epoch {epoch} ================")
+        # storage for per-epoch PPQ evaluations (for THIS gamma)
+        ppq_epoch_evals: dict[int, dict[str, float]] = {}
 
-        # 1) Average bits for current PPQ state (parameter-weighted)
-        avg_bits = compute_avg_bits(step_sizes_dict, ranges_dict, channel_weights)
-        print(f"[INFO] AvgBits (PPQ) @ epoch {epoch}: {avg_bits:.3f}")
+        # define callback that only evaluates PPQ every eval_every epochs
+        def eval_callback(
+            epoch: int,
+            step_sizes_dict: dict[str, tuple[torch.nn.Parameter, torch.Tensor]],
+            ranges_dict: dict[str, dict[str, torch.Tensor]],
+        ):
+            print(f"\n================ PPQ EVAL @ epoch {epoch} ================")
 
-        # 2) Evaluate PPQ (current learned steps)
+            ppq_metrics = evaluate_with_stepsizes(
+                model=model,
+                val_loader=val_iter,
+                weight_steps=step_sizes_dict,   # current learned PPQ steps
+                act_steps=None,
+                layer_names=cand_layers,
+                device=device,
+            )
+
+            # cache for saving later
+            ppq_epoch_evals[epoch] = ppq_metrics
+
+            print(
+                f"[PPQ-EPOCH-{epoch}] "
+                f"L1={ppq_metrics['l1']:.6e} | RelL1={ppq_metrics['rel_l1']:.6e}"
+            )
+
+        # ---------- run PPQ optimisation with LR schedule & history ----------
+        step_sizes_dict, ranges_dict, history = optimize_step_sizes(
+            model=model,
+            dataloader=calib_iter,
+            ranges_dict=None,
+            num_epochs=num_epochs,
+            num_mc_samples=num_mc_samples,
+            lr=base_lr,             # base LR; schedule will scale it
+            eta=eta,
+            gamma=gamma,
+            device=device,
+            percentile_prob=percentile_prob,
+            layer_names=cand_layers,
+            init_bits=init_bits,
+            bmax_bits=bmax_bits,
+            log_every=10,
+            updates_per_batch=1,
+            return_ranges=True,
+            eval_every=4,           # <--- evaluate PPQ every 4 epochs
+            eval_callback=eval_callback,
+        )
+
+        # ----- final evaluation for this gamma -----
+        print("\n================ FINAL EVALUATION =================")
         ppq_metrics = evaluate_with_stepsizes(
             model=model,
-            val_loader=val_iter,      # callable, evaluate_with_stepsizes should handle this
+            val_loader=val_iter,
             weight_steps=step_sizes_dict,
-            act_steps=None,           # weights-only quantization
+            act_steps=None,
             layer_names=cand_layers,
             device=device,
         )
 
-        # 3) Evaluate dynamic-4 baseline
         dyn4_metrics = evaluate_with_stepsizes(
             model=model,
             val_loader=val_iter,
@@ -1461,7 +1528,6 @@ def main():
             device=device,
         )
 
-        # 4) Evaluate dynamic-8 baseline
         dyn8_metrics = evaluate_with_stepsizes(
             model=model,
             val_loader=val_iter,
@@ -1471,7 +1537,6 @@ def main():
             device=device,
         )
 
-        # 5) Evaluate dynamic-16 baseline
         dyn16_metrics = evaluate_with_stepsizes(
             model=model,
             val_loader=val_iter,
@@ -1481,85 +1546,85 @@ def main():
             device=device,
         )
 
-        # 6) Save all metrics for this epoch
-        results[epoch] = {
-            "avg_bits": float(avg_bits),
-            "ppq":  ppq_metrics,
-            "dyn4": dyn4_metrics,
-            "dyn8": dyn8_metrics,
-            "dyn16": dyn16_metrics,
+        # final avg bits
+        with torch.no_grad():
+            final_avg_bits = compute_avg_bits(step_sizes_dict, ranges_dict, channel_weights)
+
+        # ----- save JSON for this gamma -----
+        results_obj = {
+            "gamma": float(gamma),
+            "meta": {
+                "model_path": model_path,
+                "dataset_name": dataset_name,
+                "eta": eta,
+                "percentile_prob": percentile_prob,
+                "num_epochs": num_epochs,
+                "num_mc_samples": num_mc_samples,
+                "init_bits": init_bits,
+                "bmax_bits": bmax_bits,
+                "base_lr": base_lr,
+                "final_avg_bits": float(final_avg_bits),
+            },
+            "train_history": history,            # list over epochs
+            "ppq_epoch_evals": ppq_epoch_evals,  # PPQ-only eval every 4 epochs
+            "final_eval": {
+                "ppq":  ppq_metrics,
+                "dyn4": dyn4_metrics,
+                "dyn8": dyn8_metrics,
+                "dyn16": dyn16_metrics,
+            },
         }
 
-        with open(results_path, "w") as f:
-            json.dump(results, f, indent=2)
+        result_file = os.path.join(lr_dir, f"PwC-T-gamma-{gamma:.0e}.json")
+        with open(result_file, "w") as f:
+            json.dump(results_obj, f, indent=2)
+        print(f"[INFO] Saved LR+gamma sweep results → {result_file}")
 
-        print(f"[INFO] Saved evaluation results @ epoch {epoch} → {results_path}")
-
-    # ================================================================================
-    # (E) Run PPQ optimization WITH eval callback
-    # ================================================================================
-    step_sizes_dict, ranges_dict = optimize_step_sizes(
-        model=model,
-        dataloader=calib_iter,
-        ranges_dict=None,
-        num_epochs=num_epochs,
-        num_mc_samples=num_mc_samples,
-        lr=lr,
-        eta=eta,
-        gamma=gamma,
-        device=device,
-        percentile_prob=percentile_prob,
-        layer_names=cand_layers,
-        init_bits=init_bits,
-        bmax_bits=bmax_bits,
-        log_every=1,
-        updates_per_batch=1,
-        return_ranges=True,
-        eval_every=eval_every,
-        eval_callback=eval_callback,
-    )
-
-
-    # ================================================================================
-    # (F) Save final learned PPQ step sizes
-    # ================================================================================
-    save_obj = {
-        "step_sizes": {
-            k: (v[0].detach().cpu(), v[1].detach().cpu())
-            for k, v in step_sizes_dict.items()
-        },
-        "meta": {
-            "model_path": model_path,
-            "dataset_name": dataset_name,
-            "eta": eta,
-            "gamma": gamma,
-            "percentile_prob": percentile_prob,
-            "num_epochs": num_epochs,
-            "num_mc_samples": num_mc_samples,
-            "init_bits": init_bits,
-            "bmax_bits": bmax_bits,
-        },
-    }
-
-    step_pt_path   = os.path.join(artifacts_dir, "ppq_step_sizes-1-4.pt")
-    step_json_path = os.path.join(artifacts_dir, "ppq_step_sizes-1-4.json")
-
-    torch.save(save_obj, step_pt_path)
-    with open(step_json_path, "w") as f:
-        json.dump(
-            {
-                "step_sizes": {
-                    k: (v[0].tolist(), v[1].tolist())
-                    for k, v in save_obj["step_sizes"].items()
-                },
-                "meta": save_obj["meta"],
+        # ------------------------------------------------------------------
+        #  EXTRA: save learned step sizes for this gamma in a separate file
+        # ------------------------------------------------------------------
+        step_save_obj = {
+            "step_sizes": {
+                name: (w_step.detach().cpu(), a_step.detach().cpu())
+                for name, (w_step, a_step) in step_sizes_dict.items()
             },
-            f,
-            indent=2,
-        )
+            "meta": {
+                "model_path": model_path,
+                "dataset_name": dataset_name,
+                "gamma": float(gamma),
+                "eta": eta,
+                "percentile_prob": percentile_prob,
+                "num_epochs": num_epochs,
+                "num_mc_samples": num_mc_samples,
+                "init_bits": init_bits,
+                "bmax_bits": bmax_bits,
+                "base_lr": base_lr,
+                "final_avg_bits": float(final_avg_bits),
+            },
+        }
 
-    print(f"\n✓ Saved learned PPQ step sizes → {step_pt_path}")
-    print(f"✓ Also saved JSON version     → {step_json_path}\n")
+        # binary .pt version
+        step_pt_path = os.path.join(lr_dir, f"ppq_step_sizes-gamma-{gamma:.0e}.pt")
+        torch.save(step_save_obj, step_pt_path)
+
+        # JSON version (for quick inspection)
+        step_json_path = os.path.join(lr_dir, f"ppq_step_sizes-gamma-{gamma:.0e}.json")
+        with open(step_json_path, "w") as f:
+            json.dump(
+                {
+                    "step_sizes": {
+                        name: (w.cpu().tolist(), a.cpu().tolist())
+                        for name, (w, a) in step_save_obj["step_sizes"].items()
+                    },
+                    "meta": step_save_obj["meta"],
+                },
+                f,
+                indent=2,
+            )
+
+        print(f"[INFO] Saved step sizes → {step_pt_path}")
+        print(f"[INFO] Saved step sizes (JSON) → {step_json_path}")
+
 
 
 
