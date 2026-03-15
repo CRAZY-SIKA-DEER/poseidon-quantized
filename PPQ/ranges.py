@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+from pathlib import Path
 
 def compute_data_ranges_poseidon(
     model,
@@ -140,6 +140,48 @@ def compute_data_ranges_poseidon(
     return ranges_dict
 
 
+
+def load_precalculated_ranges_if_exists(model_path, percentile_prob, repo_root, device="cpu"):
+    """
+    Try loading cached ranges from:
+      <repo_root>/precalculated_ranges/<model_name>/p<percentile>/ranges.pt
+
+    Returns:
+      ranges_dict or None
+    """
+    model_name = Path(model_path).name
+    percentile_tag = f"p{float(percentile_prob):.0e}"
+    ranges_path = (
+        Path(repo_root)
+        / "precalculated_ranges"
+        / model_name
+        / percentile_tag
+        / "ranges.pt"
+    )
+
+    if not ranges_path.exists():
+        print(f"[INFO] Precalculated ranges not found: {ranges_path}")
+        return None
+
+    print(f"[INFO] Loading precalculated ranges from: {ranges_path}")
+    obj = torch.load(ranges_path, map_location="cpu")
+    ranges_dict = obj["ranges_dict"]
+
+    # move tensors to target device
+    out = {}
+    for name, value in ranges_dict.items():
+        out[name] = {
+            "weight_ranges": value["weight_ranges"].to(device),
+            "activation_ranges": value["activation_ranges"].to(device),
+        }
+
+    print(f"[INFO] Loaded precalculated ranges for {len(out)} layers.")
+    return out
+
+
+
+
+
 def evaluate_quantized_model_poseidon(
     model,
     dataloader,
@@ -274,3 +316,4 @@ def find_best_percentile_poseidon(
             best_percentile = p
 
     return best_percentile
+
