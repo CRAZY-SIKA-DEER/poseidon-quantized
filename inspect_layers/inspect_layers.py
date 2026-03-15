@@ -10,6 +10,54 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from scOT.model import ScOT
 
+'''
+Yes, for changing to another Poseidon model, in this script you mainly change:
+model_path = "models/NS-PwC-T"
+and then rerun it.
+The 3 files mean:
+1. T_layer_info_all.json
+Contains all quantizable layers found by:
+nn.Conv2d
+nn.ConvTranspose2d
+nn.Linear
+with no exclusion filter.
+For each layer, it stores metadata like:
+layer type
+in/out channels or features
+kernel/stride/padding for convs
+parameter count
+So this is the full candidate list.
+2. T_layer_info_filtered.json
+Contains the same kind of metadata, but after excluding layer names containing:
+"norm"
+"time"
+So this is the filtered candidate list.
+3. T_quantize_layers.json
+Contains only a list of layer names selected for quantization, based on layer_info_filtered.
+So:
+no detailed metadata
+just names
+This is the human-readable quantization layer list.
+4. T_quantize_layers.pt
+This is basically the same selection as above, but saved as a PyTorch object:
+{
+    'quantize_layers': quantize_layers,
+    'layer_count': len(quantize_layers)
+}
+This is the file your later PPQ code likely loads.
+
+
+quantize_layers has the same layer names as layer_info_filtered only because exclude_additional=None here.
+
+
+
+
+'''
+
+
+
+
+
 # Directory where this script lives (main/inspect_layers)
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -196,9 +244,13 @@ def select_layers_for_quantization(layer_info, exclude_additional=None):
 # ========================
 if __name__ == "__main__":
     # Configuration
-    #model_path = "models/NS-PwC"
+    model_path = "models/NS-PwC-L"
     #model_path = "models/NS-PwC-B"
-    model_path = "models/NS-PwC-T"
+    #model_path = "models/NS-PwC-T"
+
+    model_tag = os.path.basename(model_path)   # NS-PwC-T
+    suffix = model_tag.split("-")[-1]          # T / B / L
+    prefix = f"{suffix}_"
 
     device = "cuda"
     
@@ -236,10 +288,10 @@ if __name__ == "__main__":
     print("\nSaving detailed layer info to JSON files...")
 
     # Build full paths under the script directory (inspect_layers/)
-    all_path = os.path.join(SCRIPT_DIR, 'T_layer_info_all.json')
-    filtered_path = os.path.join(SCRIPT_DIR, 'T_layer_info_filtered.json')
-    quant_list_path = os.path.join(SCRIPT_DIR, 'T_quantize_layers.json')
-    quant_pt_path = os.path.join(SCRIPT_DIR, 'T_quantize_layers.pt')
+    all_path = os.path.join(SCRIPT_DIR, f'{prefix}layer_info_all.json')
+    filtered_path = os.path.join(SCRIPT_DIR, f'{prefix}layer_info_filtered.json')
+    quant_list_path = os.path.join(SCRIPT_DIR, f'{prefix}quantize_layers.json')
+    quant_pt_path = os.path.join(SCRIPT_DIR, f'{prefix}quantize_layers.pt')
 
     # Save all layers
     with open(all_path, 'w') as f:
@@ -268,9 +320,9 @@ if __name__ == "__main__":
     
     print("\n" + "="*80)
     print("DONE! Files created:")
-    print("  - T_layer_info_all.json (full details, all layers)")
-    print("  - T_layer_info_filtered.json (full details, filtered)")
-    print("  - T_quantize_layers.json (list of layer names to quantize)")
-    print("  - T_quantize_layers.pt (lightweight, for code use)")
+    print(f'  - {prefix}layer_info_all.json (full details, all layers)')
+    print(f'  - {prefix}layer_info_filtered.json (full details, filtered)')
+    print(f'  - {prefix}quantize_layers.json (list of layer names to quantize)')
+    print(f'  - {prefix}quantize_layers.pt (lightweight, for code use)')
     print("\nYou can open the JSON files in any text editor to see all layers!")
     print("="*80 + "\n")
