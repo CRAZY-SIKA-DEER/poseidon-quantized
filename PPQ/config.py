@@ -49,10 +49,10 @@ class PPQConfig:
     # -------------------------
     # Model / data
     # -------------------------
-    model_path: str = "models/NS-PwC-B"
+    model_path: str = "models/NS-PwC-L"
     data_path: str = "dataset/NS-PwC"
     dataset_name: str = "fluids.incompressible.PiecewiseConstants"
-    quant_layer_file: str = "B_quantize_layers.pt"
+    quant_layer_file: str = "L_quantize_layers.pt"
 
     # -------------------------
     # Device
@@ -64,8 +64,8 @@ class PPQConfig:
     # -------------------------
     calib_batchsize: int = 2
     calib_steps: int = 512 #256 #512 #128  #64
-    val_batchsize: int = 4
-    val_steps: int = 40
+    val_batchsize: int = 2
+    val_steps: int = 512
 
     # -------------------------#
     # PPQ optimization

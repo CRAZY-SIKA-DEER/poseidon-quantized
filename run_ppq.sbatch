@@ -12,5 +12,6 @@ mkdir -p logs
 source /home/u6ey/yiheng.u6ey/miniforge3/etc/profile.d/conda.sh
 conda activate ppq
 
-PYTHONPATH=/home/u6ey/yiheng.u6ey/poseidon-quantized:$PYTHONPATH python PPQ/run_ppq_poseidon.py
+#PYTHONPATH=/home/u6ey/yiheng.u6ey/poseidon-quantized:$PYTHONPATH python PPQ/run_ppq_poseidon.py
 #PYTHONPATH=/home/u6ey/yiheng.u6ey/poseidon-quantized:$PYTHONPATH python precalculated_ranges/collect_data_ranges.py
+PYTHONPATH=/home/u6ey/yiheng.u6ey/poseidon-quantized:$PYTHONPATH python BRECQ/quant/main_poseidon_brecq.py --model_path models/NS-PwC-L --dataset_name fluids.incompressible.PiecewiseConstants --data_path dataset/NS-PwC --device cuda --n_bits_w 4 --channel_wise --calib_batchsize 2 --calib_steps 2 --val_batchsize 2 --val_steps 2 --batch_size_recon 2 --iters_w 10 --test_before_calibration
