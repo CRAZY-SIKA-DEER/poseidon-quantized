@@ -106,7 +106,7 @@ def recon_model(qnn: nn.Module, cali_data, args):
                 batch_size=args.batch_size_recon,
                 iters=args.iters_w,
                 weight=args.weight,
-                opt_mode="mse",
+                opt_mode=args.opt_mode,
                 asym=True,
                 include_act_func=True,
                 b_range=(args.b_start, args.b_end),
@@ -147,6 +147,13 @@ def main():
 
     parser.add_argument("--batch_size_recon", default=2, type=int)
     parser.add_argument("--test_before_calibration", action="store_true")
+
+    parser.add_argument(
+    "--opt_mode",
+    default="mse",
+    choices=["mse", "fisher_diag", "fisher_full"],
+    type=str,
+    )
 
     args = parser.parse_args()
 

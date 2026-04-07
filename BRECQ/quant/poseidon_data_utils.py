@@ -1,5 +1,6 @@
 import copy
 import torch
+import torch.nn.functional as F
 from typing import Any, Dict, List, Tuple, Union
 
 from BRECQ.quant.quant_layer import QuantModule
@@ -18,9 +19,10 @@ def move_to_device(obj: Any, device: torch.device):
         return obj.to(device)
     elif isinstance(obj, dict):
         return {k: move_to_device(v, device) for k, v in obj.items()}
-    elif isinstance(obj, (list, tuple)):
-        out = [move_to_device(v, device) for v in obj]
-        return type(obj)(out) if isinstance(obj, tuple) else out
+    elif isinstance(obj, list):
+        return [move_to_device(v, device) for v in obj]
+    elif isinstance(obj, tuple):
+        return tuple(move_to_device(v, device) for v in obj)
     else:
         return obj
 
@@ -62,7 +64,10 @@ def slice_batch(batch: Dict[str, Any], start: int, end: int) -> Dict[str, Any]:
     return out
 
 
-def expand_cali_data(cali_data: Union[List[Dict[str, Any]], Dict[str, Any]], batch_size: int):
+def expand_cali_data(
+    cali_data: Union[List[Dict[str, Any]], Dict[str, Any]],
+    batch_size: int,
+):
     """
     Normalize calibration data into a list of mini-batch dicts.
 
@@ -109,7 +114,6 @@ class DataSaverHook:
             self.input_store = input_batch
 
         if self.store_output:
-            # ScOTLayer returns (layer_output,) or (layer_output, attn)
             if isinstance(output_batch, tuple):
                 self.output_store = output_batch[0]
             else:
@@ -123,7 +127,7 @@ class PoseidonGetLayerInpOut:
     """
     Poseidon-specific version of GetLayerInpOut.
 
-    Main difference from original BRECQ:
+    Main differences from original BRECQ:
     - model input is a batch dict, not a single tensor
     - block input is a tuple of multiple arguments, not a single tensor
     """
@@ -147,7 +151,6 @@ class PoseidonGetLayerInpOut:
         self.model.set_quant_state(False, False)
 
         batch_on_device = move_to_device(model_input, self.device)
-
         handle = self.layer.register_forward_hook(self.data_saver)
 
         with torch.no_grad():
@@ -157,7 +160,7 @@ class PoseidonGetLayerInpOut:
                 pass
 
             if self.asym:
-                # recompute block input using quantized prefix, but still use FP target output
+                # recompute block input using quantized prefix, but keep FP target output
                 self.data_saver.store_output = False
                 self.model.set_quant_state(weight_quant=True, act_quant=self.act_quant)
                 try:
@@ -172,11 +175,8 @@ class PoseidonGetLayerInpOut:
         self.layer.set_quant_state(True, self.act_quant)
         self.model.train()
 
-        # input_store is the full argument tuple passed to the block
-        # output_store is the tensor target for reconstruction
         block_args = detach_to_cpu(self.data_saver.input_store)
         block_out = detach_to_cpu(self.data_saver.output_store)
-
         return block_args, block_out
 
 
@@ -194,9 +194,6 @@ def save_inp_oup_data(
     Returns:
         cached_inputs: list of block input tuples
         cached_outputs: list of output tensors
-
-    This is intentionally different from original BRECQ, because Poseidon blocks
-    need multiple forward arguments, not just one tensor.
     """
     device = next(model.parameters()).device
     get_inp_out = PoseidonGetLayerInpOut(
@@ -210,7 +207,9 @@ def save_inp_oup_data(
     cached_inputs = []
     cached_outputs = []
 
-    torch.cuda.empty_cache()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
     cali_batches = expand_cali_data(cali_data, batch_size=batch_size)
 
     for batch in cali_batches:
@@ -218,13 +217,137 @@ def save_inp_oup_data(
         cached_inputs.append(cur_inp)
         cached_outputs.append(cur_out)
 
-    torch.cuda.empty_cache()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
     return cached_inputs, cached_outputs
+
+
+class GradSaverHook:
+    """
+    Backward hook that stores gradient of block output.
+    """
+    def __init__(self, store_grad: bool = True):
+        self.store_grad = store_grad
+        self.stop_backward = False
+        self.grad_out = None
+
+    def __call__(self, module, grad_input, grad_output):
+        if self.store_grad:
+            self.grad_out = grad_output[0]
+        if self.stop_backward:
+            raise StopForwardException
+
+
+class PoseidonGetLayerGrad:
+    def __init__(
+        self,
+        model,
+        layer: Union[QuantModule, BaseQuantBlock],
+        device: torch.device,
+        act_quant: bool = False,
+    ):
+        self.model = model
+        self.layer = layer
+        self.device = device
+        self.act_quant = act_quant
+        self.data_saver = GradSaverHook(True)
+
+    def __call__(self, model_input: Dict[str, Any]):
+        """
+        Compute gradients of block output by comparing FP model and quantized-prefix model.
+        """
+        self.model.eval()
+
+        handle = self.layer.register_full_backward_hook(self.data_saver)
+
+        batch_on_device = move_to_device(model_input, self.device)
+
+        with torch.enable_grad():
+            try:
+                self.model.zero_grad()
+
+                self.model.set_quant_state(False, False)
+                out_fp = self.model(**batch_on_device)
+                out_fp = get_model_output_tensor(out_fp)
+
+                quantize_model_till(self.model, self.layer, act_quant=self.act_quant)
+                out_q = self.model(**batch_on_device)
+                out_q = get_model_output_tensor(out_q)
+
+                loss = F.mse_loss(out_q, out_fp)
+                loss.backward()
+            except StopForwardException:
+                pass
+
+        handle.remove()
+        self.model.set_quant_state(False, False)
+        self.layer.set_quant_state(True, self.act_quant)
+        self.model.train()
+
+        if self.data_saver.grad_out is None:
+            raise RuntimeError("Failed to capture gradient for target block.")
+
+        return self.data_saver.grad_out.detach()
+
+
+def save_grad_data(
+    model,
+    layer: Union[QuantModule, BaseQuantBlock],
+    cali_data: Union[List[Dict[str, Any]], Dict[str, Any]],
+    damping: float = 1.0,
+    act_quant: bool = False,
+    batch_size: int = 32,
+):
+    """
+    Poseidon-specific gradient cacher for fisher-based reconstruction.
+
+    Returns:
+        cached_grads: list of gradient tensors aligned with cached_inputs/cached_outputs
+    """
+    device = next(model.parameters()).device
+    get_grad = PoseidonGetLayerGrad(
+        model=model,
+        layer=layer,
+        device=device,
+        act_quant=act_quant,
+    )
+
+    cached_grads = []
+
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+    cali_batches = expand_cali_data(cali_data, batch_size=batch_size)
+
+    for batch in cali_batches:
+        cur_grad = get_grad(batch)
+        cur_grad = cur_grad.abs() + damping
+        cached_grads.append(cur_grad.cpu())
+
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+    return cached_grads
+
+
+def quantize_model_till(model, layer: Union[QuantModule, BaseQuantBlock], act_quant: bool = False):
+    """
+    Quantize modules in model order until reaching the target layer/block.
+    Assumes model.named_modules() follows execution order closely enough,
+    same assumption as original BRECQ.
+    """
+    model.set_quant_state(False, False)
+    for _, module in model.named_modules():
+        if isinstance(module, (QuantModule, BaseQuantBlock)):
+            module.set_quant_state(True, act_quant)
+        if module == layer:
+            break
 
 
 def move_block_args_to_device(block_args: Tuple[Any, ...], device: torch.device):
     """
-    Move cached block input tuple back to GPU before reconstruction forward.
+    Move cached block input tuple back to device before reconstruction forward.
     """
     return tuple(move_to_device(x, device) for x in block_args)
 
@@ -236,3 +359,18 @@ def get_reconstruction_output(block_output):
     if isinstance(block_output, tuple):
         return block_output[0]
     return block_output
+
+
+def get_model_output_tensor(model_output):
+    """
+    Normalize full model forward output to the main prediction tensor.
+    Supports:
+    - ScOTOutput with .output
+    - tuple/list outputs
+    - raw tensor outputs
+    """
+    if hasattr(model_output, "output"):
+        return model_output.output
+    if isinstance(model_output, (tuple, list)):
+        return model_output[0]
+    return model_output
