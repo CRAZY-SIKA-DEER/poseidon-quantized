@@ -4,7 +4,7 @@ from BRECQ.quant.quant_layer import QuantModule, StraightThrough
 from BRECQ.quant.quant_block import BaseQuantBlock
 
 # change these imports to your real paths if needed
-from poseidon_quant_block import specials
+from BRECQ.quant.poseidon_quant_block import specials
 from scOT.model import LayerNorm, ConditionalLayerNorm
 
 

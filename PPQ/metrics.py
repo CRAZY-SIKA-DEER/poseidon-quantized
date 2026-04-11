@@ -257,6 +257,9 @@ def evaluate_with_stepsizes(
 
     rel_l1_list = []
     abs_l1_list = []
+    
+    print(f"[DEBUG] number of quant hooks registered = {len(handles)}")
+
 
     with torch.no_grad():
         for batch in loader:

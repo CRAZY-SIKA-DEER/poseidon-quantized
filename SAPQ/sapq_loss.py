@@ -1,61 +1,8 @@
 # SAPQ/sapq_loss.py
-"""
-Structural-Aware Probabilistic Quantization (SAPQ) loss utilities.
-
-This file implements the core SAPQ objective:
-
-1) Block-wise probabilistic likelihood
-   - optimize learnable channel-wise weight step sizes
-   - inject PPQ-style additive uniform noise into weights
-   - run the whole block forward
-   - compare noisy block output with cached FP block output
-   - support curvature weighting:
-       * mse          : identity geometry
-       * fisher_diag  : diagonal Fisher weighting
-       * fisher_full  : BRECQ-style fuller approximation
-
-2) Sensitivity-aware bitwidth prior
-   - prior is centered at one shared target bitwidth B_target
-   - sensitivity only changes prior width sigma_{b,c}
-   - more sensitive channels => looser prior
-   - less sensitive channels => tighter prior
-
-Important design note
----------------------
-This file is written for BLOCK-BY-BLOCK SAPQ.
-
-So the trainer should pass block-local dictionaries:
-    block_step_sizes_dict
-    block_ranges_dict
-    block_sens_dict
-
-where the keys are local module names inside the current block
-(e.g. names from block.named_modules()).
-
-Typical usage inside a future trainer:
-    total, like, prior = compute_sapq_loss_with_prior(
-        block=block,
-        block_step_sizes_dict=block_step_sizes_dict,
-        cached_block_inputs=cached_inputs,
-        cached_block_outputs=cached_outputs,
-        cached_block_grads=cached_grads,
-        block_ranges_dict=block_ranges_dict,
-        block_sens_dict=block_sens_dict,
-        batch_idx=batch_idx,
-        num_mc_samples=cfg.num_mc_samples,
-        rec_loss="fisher_diag",
-        b_target=cfg.target_bits,
-        sigma0=cfg.sigma0,
-        alpha=cfg.alpha,
-        prior_scale=cfg.prior_scale,
-        device=device,
-    )
-"""
-
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import Dict, Iterable, Mapping, Optional, Tuple
+from typing import Mapping, Optional, Tuple
 
 import torch
 
@@ -64,19 +11,19 @@ from BRECQ.quant.quant_layer import QuantModule
 
 
 # ---------------------------------------------------------------------
-# Small local helpers
+# helpers
 # ---------------------------------------------------------------------
 
-def _move_block_args_to_device(block_args, device: torch.device):
-    if torch.is_tensor(block_args):
-        return block_args.to(device)
-    if isinstance(block_args, tuple):
-        return tuple(_move_block_args_to_device(x, device) for x in block_args)
-    if isinstance(block_args, list):
-        return [_move_block_args_to_device(x, device) for x in block_args]
-    if isinstance(block_args, dict):
-        return {k: _move_block_args_to_device(v, device) for k, v in block_args.items()}
-    return block_args
+def _move_to_device(obj, device: torch.device):
+    if torch.is_tensor(obj):
+        return obj.to(device)
+    if isinstance(obj, tuple):
+        return tuple(_move_to_device(x, device) for x in obj)
+    if isinstance(obj, list):
+        return [_move_to_device(x, device) for x in obj]
+    if isinstance(obj, dict):
+        return {k: _move_to_device(v, device) for k, v in obj.items()}
+    return obj
 
 
 def _get_reconstruction_output(block_output):
@@ -97,7 +44,7 @@ def _get_weight_steps(step_entry):
     return step_entry
 
 
-def _named_quantmodules(block) -> Dict[str, QuantModule]:
+def _named_quantmodules(block) -> dict[str, QuantModule]:
     return {
         name: module
         for name, module in block.named_modules()
@@ -105,86 +52,49 @@ def _named_quantmodules(block) -> Dict[str, QuantModule]:
     }
 
 
-def _reduce_dims(x: torch.Tensor) -> Tuple[int, ...]:
-    return tuple(range(1, x.dim()))
-
-
 # ---------------------------------------------------------------------
-# Curvature / reconstruction energy
+# likelihood energy
 # ---------------------------------------------------------------------
 
-def compute_block_reconstruction_energy(
+def compute_block_fisher_diag_energy(
     pred: torch.Tensor,
     tgt: torch.Tensor,
-    grad: Optional[torch.Tensor] = None,
-    rec_loss: str = "fisher_diag",
+    grad: torch.Tensor,
 ) -> torch.Tensor:
     """
-    Returns per-sample reconstruction energy E_i.
+    Per-sample Fisher-diagonal weighted block reconstruction energy.
 
-    Shapes:
-        pred, tgt, grad: [B, ...]
-    Output:
+    Implements the SAPQ likelihood geometry:
+        E_i = sum( (pred - tgt)^2 * grad^2 )
+
+    where grad is the gradient of the FINAL output loss back to the
+    current block output (cached beforehand).
+
+    Args:
+        pred: [B, ...]
+        tgt:  [B, ...]
+        grad: [B, ...]
+
+    Returns:
         energy: [B]
-
-    Supported:
-        - mse
-        - fisher_diag
-        - fisher_full
     """
     if pred.shape != tgt.shape:
         raise ValueError(
             f"pred.shape={tuple(pred.shape)} != tgt.shape={tuple(tgt.shape)}"
         )
+    if grad.shape != pred.shape:
+        raise ValueError(
+            f"grad.shape={tuple(grad.shape)} != pred.shape={tuple(pred.shape)}"
+        )
 
-    rdims = _reduce_dims(pred)
+    reduce_dims = tuple(range(1, pred.dim()))
     delta = pred - tgt
-
-    if rec_loss == "mse":
-        # Identity geometry
-        energy = delta.pow(2).sum(dim=rdims)
-        return energy
-
-    if rec_loss == "fisher_diag":
-        if grad is None:
-            raise ValueError("grad must not be None when rec_loss='fisher_diag'")
-        if grad.shape != pred.shape:
-            raise ValueError(
-                f"grad.shape={tuple(grad.shape)} != pred.shape={tuple(pred.shape)}"
-            )
-        energy = (delta.pow(2) * grad.pow(2)).sum(dim=rdims)
-        return energy
-
-    if rec_loss == "fisher_full":
-        if grad is None:
-            raise ValueError("grad must not be None when rec_loss='fisher_full'")
-        if grad.shape != pred.shape:
-            raise ValueError(
-                f"grad.shape={tuple(grad.shape)} != pred.shape={tuple(pred.shape)}"
-            )
-
-        # BRECQ-style fuller approximation, converted to per-sample energy.
-        # Original code uses:
-        #   a = |pred - tgt|
-        #   g = |grad|
-        #   dot = sum(a * g)
-        #   rec_loss = mean(dot * a * g) / 100
-        #
-        # Per sample version:
-        #   energy_i = dot_i * mean(a_i * g_i) / 100
-        a = delta.abs()
-        g = grad.abs()
-        ag = a * g
-        dot = ag.sum(dim=rdims)          # [B]
-        mean_ag = ag.mean(dim=rdims)     # [B]
-        energy = (dot * mean_ag) / 100.0
-        return energy
-
-    raise ValueError(f"Unsupported rec_loss: {rec_loss}")
+    energy = (delta.pow(2) * grad.pow(2)).sum(dim=reduce_dims)
+    return energy
 
 
 # ---------------------------------------------------------------------
-# Temporary noisy-weight injection
+# temporary noisy-weight injection
 # ---------------------------------------------------------------------
 
 @contextmanager
@@ -194,13 +104,12 @@ def temporary_block_noisy_weights(
     device: torch.device,
 ):
     """
-    Temporarily replace QuantModule.org_weight inside the block by:
-        W_noisy = W + step * U(-1/2, 1/2)
+    Temporarily replace QuantModule.org_weight by:
+        W_noisy = W + s * U(-1/2, 1/2)
 
     Important:
     - This uses the FP path of QuantModule (org_weight), not AdaRound.
-    - It is meant for SAPQ likelihood optimization over step sizes.
-    - It preserves the original block structure.
+    - This is for SAPQ step-size optimization.
     """
     name2module = _named_quantmodules(block)
     saved_org_weights = {}
@@ -219,8 +128,8 @@ def temporary_block_noisy_weights(
 
             if w_step.numel() != w_clean.shape[0]:
                 raise ValueError(
-                    f"[{local_name}] step size channels ({w_step.numel()}) "
-                    f"!= weight out_channels/out_features ({w_clean.shape[0]})"
+                    f"[{local_name}] step channels ({w_step.numel()}) "
+                    f"!= weight out_channels ({w_clean.shape[0]})"
                 )
 
             saved_org_weights[local_name] = module.org_weight
@@ -235,72 +144,60 @@ def temporary_block_noisy_weights(
 
 
 # ---------------------------------------------------------------------
-# Likelihood
+# likelihood
 # ---------------------------------------------------------------------
 
-def compute_block_mc_loglikelihood_single_batch(
+def compute_block_mc_negative_loglikelihood(
     block,
     block_step_sizes_dict: Mapping[str, torch.Tensor | Tuple[torch.Tensor, torch.Tensor]],
     cached_block_inputs,
     cached_block_outputs,
+    cached_block_grads,
     batch_idx: int,
-    cached_block_grads=None,
     num_mc_samples: int = 10,
-    rec_loss: str = "fisher_diag",
     device: str | torch.device = "cuda",
 ):
     """
-    SAPQ block-wise likelihood for one cached batch.
+    SAPQ block-wise Monte Carlo negative log-likelihood for one cached batch.
 
     Implements:
-        log( (1/M) sum_j exp( -1/2 * E_{i,j} ) )
+        - sum_i log( (1/M) sum_j exp( -1/2 * E_{i,j} ) )
 
-    where E_{i,j} is the block reconstruction energy for sample i and MC draw j.
+    where E_{i,j} is the Fisher-diagonal weighted block reconstruction energy.
 
     Args:
         block:
-            current Poseidon block
+            current block
         block_step_sizes_dict:
-            block-local step size dict keyed by local QuantModule names
+            block-local step sizes keyed by local QuantModule names
         cached_block_inputs:
             list of cached block input tuples
         cached_block_outputs:
-            list of cached FP block output tensors
+            list of cached FP block outputs
+        cached_block_grads:
+            list of cached final-loss gradients wrt block output
         batch_idx:
             which cached batch to use
-        cached_block_grads:
-            optional list of cached gradient tensors, required for fisher_* modes
-        num_mc_samples:
-            number of MC noisy forward samples
-        rec_loss:
-            "mse" | "fisher_diag" | "fisher_full"
 
     Returns:
-        scalar likelihood term to MINIMIZE:
-            -(sum_i log mean_j exp(-1/2 * E_{i,j}))
+        scalar negative log-likelihood to MINIMIZE
     """
     device = torch.device(device)
     block = block.to(device).eval()
+    block.set_quant_state(False, False)
 
     if batch_idx < 0 or batch_idx >= len(cached_block_inputs):
         raise IndexError(f"batch_idx={batch_idx} out of range for cached_block_inputs")
     if batch_idx < 0 or batch_idx >= len(cached_block_outputs):
         raise IndexError(f"batch_idx={batch_idx} out of range for cached_block_outputs")
+    if batch_idx < 0 or batch_idx >= len(cached_block_grads):
+        raise IndexError(f"batch_idx={batch_idx} out of range for cached_block_grads")
 
-    block.set_quant_state(False, False)
-
-    cur_inp = _move_block_args_to_device(cached_block_inputs[batch_idx], device)
+    cur_inp = _move_to_device(cached_block_inputs[batch_idx], device)
     tgt = cached_block_outputs[batch_idx].to(device)
-
-    if rec_loss != "mse":
-        if cached_block_grads is None:
-            raise ValueError("cached_block_grads must not be None for fisher-based loss")
-        grad = cached_block_grads[batch_idx].to(device)
-    else:
-        grad = None
+    grad = cached_block_grads[batch_idx].to(device)
 
     score_list = []
-
     for _ in range(num_mc_samples):
         with temporary_block_noisy_weights(
             block=block,
@@ -310,35 +207,33 @@ def compute_block_mc_loglikelihood_single_batch(
             pred = block(*cur_inp)
             pred = _get_reconstruction_output(pred)
 
-        energy = compute_block_reconstruction_energy(
+        energy = compute_block_fisher_diag_energy(
             pred=pred,
             tgt=tgt,
             grad=grad,
-            rec_loss=rec_loss,
         )  # [B]
+
         score = -0.5 * energy
         score_list.append(score)
 
     # [M, B]
     scores = torch.stack(score_list, dim=0)
 
-    # log(1/M sum_j exp(score_j)) = logsumexp(scores) - log(M)
     log_prob_per_sample = torch.logsumexp(scores, dim=0) - torch.log(
         torch.tensor(float(num_mc_samples), device=device)
     )
 
-    # We minimize negative log-likelihood
     nll = -log_prob_per_sample.sum()
     return nll
 
 
 # ---------------------------------------------------------------------
-# Prior
+# prior
 # ---------------------------------------------------------------------
 
 def compute_sensitivity_aware_bit_prior(
     block_step_sizes_dict: Mapping[str, torch.Tensor | Tuple[torch.Tensor, torch.Tensor]],
-    block_ranges_dict: Mapping[str, Dict[str, torch.Tensor]],
+    block_ranges_dict: Mapping[str, dict[str, torch.Tensor]],
     block_sens_dict: Optional[Mapping[str, torch.Tensor]] = None,
     b_target: float = 4.0,
     sigma0: float = 0.5,
@@ -351,16 +246,15 @@ def compute_sensitivity_aware_bit_prior(
 
         L_prior
         =
-        sum_{c}
-        ( log2(R_c / s_c) - B_target )^2 / (2 sigma_c^2)
+        sum_c ( log2(R_c / s_c) - B_target )^2 / (2 sigma_c^2)
 
     with
         sigma_c = sigma0 * (1 + alpha * sens_tilde_c)
 
     Notes:
-    - All channels share the same center B_target.
-    - Sensitivity changes only the width, not the center.
-    - block_sens_dict is assumed already normalized (e.g. to [0,1] or similar).
+    - all channels share the same center B_target
+    - sensitivity only changes prior width, not center
+    - block_sens_dict is assumed precomputed and normalized beforehand
     """
     device = None
     for step_entry in block_step_sizes_dict.values():
@@ -389,7 +283,8 @@ def compute_sensitivity_aware_bit_prior(
             )
 
         bits = torch.log2(
-            torch.clamp(w_range, min=eps) / torch.clamp(w_step, min=eps)
+            torch.clamp(w_range, min=eps) /
+            torch.clamp(w_step, min=eps)
         )
 
         if block_sens_dict is not None and local_name in block_sens_dict:
@@ -413,7 +308,7 @@ def compute_sensitivity_aware_bit_prior(
 
 
 # ---------------------------------------------------------------------
-# Full SAPQ objective
+# full SAPQ objective
 # ---------------------------------------------------------------------
 
 def compute_sapq_loss_with_prior(
@@ -421,12 +316,11 @@ def compute_sapq_loss_with_prior(
     block_step_sizes_dict: Mapping[str, torch.Tensor | Tuple[torch.Tensor, torch.Tensor]],
     cached_block_inputs,
     cached_block_outputs,
+    cached_block_grads,
     batch_idx: int,
-    block_ranges_dict: Mapping[str, Dict[str, torch.Tensor]],
+    block_ranges_dict: Mapping[str, dict[str, torch.Tensor]],
     block_sens_dict: Optional[Mapping[str, torch.Tensor]] = None,
-    cached_block_grads=None,
     num_mc_samples: int = 10,
-    rec_loss: str = "fisher_diag",
     b_target: float = 4.0,
     sigma0: float = 0.5,
     alpha: float = 1.0,
@@ -439,18 +333,18 @@ def compute_sapq_loss_with_prior(
         total = likelihood + prior
 
     where:
-        likelihood = negative block-wise log Monte Carlo likelihood
+        likelihood = block-wise MC negative log-likelihood
+                     with Fisher-diagonal geometry
         prior      = sensitivity-aware bitwidth prior
     """
-    like_loss = compute_block_mc_loglikelihood_single_batch(
+    like_loss = compute_block_mc_negative_loglikelihood(
         block=block,
         block_step_sizes_dict=block_step_sizes_dict,
         cached_block_inputs=cached_block_inputs,
         cached_block_outputs=cached_block_outputs,
-        batch_idx=batch_idx,
         cached_block_grads=cached_block_grads,
+        batch_idx=batch_idx,
         num_mc_samples=num_mc_samples,
-        rec_loss=rec_loss,
         device=device,
     )
 

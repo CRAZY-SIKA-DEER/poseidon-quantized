@@ -1,0 +1,29 @@
+{
+  "FP": {
+    "L1": 45.759715653024614,
+    "RelL1": 0.17489314523845678
+  },
+  "SAPQ": {
+    "L1": 57.78770859912038,
+    "RelL1": 0.22135082153545227
+  },
+  "Dyn4": {
+    "L1": 3317.725633740425,
+    "RelL1": 12.7084297304973
+  },
+  "Dyn8": {
+    "L1": 68.7293744571507,
+    "RelL1": 0.26287768862675875
+  },
+  "Dyn16": {
+    "L1": 45.73832682799548,
+    "RelL1": 0.17481744878023164
+  },
+  "meta": {
+    "model_path": "models/NS-PwC-L",
+    "dataset_name": "fluids.incompressible.PiecewiseConstants",
+    "quant_layer_path": "/home/u6ey/yiheng.u6ey/poseidon-quantized/inspect_layers/L_quantize_layers.pt",
+    "num_candidate_layers": 533,
+    "num_frozen_batches": 300
+  }
+}

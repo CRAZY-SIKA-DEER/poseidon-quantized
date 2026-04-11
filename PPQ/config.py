@@ -63,7 +63,7 @@ class PPQConfig:
     # Calibration / validation
     # -------------------------
     calib_batchsize: int = 2
-    calib_steps: int = 512 #256 #512 #128  #64
+    calib_steps: int = 300 #256 #512 #128  #64
     val_batchsize: int = 2
     val_steps: int = 512
 
@@ -71,7 +71,7 @@ class PPQConfig:
     # PPQ optimization
     # -------------------------
     weight_only: bool = True
-    num_epochs: int = 20
+    num_epochs: int = 
     num_mc_samples: int = 10
     base_lr: float = 9.1e-4
     eta: float = 1e-6
@@ -98,6 +98,17 @@ class PPQConfig:
     dyn4_json: str = "NS-PwC-T-dynamic-stepsizes-4.json"
     dyn8_bits: int = 8
     dyn16_bits: int = 16
+
+    # ----------------------------
+    # those might needed for sapq
+    # ----------------------------
+    target_bits: float = 8
+    sigma0: float = 0.5
+    alpha: float = 1.0
+    prior_scale: float = 1.0
+    sapq_rec_loss: str = "fisher_diag"
+
+
 
     def __post_init__(self):
         self.inspect_dir = self.project_root / "inspect_layers"
