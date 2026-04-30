@@ -34,7 +34,7 @@ on the configuration.
 from dataclasses import dataclass, field
 from pathlib import Path
 from PPQ.path_utils import PROJECT_STORAGE_ROOT, get_repo_root, ensure_symlink_dir
-
+import os
 
 @dataclass
 class PPQConfig:
@@ -49,9 +49,16 @@ class PPQConfig:
     # -------------------------
     # Model / data
     # -------------------------
+    # for ns-pwc
     model_path: str = "models/NS-PwC-L"
     data_path: str = "dataset/NS-PwC"
     dataset_name: str = "fluids.incompressible.PiecewiseConstants"
+
+    # for ns-svs
+    # model_path: str = "models/NS-SVS-L"
+    # data_path: str = "dataset/NS-SVS"
+    # dataset_name: str = "fluids.incompressible.VortexSheet"
+
     quant_layer_file: str = "L_quantize_layers.pt"
 
     # -------------------------
@@ -63,7 +70,7 @@ class PPQConfig:
     # Calibration / validation
     # -------------------------
     calib_batchsize: int = 2
-    calib_steps: int = 300 #256 #512 #128  #64
+    calib_steps: int = 512 #256 #512 #128  #64
     val_batchsize: int = 2
     val_steps: int = 512
 
@@ -71,7 +78,7 @@ class PPQConfig:
     # PPQ optimization
     # -------------------------
     weight_only: bool = True
-    num_epochs: int = 
+    num_epochs: int = 10
     num_mc_samples: int = 10
     base_lr: float = 9.1e-4
     eta: float = 1e-6
@@ -105,12 +112,32 @@ class PPQConfig:
     target_bits: float = 8
     sigma0: float = 0.5
     alpha: float = 1.0
-    prior_scale: float = 1.0
+    prior_scale: float = 1e-4
     sapq_rec_loss: str = "fisher_diag"
 
+    prior_mode: str = "block_sens"
+    exp_name: str = "default"
+
+
+    # ----------------------------
+    # those might needed for sobolev
+    # ----------------------------
+
+    sensitivity_loss_mode: str = "mse"   # "mse" or "mse_div"
+    sensitivity_div_weight: float = 1.0
+    sensitivity_u_idx: int = 1
+    sensitivity_v_idx: int = 2
+
+    min_epochs: int = 10
+    max_epochs: int = 20
+    early_stop_bits: float = 4.0
 
 
     def __post_init__(self):
+        self.model_path = os.environ.get("PPQ_MODEL_PATH", self.model_path)
+        self.data_path = os.environ.get("PPQ_DATA_PATH", self.data_path)
+        self.dataset_name = os.environ.get("PPQ_DATASET_NAME", self.dataset_name)
+
         self.inspect_dir = self.project_root / "inspect_layers"
         self.artifacts_root = self.project_root / "ppq_artifacts"
         self.dynamic_stats_dir = self.project_root / "dynamic_stats"

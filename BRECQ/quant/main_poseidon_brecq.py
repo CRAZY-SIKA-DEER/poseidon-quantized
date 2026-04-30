@@ -12,13 +12,93 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from poseidon_quant_model import PoseidonQuantModel
-from poseidon_quant_block import QuantScOTLayer, QuantConvNeXtBlock, QuantResNetBlock
-from poseidon_block_recon import poseidon_block_reconstruction
+from BRECQ.quant.poseidon_quant_model import PoseidonQuantModel
+from BRECQ.quant.poseidon_quant_block import QuantScOTLayer, QuantConvNeXtBlock, QuantResNetBlock
+from BRECQ.quant.poseidon_block_recon import poseidon_block_reconstruction
 
 from scOT.metrics import relative_lp_error, lp_error
 from PPQ.poseidon_utils import load_poseidon_model, build_poseidon_loaders
+from BRECQ.quant.quant_layer import QuantModule
+from BRECQ.quant.quant_block import BaseQuantBlock
+import time
 
+
+def get_weight_scale_path(args):
+    cw_name = "channelwise" if args.channel_wise else "layerwise"
+    model_name = Path(args.model_path).name
+
+    scale_path = (
+        REPO_ROOT
+        / "brecq_artifacts"
+        / model_name
+        / "weight_scales"
+        / f"w{args.n_bits_w}_{cw_name}_mse80.pt"
+    )
+    return scale_path
+
+
+def get_recon_save_dir(args):
+    model_name = Path(args.model_path).name
+
+    save_dir = (
+        REPO_ROOT
+        / "brecq_artifacts"
+        / model_name
+        / "recon"
+        / f"w{args.n_bits_w}"
+        / f"iters{args.iters_w}"
+    )
+    save_dir.mkdir(parents=True, exist_ok=True)
+    return save_dir
+
+def save_brecq_recon_state(qnn, save_dir: Path, args, metrics=None):
+    state = {}
+
+    for name, m in qnn.model.named_modules():
+        if not isinstance(m, QuantModule):
+            continue
+
+        q = m.weight_quantizer
+
+        item = {
+            "n_bits": q.n_bits,
+            "delta": q.delta.detach().cpu(),
+            "zero_point": q.zero_point.detach().cpu(),
+        }
+
+        if hasattr(q, "alpha") and q.alpha is not None:
+            item["alpha"] = q.alpha.detach().cpu()
+            item["soft_targets"] = bool(q.soft_targets)
+
+        state[name] = item
+
+    save_path = save_dir / "adaround_state.pt"
+    torch.save(state, save_path)
+
+    meta = {
+        "model_path": args.model_path,
+        "model_name": Path(args.model_path).name,
+        "dataset_name": args.dataset_name,
+        "data_path": args.data_path,
+        "n_bits_w": args.n_bits_w,
+        "channel_wise": args.channel_wise,
+        "iters_w": args.iters_w,
+        "opt_mode": args.opt_mode,
+        "calib_batchsize": args.calib_batchsize,
+        "calib_steps": args.calib_steps,
+        "num_quant_modules": len(state),
+        "metrics": metrics,
+        "save_path": str(save_path),
+        "real_save_path": str(save_path.resolve()),
+    }
+
+    meta_path = save_dir / "meta.json"
+    import json
+    with open(meta_path, "w") as f:
+        json.dump(meta, f, indent=2)
+
+    print(f"[INFO] Saved BRECQ AdaRound state -> {save_path}")
+    print(f"[INFO] Saved meta -> {meta_path}")
 
 def seed_all(seed: int = 1029):
     random.seed(seed)
@@ -117,6 +197,30 @@ def recon_model(qnn: nn.Module, cali_data, args):
             )
 
 
+def load_precomputed_weight_scales(qnn, scale_path: str, device):
+    state = torch.load(scale_path, map_location="cpu")
+
+    loaded = 0
+    missing = 0
+
+    for name, m in qnn.model.named_modules():
+        if not isinstance(m, QuantModule):
+            continue
+
+        if name not in state:
+            print(f"[WARN] missing scale for {name}")
+            missing += 1
+            continue
+
+        q = m.weight_quantizer
+        q.delta = state[name]["delta"].to(device)
+        q.zero_point = state[name]["zero_point"].to(device)
+        q.inited = True
+        loaded += 1
+
+    print(f"[INFO] Loaded precomputed scales: {loaded}, missing: {missing}")
+
+
 def main():
     parser = argparse.ArgumentParser()
 
@@ -172,7 +276,11 @@ def main():
         val_steps=args.val_steps,
     )
 
+
     cali_data = list(calib_iter())
+    print("[DEBUG] num calibration batches =", len(cali_data))
+    print("[DEBUG] batch sizes =", [b["pixel_values"].shape[0] for b in cali_data])
+    print("[DEBUG] total calibration samples =", sum(b["pixel_values"].shape[0] for b in cali_data))
     if args.num_samples > 0:
         kept_batches = []
         total = 0
@@ -190,7 +298,7 @@ def main():
     wq_params = {
         "n_bits": args.n_bits_w,
         "channel_wise": args.channel_wise,
-        "scale_method": "mse",
+        "scale_method": "max",
     }
     aq_params = {
         "n_bits": 8,
@@ -207,17 +315,24 @@ def main():
     qnn.to(device)
     qnn.eval()
 
-    print("Initializing quantizer states...")
+    print("Num QuantModule:", sum(1 for m in qnn.modules() if isinstance(m, QuantModule)))
+    print("Num BaseQuantBlock:", sum(1 for m in qnn.modules() if isinstance(m, BaseQuantBlock)))
+    print("Num QuantScOTLayer:", sum(1 for m in qnn.modules() if isinstance(m, QuantScOTLayer)))
+    print("Num QuantConvNeXtBlock:", sum(1 for m in qnn.modules() if isinstance(m, QuantConvNeXtBlock)))
+    print("Num QuantResNetBlock:", sum(1 for m in qnn.modules() if isinstance(m, QuantResNetBlock)))
+
+    print("Loading precomputed weight scales...")
+    scale_path = get_weight_scale_path(args)
+    print("[INFO] scale_path =", scale_path)
+    print("[INFO] real scale_path =", scale_path.resolve())
+
+    if not scale_path.exists():
+        raise FileNotFoundError(f"Precomputed scale file not found: {scale_path}")
+
+    load_precomputed_weight_scales(qnn, str(scale_path), device)
+
+    print("Setting quantizer states...")
     qnn.set_quant_state(True, False)
-    with torch.no_grad():
-        init_batch = move_batch_to_device(cali_data[0], device)
-        _ = qnn(
-            pixel_values=init_batch["pixel_values"],
-            time=init_batch.get("time", None),
-            pixel_mask=init_batch.get("pixel_mask", None),
-            labels=init_batch.get("labels", None),
-            return_dict=True,
-        )
 
     if args.test_before_calibration:
         print("Before reconstruction:")
@@ -228,7 +343,12 @@ def main():
 
     qnn.set_quant_state(True, False)
     print("After reconstruction:")
-    validate_poseidon(qnn, val_iter, device)
+    metrics = validate_poseidon(qnn, val_iter, device)
+
+    save_dir = get_recon_save_dir(args)
+    print("[INFO] recon save_dir =", save_dir)
+    print("[INFO] real recon save_dir =", save_dir.resolve())
+    save_brecq_recon_state(qnn, save_dir, args, metrics=metrics)
 
 
 if __name__ == "__main__":

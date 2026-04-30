@@ -111,5 +111,33 @@ class PoseidonQuantModel(nn.Module):
             if isinstance(m, (QuantModule, BaseQuantBlock)):
                 m.set_quant_state(weight_quant, act_quant)
 
+    def set_first_last_layer_to_8bit(self):
+        """
+        BRECQ default setting:
+        keep the first and last quantized layers at 8-bit,
+        and skip their reconstruction.
+        """
+        quant_modules = [
+            (name, m)
+            for name, m in self.model.named_modules()
+            if isinstance(m, QuantModule)
+        ]
+
+        if len(quant_modules) == 0:
+            print("[WARN] No QuantModule found. Cannot set first/last layer to 8-bit.")
+            return
+
+        first_name, first_module = quant_modules[0]
+        last_name, last_module = quant_modules[-1]
+
+        print(f"Setting first quant layer to 8-bit: {first_name}")
+        first_module.weight_quantizer.n_bits = 8
+        first_module.ignore_reconstruction = True
+
+        if last_module is not first_module:
+            print(f"Setting last quant layer to 8-bit: {last_name}")
+            last_module.weight_quantizer.n_bits = 8
+            last_module.ignore_reconstruction = True
+
     def forward(self, *args, **kwargs):
         return self.model(*args, **kwargs)

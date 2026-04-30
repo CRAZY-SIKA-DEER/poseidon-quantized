@@ -1,4 +1,4 @@
-# SAPQ/sapq_sensitivity.py
+# SAPQ/sapq_sobo_sensitivity.py
 from __future__ import annotations
 
 import json
@@ -19,6 +19,9 @@ from BRECQ.quant.poseidon_quant_block import (
 )
 from BRECQ.quant.poseidon_data_utils import get_model_output_tensor
 
+from scOT.problems.fluids.normalization_constants import CONSTANTS
+
+
 
 TARGET_BLOCK_TYPES = (QuantScOTLayer, QuantConvNeXtBlock, QuantResNetBlock)
 
@@ -28,128 +31,132 @@ class BlockGradHook:
         self.grad = None
 
     def __call__(self, module, grad_input, grad_output):
-        # grad_output is usually a tuple; first entry is grad wrt block output tensor
         self.grad = grad_output[0].detach()
 
 
 def reduce_channel_sensitivity(grad: torch.Tensor) -> torch.Tensor:
-    """
-    Convert gradient wrt block output into one scalar sensitivity per channel.
-
-    Expected block output shapes:
-    - [B, T, C]     (most ScOT blocks)
-    - [B, C, H, W]  (fallback if some block returns image-like tensor)
-    - [B, C]
-
-    Returns:
-        sens: [C]
-    """
     g2 = grad.pow(2)
 
     if g2.dim() == 3:
-        # [B, T, C] -> average over B,T
-        sens = g2.mean(dim=(0, 1))
+        return g2.mean(dim=(0, 1))
     elif g2.dim() == 4:
-        # [B, C, H, W] -> average over B,H,W
-        sens = g2.mean(dim=(0, 2, 3))
+        return g2.mean(dim=(0, 2, 3))
     elif g2.dim() == 2:
-        # [B, C]
-        sens = g2.mean(dim=0)
+        return g2.mean(dim=0)
     else:
-        # fallback: assume channel is last dim
         reduce_dims = tuple(range(g2.dim() - 1))
-        sens = g2.mean(dim=reduce_dims)
-
-    return sens
+        return g2.mean(dim=reduce_dims)
 
 
-def compute_divergence_2d(
-    field: torch.Tensor,
-    u_idx: int = 1,
-    v_idx: int = 2,
-    eps: float = 1e-12,
-) -> torch.Tensor:
-    """
-    Compute 2D divergence from model output tensor of shape [B, C, H, W].
-
-    Divergence:
-        div = du/dx + dv/dy
-
-    Uses central differences on the interior grid only.
-
-    Args:
-        field: [B, C, H, W]
-        u_idx: channel index for u-velocity
-        v_idx: channel index for v-velocity
-
-    Returns:
-        div: [B, H-2, W-2]
-    """
-    if field.dim() != 4:
-        raise ValueError(f"Expected field to have shape [B, C, H, W], got {tuple(field.shape)}")
-
-    if field.size(1) <= max(u_idx, v_idx):
-        raise ValueError(
-            f"Field has only {field.size(1)} channels, but requested u_idx={u_idx}, v_idx={v_idx}"
-        )
-
-    u = field[:, u_idx]  # [B, H, W]
-    v = field[:, v_idx]  # [B, H, W]
-
-    H, W = u.shape[-2], u.shape[-1]
-    if H < 3 or W < 3:
-        raise ValueError(f"Need H,W >= 3 for central differences, got H={H}, W={W}")
-
-    dx = 1.0 / max(W - 1, 1)
-    dy = 1.0 / max(H - 1, 1)
-
-    # du/dx on interior
-    du_dx = (u[:, :, 2:] - u[:, :, :-2]) / (2.0 * dx)   # [B, H, W-2]
-    # dv/dy on interior
-    dv_dy = (v[:, 2:, :] - v[:, :-2, :]) / (2.0 * dy)   # [B, H-2, W]
-
-    # crop to common interior shape [B, H-2, W-2]
-    du_dx = du_dx[:, 1:-1, :]
-    dv_dy = dv_dy[:, :, 1:-1]
-
-    div = du_dx + dv_dy
-    return div
-
-
-def compute_sensitivity_loss(
+def compute_sobolev_h1_loss_denorm(
     out_q: torch.Tensor,
     out_fp: torch.Tensor,
-    loss_mode: str = "mse",
-    div_weight: float = 1.0,
-    u_idx: int = 1,
-    v_idx: int = 2,
+    dataset,
+    dataset_name: str,
+    sobolev_weight: float = 1.0,
+    transpose: bool = False,
 ) -> torch.Tensor:
     """
-    Supported modes:
-        - "mse":     ||out_q - out_fp||^2
-        - "mse_div": ||out_q - out_fp||^2 + div_weight * ||div_q - div_fp||^2
+    Clean Sobolev H1 loss with correct dataset-dependent normalization.
+
+    L = ||q - fp||^2 + λ (||Dx(q-fp)||^2 + ||Dy(q-fp)||^2)
+
+    Uses dataset.constants automatically.
     """
-    loss_mse = F.mse_loss(out_q, out_fp)
 
-    if loss_mode == "mse":
-        return loss_mse
+    if out_q.dim() != 4 or out_fp.dim() != 4:
+        raise ValueError(
+            f"Sobolev H1 expects [B,C,H,W], got {out_q.shape}"
+        )
 
-    if loss_mode == "mse_div":
-        div_q = compute_divergence_2d(out_q, u_idx=u_idx, v_idx=v_idx)
-        div_fp = compute_divergence_2d(out_fp, u_idx=u_idx, v_idx=v_idx)
-        loss_div = F.mse_loss(div_q, div_fp)
-        return loss_mse + div_weight * loss_div
+    device = out_q.device
 
-    raise ValueError(f"Unsupported sensitivity loss_mode: {loss_mode}")
+    # ----------------------------
+    # 1. Load dataset constants
+    # ----------------------------
+    constants = dataset.constants
 
+    mean = constants["mean"]
+    std = constants["std"]
+
+    if not torch.is_tensor(mean):
+        mean = torch.tensor(mean, device=device, dtype=torch.float32)
+    else:
+        mean = mean.to(device=device, dtype=torch.float32)
+
+    if not torch.is_tensor(std):
+        std = torch.tensor(std, device=device, dtype=torch.float32)
+    else:
+        std = std.to(device=device, dtype=torch.float32)
+
+    if mean.ndim == 1:
+        mean = mean.view(1, -1, 1, 1)
+    if std.ndim == 1:
+        std = std.view(1, -1, 1, 1)
+
+    # ----------------------------
+    # 2. Denormalize
+    # ----------------------------
+    q = out_q * std + mean
+    fp = out_fp * std + mean
+
+    if transpose:
+        q = q.transpose(-2, -1)
+        fp = fp.transpose(-2, -1)
+
+    # ----------------------------
+    # 3. Select meaningful channels
+    # ----------------------------
+    C = q.shape[1]
+    name_lower = dataset_name.lower()
+
+    if "incompressible" in name_lower or "ns" in name_lower:
+        if C == 4:
+            indices = [1, 2, 3]   # [rho,u,v,p] → [u,v,p]
+        elif C == 3:
+            indices = [0, 1, 2]
+        elif C == 2:
+            indices = [0, 1]
+        else:
+            indices = list(range(C))
+    elif "compressible" in name_lower:
+        indices = list(range(C))
+    elif "wave" in name_lower:
+        indices = list(range(C))
+    else:
+        indices = list(range(C))
+
+    q = q[:, indices, ...].contiguous()
+    fp = fp[:, indices, ...].contiguous()
+
+    # ----------------------------
+    # 4. Order 0 (value loss)
+    # ----------------------------
+    loss0 = torch.nn.functional.mse_loss(q, fp)
+
+    # ----------------------------
+    # 5. Order 1 (spatial gradients)
+    # ----------------------------
+    dx_q = q[..., 1:] - q[..., :-1]
+    dx_fp = fp[..., 1:] - fp[..., :-1]
+
+    dy_q = q[..., 1:, :] - q[..., :-1, :]
+    dy_fp = fp[..., 1:, :] - fp[..., :-1, :]
+
+    loss1 = (
+        torch.nn.functional.mse_loss(dx_q, dx_fp) +
+        torch.nn.functional.mse_loss(dy_q, dy_fp)
+    )
+
+    # ----------------------------
+    # 6. Final Sobolev loss
+    # ----------------------------
+    return loss0 + sobolev_weight * loss1
 
 def normalize_blockwise_minmax(
     sens_dict: dict[str, torch.Tensor],
     eps: float = 1e-8,
 ) -> dict[str, torch.Tensor]:
-    """
-    Normalize each block's channel sensitivity independently to [0, 1].
-    """
     out = {}
     for name, sens in sens_dict.items():
         smin = sens.min()
@@ -166,7 +173,7 @@ def plot_layer_importance(layer_importance: dict[str, float], save_path: Path):
     plt.bar(range(len(names)), values)
     plt.xticks(range(len(names)), names, rotation=90, fontsize=7)
     plt.ylabel("Mean normalized channel sensitivity")
-    plt.title("SAPQ layer importance")
+    plt.title("SAPQ Sobolev-H1 layer importance")
     plt.tight_layout()
     plt.savefig(save_path, dpi=220)
     plt.close()
@@ -177,9 +184,6 @@ def plot_topk_channel_sensitivity(
     save_dir: Path,
     topk_layers: int = 12,
 ):
-    """
-    Plot per-channel sensitivity for the top-k most important layers.
-    """
     layer_scores = {k: float(v.mean().item()) for k, v in sens_dict.items()}
     top_layers = sorted(layer_scores.items(), key=lambda x: x[1], reverse=True)[:topk_layers]
 
@@ -203,19 +207,6 @@ def build_block_sensitivity_to_inner_layer_dict(
     block_sens_dict: dict[str, torch.Tensor],
     fallback: str = "mean",
 ) -> dict[str, torch.Tensor]:
-    """
-    Map block-output sensitivity to inner QuantModule layers.
-
-    Output keys are in ORIGINAL PPQ namespace, e.g.
-        encoder.layers.0.blocks.0.attention.self.query
-
-    Current rule:
-    - if inner QuantModule out_channels == len(block_sensitivity):
-        use block sensitivity directly
-    - else:
-        fallback == "mean": fill all channels with block mean
-        fallback == "zeros": fill with zeros
-    """
     from BRECQ.quant.quant_layer import QuantModule
 
     out = {}
@@ -254,21 +245,93 @@ def build_block_sensitivity_to_inner_layer_dict(
 
     return out
 
+def load_frozen_calibration_batches(cfg, device: torch.device):
+    """
+    Load pre-frozen calibration batches from:
+        <repo_root>/ppq_artifacts/frozen_calibration_batches.pt
+
+    Expected format:
+        list[dict] with keys:
+            pixel_values, labels, time, pixel_mask
+    """
+    #frozen_path = Path(cfg.repo_root) / "ppq_artifacts" / "frozen_calibration_batches.pt"
+    #frozen_path = Path(cfg.repo_root) / "ppq_artifacts" / "fluids.incompressible.VortexSheet-calib" / "frozen_calibration_batches.pt"
+    frozen_path = (
+        Path(cfg.repo_root)
+        / "ppq_artifacts"
+        / f"{Path(cfg.data_path).name}-calib"
+        / "frozen_calibration_batches.pt"
+    )
+    print(frozen_path)
+
+
+    if not frozen_path.exists():
+        raise FileNotFoundError(
+            f"Frozen calibration file not found: {frozen_path}"
+        )
+
+    print(f"[INFO] Loading frozen calibration batches from: {frozen_path}")
+    frozen_batches = torch.load(frozen_path, map_location="cpu")
+
+    if not isinstance(frozen_batches, list):
+        raise ValueError(
+            f"Expected frozen_batches to be a list, got {type(frozen_batches)}"
+        )
+    if len(frozen_batches) == 0:
+        raise ValueError("Frozen calibration batch list is empty.")
+
+    first_batch = frozen_batches[0]
+
+    dataset_tag = Path(cfg.data_path).name
+
+    if dataset_tag in {"Wave-Layer", "Wave-Gauss"}:
+        required_keys = {"pixel_values", "labels", "time"}
+    else:
+        required_keys = {"pixel_values", "labels", "time", "pixel_mask"}
+    first_batch = frozen_batches[0]
+
+    if not isinstance(first_batch, dict):
+        raise ValueError(
+            f"Expected each frozen batch to be a dict, got {type(first_batch)}"
+        )
+
+    missing = required_keys - set(first_batch.keys())
+    if missing:
+        raise ValueError(
+            f"Frozen calibration batch missing keys: {missing}"
+        )
+
+    print(f"[INFO] Loaded {len(frozen_batches)} frozen calibration batches.")
+
+    # move to device ONCE
+    for batch in frozen_batches:
+        for k, v in batch.items():
+            if torch.is_tensor(v):
+                batch[k] = v.to(device)
+    return frozen_batches
+
 
 def main():
     cfg = PPQConfig()
 
-    sensitivity_loss_mode = getattr(cfg, "sensitivity_loss_mode", "mse_div")
-    sensitivity_div_weight = float(getattr(cfg, "sensitivity_div_weight", 1.0))
-    sensitivity_u_idx = int(getattr(cfg, "sensitivity_u_idx", 1))
-    sensitivity_v_idx = int(getattr(cfg, "sensitivity_v_idx", 2))
+    sobolev_weight = float(getattr(cfg, "sobolev_weight", 1.0))
+    sobolev_transpose = bool(getattr(cfg, "sobolev_transpose", False))
 
     # ----------------------------
     # output paths
     # ----------------------------
     model_name = Path(cfg.model_path).name
-    out_dir = Path(cfg.repo_root) / "SAPQ" / "prior_sensitivity" / model_name
+    out_dir = Path(cfg.repo_root) / "SAPQ" / "prior_sensitivity_sobo" / model_name
     out_dir.mkdir(parents=True, exist_ok=True)
+    print("\n========== SOBO SENSITIVITY CONFIG ==========")
+    print("[DEBUG] cfg.model_path       =", cfg.model_path)
+    print("[DEBUG] cfg.data_path        =", cfg.data_path)
+    print("[DEBUG] cfg.dataset_name     =", cfg.dataset_name)
+    print("[DEBUG] frozen path will be  =", Path(cfg.repo_root) / "ppq_artifacts" / f"{Path(cfg.data_path).name}-calib" / "frozen_calibration_batches.pt")
+    print("[DEBUG] save out_dir         =", out_dir)
+    print("[DEBUG] real save out_dir    =", out_dir.resolve())
+    print("============================================\n")
+    print(out_dir)
 
     pt_path = out_dir / "prior_sensitivity.pt"
     json_path = out_dir / "prior_sensitivity.json"
@@ -282,18 +345,42 @@ def main():
     print("Loading Poseidon model...")
     fp_model, device = load_poseidon_model(cfg.model_path, cfg.device)
 
-    print("Building calibration loader...")
-    _calib_loader, _val_loader, calib_iter, _val_iter = build_poseidon_loaders(
-        dataset_name=cfg.dataset_name,
-        data_path=cfg.data_path,
-        calib_batchsize=cfg.calib_batchsize,
-        calib_steps=cfg.calib_steps,
-        val_batchsize=cfg.val_batchsize,
-        val_steps=cfg.val_steps,
-    )
+    # --------------------------------------------------
+    # Load fixed frozen calibration dataset from disk
+    # --------------------------------------------------
+    print("Loading frozen calibration batches...")
+    frozen_batches = load_frozen_calibration_batches(cfg, device=device)
 
-    cali_batches = list(calib_iter())
-    print(f"Collected {len(cali_batches)} calibration batches.")
+    def frozen_iter():
+        for batch in frozen_batches:
+            yield batch
+
+    cali_batches = list(frozen_iter())
+    print(f"[INFO] Frozen calibration batches: {len(cali_batches)}")
+
+    # ----------------------------
+    # denormalization constants
+    # ----------------------------
+ 
+    constants = CONSTANTS
+
+    mean = constants["mean"]
+    std = constants["std"]
+
+    if not torch.is_tensor(mean):
+        mean = torch.tensor(mean, device=device, dtype=torch.float32)
+    else:
+        mean = mean.to(device=device, dtype=torch.float32)
+
+    if not torch.is_tensor(std):
+        std = torch.tensor(std, device=device, dtype=torch.float32)
+    else:
+        std = std.to(device=device, dtype=torch.float32)
+
+    if mean.ndim == 1:
+        mean = mean.view(1, -1, 1, 1)
+    if std.ndim == 1:
+        std = std.view(1, -1, 1, 1)
 
     # ----------------------------
     # wrap quant model
@@ -301,7 +388,6 @@ def main():
     print("Wrapping model with PoseidonQuantModel...")
     qmodel = PoseidonQuantModel(model=fp_model).to(device).eval()
 
-    # initialize quantizer states once
     print("Initializing quantizer states with first calibration batch...")
     first_batch = cali_batches[0]
     with torch.no_grad():
@@ -309,7 +395,11 @@ def main():
         _ = qmodel(
             pixel_values=first_batch["pixel_values"].to(device),
             time=first_batch["time"].to(device),
-            pixel_mask=first_batch["pixel_mask"].to(device),
+            pixel_mask=(
+                first_batch["pixel_mask"].to(device)
+                if "pixel_mask" in first_batch
+                else None
+            ),
             labels=(
                 first_batch["labels"].to(device)
                 if first_batch.get("labels") is not None
@@ -345,7 +435,9 @@ def main():
 
             x = batch["pixel_values"].to(device)
             t = batch["time"].to(device)
-            pm = batch["pixel_mask"].to(device)
+            pm = batch.get("pixel_mask")
+            if pm is not None:
+                pm = pm.to(device)
             y = batch.get("labels")
             if y is not None:
                 y = y.to(device)
@@ -370,17 +462,25 @@ def main():
             )
             out_q = get_model_output_tensor(out_q)
 
-            # # final-output loss for sensitivity
-            # loss = F.mse_loss(out_q, out_fp)
-            # loss.backward()
 
-            loss = compute_sensitivity_loss(
-                out_q,
-                out_fp,
-                loss_mode=sensitivity_loss_mode,
-                div_weight=sensitivity_div_weight,
-                u_idx=sensitivity_u_idx,
-                v_idx=sensitivity_v_idx,
+            calib_loader, _, _, _ = build_poseidon_loaders(
+                dataset_name=cfg.dataset_name,
+                data_path=cfg.data_path,
+                calib_batchsize=cfg.calib_batchsize,
+                calib_steps=cfg.calib_steps,
+                val_batchsize=cfg.val_batchsize,
+                val_steps=cfg.val_steps,
+            )
+
+            dataset = calib_loader.dataset
+            
+            loss = compute_sobolev_h1_loss_denorm(
+                out_q=out_q,
+                out_fp=out_fp,
+                dataset=dataset,                     # pass dataset
+                dataset_name=cfg.dataset_name,
+                sobolev_weight=sobolev_weight,
+                transpose=sobolev_transpose,
             )
             loss.backward()
 
@@ -411,7 +511,7 @@ def main():
     # normalize per block
     block_sens_norm = normalize_blockwise_minmax(block_sens_raw)
 
-    # map block sensitivity to inner QuantModule layers (original PPQ namespace)
+    # map block sensitivity to inner QuantModule layers
     layer_sens_norm = build_block_sensitivity_to_inner_layer_dict(
         qmodel=qmodel,
         block_sens_dict=block_sens_norm,
@@ -424,7 +524,6 @@ def main():
         fallback="mean",
     )
 
-    # layer importance = mean over channels
     layer_importance = {
         name: float(s.mean().item())
         for name, s in layer_sens_norm.items()
@@ -446,12 +545,12 @@ def main():
             "num_calibration_batches": len(cali_batches),
             "calib_batchsize": cfg.calib_batchsize,
             "calib_steps": cfg.calib_steps,
-            "loss_for_sensitivity": sensitivity_loss_mode,
-            "divergence_weight": sensitivity_div_weight,
-            "velocity_channels": {
-                "u_idx": sensitivity_u_idx,
-                "v_idx": sensitivity_v_idx,
-            },
+            "loss_for_sensitivity": "sobolev_h1_denorm(final_quant_output, final_fp_output)",
+            "sobolev_order": 1,
+            "sobolev_weight": sobolev_weight,
+            "sobolev_transpose": sobolev_transpose,
+            "denormalized": True,
+            "normalization_constants_source": "scOT.problems.fluids.normalization_constants.CONSTANTS",
             "normalization": "per-block minmax",
             "layer_mapping_fallback": "mean",
         },

@@ -75,8 +75,42 @@ train_file/**
 !train_file/**/*.md
 !train_file/**/*.json
 !train_file/**/*.cfg
-!train_file/**/*.iniPTQ4ViT/.git/
+!train_file/**/*.ini
+PTQ4ViT/.git/
 RepQ-ViT/.git/
 pytorch_25.05.sif
 setting_environment/Miniconda3-latest-Linux-x86_64.sh
 setting_environment/Miniconda3-latest-Linux-aarch64.sh
+
+# === My experiment exclusions ===
+
+# Nested repos
+PDEBench/
+VICON/
+external_repos/
+
+# SAPQ artifacts (VERY important)
+SAPQ/artifacts/
+SAPQ/artifacts_*/
+SAPQ/artifacts_block/
+SAPQ/artifacts_global/
+SAPQ/artifacts_layerwise/
+SAPQ/eval_saved_steps/
+SAPQ/prior_sensitivity_*/
+
+# Outputs
+eval_results/
+logs/
+brecq_artifacts/
+ppq_experiments/
+sapq_experiments/
+zzzz_plot/
+
+# Generated result files
+*_results.json
+*_history.json
+metric_table_with_increase.csv
+metric_table_with_increase.xlsx
+
+# Core dumps
+core

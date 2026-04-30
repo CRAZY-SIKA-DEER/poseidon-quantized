@@ -1,8 +1,8 @@
-# SAPQ/run_sapq_poseidon.py
 from __future__ import annotations
 
 import json
 from pathlib import Path
+import copy
 import os
 
 import torch
@@ -21,8 +21,8 @@ from PPQ.metrics import (
     evaluate_with_stepsizes,
     compute_dynamic_stepsizes,
 )
-from SAPQ.sapq_trainer import SAPQTrainer
-import copy
+
+from SAPQ.sapq_layerwise_trainer import SAPQLayerwiseTrainer
 
 
 def load_candidate_layers(model, quant_layer_path: Path):
@@ -74,7 +74,13 @@ def load_sapq_sensitivity(cfg: PPQConfig, device: torch.device):
     which is channel-wise sensitivity in ORIGINAL PPQ namespace.
     """
     model_name = Path(cfg.model_path).name
-    sens_path = Path(cfg.repo_root) / "SAPQ" / "prior_sensitivity" / model_name / "prior_sensitivity.pt"
+    sens_path = (
+        Path(cfg.repo_root)
+        / "SAPQ"
+        / "prior_sensitivity"
+        / model_name
+        / "prior_sensitivity.pt"
+    )
 
     if not sens_path.exists():
         raise FileNotFoundError(
@@ -98,31 +104,39 @@ def load_sapq_sensitivity(cfg: PPQConfig, device: torch.device):
 
 
 def maybe_load_or_compute_ranges(cfg: PPQConfig, model, frozen_iter, candidate_layers, device):
-    ranges_dict = load_precalculated_ranges_if_exists(
-        model_path=cfg.model_path,
-        percentile_prob=cfg.percentile_prob,
-        repo_root=cfg.repo_root,
-        device=device,
-    )
+    model_name = Path(cfg.model_path).name
 
-    if ranges_dict is None:
-        print(f"[INFO] Computing ranges with percentile_prob={cfg.percentile_prob} ...")
-        ranges_dict = compute_data_ranges_poseidon(
-            model=model,
-            dataloader=frozen_iter,
-            device=device,
-            layer_names=candidate_layers,
-            percentile_prob=cfg.percentile_prob,
+    if model_name == "NS-PwC-L":
+        ranges_path = (
+            Path(cfg.repo_root)
+            / "precalculated_ranges"
+            / model_name
+            / "p1e-04"
+            / "ranges.pt"
         )
-        for name, value in ranges_dict.items():
-            value["weight_ranges"] = value["weight_ranges"].to(device)
-            value["activation_ranges"] = value["activation_ranges"].to(device)
     else:
-        print("[INFO] Using cached precalculated ranges.")
+        ranges_path = (
+            Path(cfg.repo_root)
+            / "precalculated_ranges"
+            / model_name
+            / "best"
+            / "ranges.pt"
+        )
 
-    return ranges_dict
+    if ranges_path.exists():
+        print(f"[INFO] Loading ranges from: {ranges_path}")
+        obj = torch.load(ranges_path, map_location="cpu")
+        ranges_dict = obj["ranges_dict"]
 
+        out = {}
+        for name, value in ranges_dict.items():
+            out[name] = {
+                "weight_ranges": value["weight_ranges"].to(device),
+                "activation_ranges": value["activation_ranges"].to(device),
+            }
+        return out, ranges_path
 
+    raise FileNotFoundError(f"Ranges file not found: {ranges_path}")
 
 
 def load_frozen_calibration_batches(cfg, device: torch.device):
@@ -134,7 +148,13 @@ def load_frozen_calibration_batches(cfg, device: torch.device):
         list[dict] with keys:
             pixel_values, labels, time, pixel_mask
     """
-    frozen_path = Path(cfg.repo_root) / "ppq_artifacts" / "frozen_calibration_batches.pt"
+    dataset_tag = Path(cfg.data_path).name
+    frozen_path = (
+        Path(cfg.repo_root)
+        / "ppq_artifacts"
+        / f"{dataset_tag}-calib"
+        / "frozen_calibration_batches.pt"
+    )
 
     if not frozen_path.exists():
         raise FileNotFoundError(
@@ -151,8 +171,21 @@ def load_frozen_calibration_batches(cfg, device: torch.device):
     if len(frozen_batches) == 0:
         raise ValueError("Frozen calibration batch list is empty.")
 
-    required_keys = {"pixel_values", "labels", "time", "pixel_mask"}
     first_batch = frozen_batches[0]
+
+    dataset_tag = Path(cfg.data_path).name
+
+    if dataset_tag in {"Wave-Layer", "Wave-Gauss"}:
+        required_keys = {"pixel_values", "labels", "time"}
+    else:
+        required_keys = {"pixel_values", "labels", "time", "pixel_mask"}
+
+    missing = required_keys - set(first_batch.keys())
+    if missing:
+        raise ValueError(
+            f"Frozen calibration batch missing keys: {missing}"
+        )
+    
 
     if not isinstance(first_batch, dict):
         raise ValueError(
@@ -171,24 +204,26 @@ def load_frozen_calibration_batches(cfg, device: torch.device):
 
 def main():
     cfg = PPQConfig()
+    cfg.prior_mode = os.environ.get("SAPQ_PRIOR_MODE", "ppq")
+    cfg.exp_name = cfg.prior_mode
+    cfg.eval_every = None
 
     # --------------------------------------------------
     # Set ablation choice here
     # --------------------------------------------------
-    #cfg.prior_mode = "ppq"          # choose from: "ppq", "block_no_sens", "block_sens"
-    # cfg.exp_name = "block_ppq"      # example: "block_ppq", "block_block_no_sens", "block_block_sens"
-    
+    #cfg.prior_mode = "ppq"         # choose from: "ppq", "block_no_sens", "block_sens"
+    # cfg.exp_name = "layer_ppq"     # example: "layer_ppq", "layer_block_no_sens", "layer_block_sens"
+
     # cfg.prior_mode = "block_no_sens"
-    # cfg.exp_name = "block_block_no_sens"   #block wise prior without sensitivity, the first block means we are doing block here
+    # cfg.exp_name = "layer_block_no_sens"
 
     #cfg.prior_mode = "block_sens"
-    #cfg.exp_name = "block_block_sens"
+    #cfg.exp_name = "layer_block_sens"
 
-    cfg.prior_mode = os.environ.get("SAPQ_PRIOR_MODE", cfg.prior_mode)
+    #cfg.prior_mode = os.environ.get("SAPQ_PRIOR_MODE", cfg.prior_mode)
 
-    exp_subdir = cfg.prior_mode
-
-
+    #exp_subdir = cfg.prior_mode
+    cfg.eval_every = None
 
     print(f"Mode: {cfg.prior_mode}")
     print(f"Experiment: {cfg.exp_name}")
@@ -220,7 +255,7 @@ def main():
 
     print(f"[INFO] Frozen calibration batches: {len(frozen_batches)}")
 
-    ranges_dict = maybe_load_or_compute_ranges(
+    ranges_dict, ranges_path = maybe_load_or_compute_ranges(
         cfg=cfg,
         model=model,
         frozen_iter=frozen_iter,
@@ -228,7 +263,11 @@ def main():
         device=device,
     )
 
-    sens_dict = load_sapq_sensitivity(cfg, device=device)
+    if cfg.prior_mode == "block_sens":
+        sens_dict = load_sapq_sensitivity(cfg, device=device)
+    else:
+        sens_dict = None
+        print(f"[INFO] prior_mode={cfg.prior_mode}; skip loading sensitivity.")
 
     # --------------------------------------------------
     # Optional dynamic baselines for comparison
@@ -240,14 +279,12 @@ def main():
         num_bits=4,
         device=device,
     )
-
     dyn8_steps = compute_dynamic_stepsizes(
         model=model,
         layer_names=candidate_layers,
         num_bits=8,
         device=device,
     )
-
     dyn16_steps = compute_dynamic_stepsizes(
         model=model,
         layer_names=candidate_layers,
@@ -255,21 +292,32 @@ def main():
         device=device,
     )
 
-    print("Creating SAPQTrainer...")
-    trainer = SAPQTrainer(
+    print("Creating SAPQLayerwiseTrainer...")
+    trainer = SAPQLayerwiseTrainer(
         model=copy.deepcopy(model),
         config=cfg,
         layer_names=candidate_layers,
         device=str(device),
     )
 
-    # --------------------------------------------------
-    # Optional eval callback
-    # --------------------------------------------------
-    def eval_callback(block_idx, block_name, epoch, step_sizes_dict, ranges_dict_cb):
-        print(f"[EvalCallback] block={block_idx} name={block_name} epoch={epoch}")
+    def eval_callback(epoch, step_sizes_dict, ranges_dict_cb):
+        print(f"\n================ SAPQ LAYERWISE EVAL @ epoch {epoch} ================")
 
-    print("Starting SAPQ training...")
+        sapq_metrics = evaluate_with_stepsizes(
+            model=model,
+            val_loader=val_iter,
+            weight_steps=step_sizes_dict,
+            act_steps=None,
+            layer_names=candidate_layers,
+            device=device,
+        )
+
+        print(
+            f"[SAPQ-LAYERWISE-EPOCH-{epoch}] "
+            f"L1={sapq_metrics['l1']:.6e} | RelL1={sapq_metrics['rel_l1']:.6e}"
+        )
+
+    print("Starting SAPQ layerwise training...")
     step_sizes_dict, ranges_dict, history = trainer.train(
         dataloader=frozen_iter,
         ranges_dict=ranges_dict,
@@ -277,19 +325,17 @@ def main():
         eval_callback=eval_callback if cfg.eval_every is not None else None,
     )
 
-    print("\nEvaluating FP / SAPQ / Dyn4 / Dyn8 / Dyn16 on validation iterator...")
+    print("\nEvaluating FP / SAPQ-layerwise / Dyn4 / Dyn8 / Dyn16 on validation iterator...")
 
-    # FP metric
     fp_metrics = evaluate_with_stepsizes(
         model=model,
         val_loader=val_iter,
-        weight_steps={},   # empty = no quant
+        weight_steps={},
         act_steps=None,
         layer_names=candidate_layers,
         device=device,
     )
 
-    # SAPQ metric
     sapq_metrics = evaluate_with_stepsizes(
         model=model,
         val_loader=val_iter,
@@ -299,7 +345,6 @@ def main():
         device=device,
     )
 
-    # Dyn baselines
     dyn4_metrics = evaluate_with_stepsizes(
         model=model,
         val_loader=val_iter,
@@ -327,28 +372,33 @@ def main():
 
     print("number of epochs:", cfg.num_epochs)
     print("\n========== FINAL RESULTS ==========")
-    print(f"FP     | L1={fp_metrics['l1']:.6e} | RelL1={fp_metrics['rel_l1']:.6e}")
-    print(f"SAPQ   | L1={sapq_metrics['l1']:.6e} | RelL1={sapq_metrics['rel_l1']:.6e}")
-    print(f"Dyn4   | L1={dyn4_metrics['l1']:.6e} | RelL1={dyn4_metrics['rel_l1']:.6e}")
-    print(f"Dyn8   | L1={dyn8_metrics['l1']:.6e} | RelL1={dyn8_metrics['rel_l1']:.6e}")
-    print(f"Dyn16  | L1={dyn16_metrics['l1']:.6e} | RelL1={dyn16_metrics['rel_l1']:.6e}")
+    print(f"FP              | L1={fp_metrics['l1']:.6e} | RelL1={fp_metrics['rel_l1']:.6e}")
+    print(f"SAPQ-Layerwise  | L1={sapq_metrics['l1']:.6e} | RelL1={sapq_metrics['rel_l1']:.6e}")
+    print(f"Dyn4            | L1={dyn4_metrics['l1']:.6e} | RelL1={dyn4_metrics['rel_l1']:.6e}")
+    print(f"Dyn8            | L1={dyn8_metrics['l1']:.6e} | RelL1={dyn8_metrics['rel_l1']:.6e}")
+    print(f"Dyn16           | L1={dyn16_metrics['l1']:.6e} | RelL1={dyn16_metrics['rel_l1']:.6e}")
 
     # --------------------------------------------------
     # Save outputs (separate per experiment)
     # --------------------------------------------------
+    model_tag = Path(cfg.model_path).name
+    dataset_tag = Path(cfg.data_path).name
+
     out_dir = (
         Path(cfg.repo_root)
-        / "SAPQ"
-        / "artifacts_block"
-        / Path(cfg.model_path).name
-        / exp_subdir
+        / "ppq_experiments"
+        / model_tag
+        / dataset_tag
+        / "layerwise_ppq"
     )
+
     print("[DEBUG] save out_dir =", out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    print("[DEBUG] exists =", out_dir.exists())
 
-    steps_path = out_dir / "sapq_step_sizes.pt"
-    history_path = out_dir / "sapq_history.json"
-    results_path = out_dir / "sapq_results.json"
+    steps_path = out_dir / "sapq_layerwise_step_sizes.pt"
+    history_path = out_dir / "sapq_layerwise_history.json"
+    results_path = out_dir / "sapq_layerwise_results.json"
 
     torch.save(
         {
@@ -372,9 +422,14 @@ def main():
                 "num_mc_samples": int(cfg.num_mc_samples),
                 "num_epochs": int(cfg.num_epochs),
                 "updates_per_batch": int(cfg.updates_per_batch),
+                "eta": float(cfg.eta),
                 "prior_mode": str(getattr(cfg, "prior_mode", "block_sens")),
                 "exp_name": cfg.prior_mode,
-                "likelihood_mode": "blockwise",
+                "likelihood_mode": "layerwise",
+                "model_name": Path(cfg.model_path).name,
+                "dataset_tag": Path(cfg.data_path).name,
+                "ranges_source": str(ranges_path) if "ranges_path" in locals() else "loaded_in_function",
+                "frozen_calib_source": str(Path(cfg.repo_root) / "ppq_artifacts" / f"{Path(cfg.data_path).name}-calib" / "frozen_calibration_batches.pt"),
             },
         },
         steps_path,
@@ -387,7 +442,10 @@ def main():
         json.dump(
             {
                 "FP": {"L1": fp_metrics["l1"], "RelL1": fp_metrics["rel_l1"]},
-                "SAPQ": {"L1": sapq_metrics["l1"], "RelL1": sapq_metrics["rel_l1"]},
+                "SAPQ-Layerwise": {
+                    "L1": sapq_metrics["l1"],
+                    "RelL1": sapq_metrics["rel_l1"],
+                },
                 "Dyn4": {"L1": dyn4_metrics["l1"], "RelL1": dyn4_metrics["rel_l1"]},
                 "Dyn8": {"L1": dyn8_metrics["l1"], "RelL1": dyn8_metrics["rel_l1"]},
                 "Dyn16": {"L1": dyn16_metrics["l1"], "RelL1": dyn16_metrics["rel_l1"]},
@@ -399,7 +457,7 @@ def main():
                     "num_frozen_batches": len(frozen_batches),
                     "prior_mode": str(getattr(cfg, "prior_mode", "block_sens")),
                     "exp_name": cfg.prior_mode,
-                    "likelihood_mode": "blockwise",
+                    "likelihood_mode": "layerwise",
                 },
             },
             f,
@@ -409,6 +467,7 @@ def main():
     print(f"\n[INFO] Saved step sizes -> {steps_path}")
     print(f"[INFO] Saved history    -> {history_path}")
     print(f"[INFO] Saved results    -> {results_path}")
+
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,12 @@
+PYTHONPATH=. python -u BRECQ/run_vicon_brecq.py \
+  --dataset_name NS2D \
+  --ckpt_path models/vicon/vicon.pth \
+  --n_bits_w 4 \
+  --channel_wise \
+  --calib_batchsize 2 \
+  --calib_steps 512 \
+  --recon_iters 10 \
+  --recon_batch_size 32 \
+  --asym \
+  --device cuda \
+  --weight_scales_path brecq_artifacts/VICON/weight_scales/w4_channelwise_mse80.pt

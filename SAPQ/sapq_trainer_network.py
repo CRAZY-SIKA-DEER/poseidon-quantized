@@ -1,6 +1,6 @@
-# SAPQ/sapq_trainer.py
 from __future__ import annotations
 
+import copy
 import torch
 import torch.optim as optim
 
@@ -19,7 +19,7 @@ from PPQ.metrics import (
     compute_avg_bits,
 )
 
-from SAPQ.sapq_loss import compute_sapq_loss_with_prior
+from SAPQ.sapq_loss import compute_sapq_loss_with_prior_network
 
 from BRECQ.quant.poseidon_quant_model import PoseidonQuantModel
 from BRECQ.quant.poseidon_quant_block import (
@@ -27,30 +27,21 @@ from BRECQ.quant.poseidon_quant_block import (
     QuantConvNeXtBlock,
     QuantResNetBlock,
 )
-from BRECQ.quant.poseidon_data_utils import (
-    save_inp_oup_data,
-    save_grad_data,
-)
 from BRECQ.quant.quant_layer import QuantModule
+from BRECQ.quant.poseidon_data_utils import get_model_output_tensor
 
 
-class SAPQTrainer:
+class SAPQTrainerNetwork:
     """
-    Structural-Aware Probabilistic Quantization (SAPQ) trainer.
+    SAPQ trainer with:
+    - block-by-block optimization schedule
+    - NETWORK-wise likelihood (final output only)
+    - SAPQ prior unchanged
 
-    Design:
-    - wrap Poseidon into quantized block structure
-    - keep global PPQ-style per-channel step sizes
-    - optimize block by block
-    - likelihood is fixed to block-wise Fisher-diagonal geometry
-    - prior uses precomputed sensitivity from final-output gradients
-
-    Naming detail:
-    - original PPQ namespace:
-          encoder.layers.0.blocks.0.attention.self.query
-    - wrapped PoseidonQuantModel namespace:
-          model.encoder.layers.0.blocks.0.attention.self.query
-    - this trainer handles the mapping internally
+    Main idea:
+    - use PoseidonQuantModel only to discover block boundaries
+    - use raw model for final-output likelihood
+    - optimize only the current block's step sizes each time
     """
 
     def __init__(
@@ -68,13 +59,18 @@ class SAPQTrainer:
         weight_quant_params = {} if weight_quant_params is None else weight_quant_params
         act_quant_params = {} if act_quant_params is None else act_quant_params
 
+        # raw model for network-wise likelihood
+        self.raw_model = copy.deepcopy(model).to(self.device).eval()
+
+        # wrapped model only for discovering block structure
         self.qmodel = PoseidonQuantModel(
-            model=model,
+            model=copy.deepcopy(model),
             weight_quant_params=weight_quant_params,
             act_quant_params=act_quant_params,
         ).to(self.device).eval()
 
         self.layer_names = layer_names
+        self.raw_name2mod = dict(self.raw_model.named_modules())
         self.q_name2mod = dict(self.qmodel.named_modules())
 
         self.orig_to_wrapped = {}
@@ -83,7 +79,7 @@ class SAPQTrainer:
                 self.orig_to_wrapped[wrapped_name[len("model."):]] = wrapped_name
 
         # global avg-bit reporting uses original namespace
-        self.channel_weights = build_channel_param_weights(self.qmodel.model, self.layer_names)
+        self.channel_weights = build_channel_param_weights(self.raw_model, self.layer_names)
 
     # ------------------------------------------------------------------
     # Name helpers
@@ -103,7 +99,7 @@ class SAPQTrainer:
         """
         Keep only target layers that:
         - appear in ranges_dict
-        - appear in wrapped model as QuantModule
+        - appear in raw model as nn.Linear
         - have matching per-channel weight range size
         """
         target_layers = []
@@ -112,11 +108,10 @@ class SAPQTrainer:
             if orig_name not in ranges_dict:
                 continue
 
-            wrapped_name = self._to_wrapped_name(orig_name)
-            mod = self.q_name2mod.get(wrapped_name, None)
+            mod = self.raw_name2mod.get(orig_name, None)
             rec = ranges_dict[orig_name]
 
-            if mod is None or not isinstance(mod, QuantModule):
+            if mod is None or not isinstance(mod, torch.nn.Linear):
                 continue
 
             w_range = rec.get("weight_ranges", None)
@@ -141,7 +136,7 @@ class SAPQTrainer:
     # Block-local dict builders
     # ------------------------------------------------------------------
 
-    def _collect_block_local_dicts(
+    def _collect_block_global_dicts(
         self,
         block_wrapped_name: str,
         block,
@@ -150,7 +145,8 @@ class SAPQTrainer:
         global_sens_dict,
     ):
         """
-        Build block-local dicts keyed by LOCAL QuantModule names inside current block.
+        Build CURRENT-BLOCK dicts, but keys remain in ORIGINAL namespace,
+        because the network-wise likelihood runs on self.raw_model.
 
         Example:
             block_wrapped_name:
@@ -164,7 +160,7 @@ class SAPQTrainer:
         """
         block_step_sizes_dict = {}
         block_ranges_dict = {}
-        block_sens_local_dict = {}
+        block_sens_dict = {}
         block_orig_names = []
 
         block_orig_prefix = self._to_orig_name(block_wrapped_name)
@@ -182,19 +178,55 @@ class SAPQTrainer:
             if orig_name not in global_ranges_dict:
                 continue
 
-            block_step_sizes_dict[local_name] = global_step_sizes_dict[orig_name]
-            block_ranges_dict[local_name] = global_ranges_dict[orig_name]
+            block_step_sizes_dict[orig_name] = global_step_sizes_dict[orig_name]
+            block_ranges_dict[orig_name] = global_ranges_dict[orig_name]
             block_orig_names.append(orig_name)
 
             if global_sens_dict is not None and orig_name in global_sens_dict:
-                block_sens_local_dict[local_name] = global_sens_dict[orig_name]
+                block_sens_dict[orig_name] = global_sens_dict[orig_name]
 
         return (
             block_step_sizes_dict,
             block_ranges_dict,
-            block_sens_local_dict,
+            block_sens_dict,
             block_orig_names,
         )
+
+    # ------------------------------------------------------------------
+    # clean final output cache
+    # ------------------------------------------------------------------
+
+    def _cache_clean_network_outputs(self, frozen_batches):
+        """
+        Cache final clean FP outputs of the RAW model on frozen batches.
+        """
+        clean_net_outputs = []
+
+        self.raw_model.eval()
+        with torch.no_grad():
+            for batch in frozen_batches:
+                x = batch["pixel_values"].to(self.device)
+                t = batch.get("time", None)
+                pm = batch.get("pixel_mask", None)
+                y = batch.get("labels", None)
+
+                if t is not None:
+                    t = t.to(self.device)
+                if pm is not None:
+                    pm = pm.to(self.device)
+                if y is not None:
+                    y = y.to(self.device)
+
+                outputs = self.raw_model(
+                    pixel_values=x,
+                    time=t,
+                    pixel_mask=pm,
+                    labels=y,
+                )
+                y_clean = get_model_output_tensor(outputs).detach().cpu()
+                clean_net_outputs.append(y_clean)
+
+        return clean_net_outputs
 
     # ------------------------------------------------------------------
     # Main training
@@ -229,7 +261,7 @@ class SAPQTrainer:
             if ranges_dict is None:
                 print(f"Computing ranges with percentile_prob={cfg.percentile_prob} ...")
                 ranges_dict = compute_data_ranges_poseidon(
-                    model=self.qmodel.model,
+                    model=self.raw_model,
                     dataloader=frozen_iter,
                     device=self.device,
                     layer_names=self.layer_names,
@@ -246,9 +278,9 @@ class SAPQTrainer:
         # 3) Get target layers in ORIGINAL namespace
         # --------------------------------------------------
         target_layers = self._get_target_layers(ranges_dict)
-        print(f"Optimizing {len(target_layers)} compatible QuantModule layers.")
+        print(f"Optimizing {len(target_layers)} compatible nn.Linear layers.")
         if len(target_layers) == 0:
-            raise ValueError("No compatible QuantModule layers found.")
+            raise ValueError("No compatible nn.Linear layers found.")
 
         # --------------------------------------------------
         # 4) Initialize global step sizes in ORIGINAL namespace
@@ -274,24 +306,30 @@ class SAPQTrainer:
                 ranges_dict=ranges_dict,
                 channel_weights=self.channel_weights,
             )
-        print(f"[Init] AvgBits≈{avg_bits:.2f} (initial={cfg.init_bits})")
+        print(f"[Init] AvgBits≈{avg_bits:.2f} (target={getattr(cfg, 'target_bits', cfg.init_bits)})")
 
         # --------------------------------------------------
         # 6) Sensitivity dict in ORIGINAL namespace
         # --------------------------------------------------
         if sens_dict is None:
             raise ValueError(
-                "sens_dict must be provided to SAPQTrainer.train(...). "
+                "sens_dict must be provided to SAPQTrainerNetwork.train(...). "
                 "Please precompute it with SAPQ/sapq_sensitivity.py."
             )
+
+        # --------------------------------------------------
+        # 7) Cache clean final outputs once
+        # --------------------------------------------------
+        print("Caching clean final network outputs...")
+        clean_net_outputs = self._cache_clean_network_outputs(frozen_batches)
 
         history = []
 
         # --------------------------------------------------
-        # 7) Traverse wrapped blocks
+        # 8) Traverse wrapped blocks (schedule only)
         # --------------------------------------------------
         target_blocks = list(self._iter_target_blocks())
-        print(f"Found {len(target_blocks)} target blocks for SAPQ.")
+        print(f"Found {len(target_blocks)} target blocks for SAPQ network-wise mode.")
 
         for block_idx, (block_wrapped_name, block) in enumerate(target_blocks, start=1):
             (
@@ -299,7 +337,7 @@ class SAPQTrainer:
                 block_ranges_dict,
                 block_sens_dict,
                 block_orig_names,
-            ) = self._collect_block_local_dicts(
+            ) = self._collect_block_global_dicts(
                 block_wrapped_name=block_wrapped_name,
                 block=block,
                 global_step_sizes_dict=step_sizes_dict,
@@ -308,7 +346,7 @@ class SAPQTrainer:
             )
 
             if len(block_step_sizes_dict) == 0:
-                print(f"[Skip] Block {block_wrapped_name}: no QuantModule step sizes found.")
+                print(f"[Skip] Block {block_wrapped_name}: no step sizes found.")
                 continue
 
             print(
@@ -328,34 +366,11 @@ class SAPQTrainer:
 
             optimizer = optim.Adam(block_params, lr=cfg.base_lr)
 
-            # --------------------------------------------------
-            # 8) Cache block inputs / outputs
-            # --------------------------------------------------
-            cached_block_inputs, cached_block_outputs = save_inp_oup_data(
-                model=self.qmodel,
-                layer=block,
-                cali_data=frozen_batches,
-                asym=getattr(cfg, "asym", True),
-                act_quant=False,
-                batch_size=cfg.calib_batchsize,
-            )
+            num_frozen_batches = len(frozen_batches)
 
             # --------------------------------------------------
-            # 9) Cache Fisher gradients (always needed now)
+            # 9) Optimize this block, but likelihood is network-wise
             # --------------------------------------------------
-            cached_block_grads = save_grad_data(
-                model=self.qmodel,
-                layer=block,
-                cali_data=frozen_batches,
-                act_quant=False,
-                batch_size=cfg.calib_batchsize,
-            )
-
-            # --------------------------------------------------
-            # 10) Optimize this block
-            # --------------------------------------------------
-            num_cached_batches = len(cached_block_inputs)
-
             for epoch in range(1, cfg.num_epochs + 1):
                 lr_epoch = get_lr_for_epoch(
                     epoch=epoch,
@@ -365,21 +380,20 @@ class SAPQTrainer:
                 for pg in optimizer.param_groups:
                     pg["lr"] = lr_epoch
 
-                for batch_idx in range(num_cached_batches):
+                for batch_idx in range(num_frozen_batches):
                     for _ in range(cfg.updates_per_batch):
                         optimizer.zero_grad()
 
-                        total_loss, like_loss, prior_loss = compute_sapq_loss_with_prior(
-                            block=block,
-                            block_step_sizes_dict=block_step_sizes_dict,
-                            cached_block_inputs=cached_block_inputs,
-                            cached_block_outputs=cached_block_outputs,
-                            cached_block_grads=cached_block_grads,
+                        total_loss, like_loss, prior_loss = compute_sapq_loss_with_prior_network(
+                            model=self.raw_model,
+                            step_sizes_dict=block_step_sizes_dict,   # only current block updated
+                            frozen_batches=frozen_batches,
+                            clean_net_outputs=clean_net_outputs,
                             batch_idx=batch_idx,
-                            block_ranges_dict=block_ranges_dict,
-                            block_sens_dict=block_sens_dict,
+                            ranges_dict=block_ranges_dict,
+                            sens_dict=block_sens_dict,
                             num_mc_samples=cfg.num_mc_samples,
-                            prior_mode=str(getattr(cfg, "prior_mode", "block_sens")),
+                            eta=cfg.eta,
                             b_target=float(getattr(cfg, "target_bits", cfg.init_bits)),
                             sigma0=float(getattr(cfg, "sigma0", 0.5)),
                             alpha=float(getattr(cfg, "alpha", 1.0)),
@@ -427,8 +441,7 @@ class SAPQTrainer:
                         "avg_bits": float(avg_bits),
                         "num_local_layers": len(block_step_sizes_dict),
                         "orig_layer_names": list(block_orig_names),
-                        "prior_mode": str(getattr(cfg, "prior_mode", "block_sens")),
-                        "likelihood_mode": "blockwise",
+                        "likelihood_mode": "network",
                     }
                 )
 

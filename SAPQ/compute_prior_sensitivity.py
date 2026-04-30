@@ -119,7 +119,11 @@ def main():
     # --------------------------------------------------
     # paths
     # --------------------------------------------------
-    out_dir = Path(cfg.repo_root) / "SAPQ" / "prior_sensitivity" / Path(cfg.model_path).name
+    # this path stroes teh older sensitivity
+    #out_dir = Path(cfg.repo_root) / "SAPQ" / "prior_sensitivity" / Path(cfg.model_path).name
+    # this path is to store the sobolve sensitivity (divergence)
+    out_dir = Path(cfg.repo_root) / "SAPQ" / "prior_sensitivity_div" / Path(cfg.model_path).name
+
     out_dir.mkdir(parents=True, exist_ok=True)
 
     pt_path = out_dir / "prior_sensitivity.pt"

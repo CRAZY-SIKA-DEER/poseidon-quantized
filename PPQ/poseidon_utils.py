@@ -72,20 +72,20 @@ def build_poseidon_loaders(
         data_path=data_path,
     )
 
-    try:
-        val_ds = get_dataset(
-            dataset_name,
-            which="val",
-            num_trajectories=256,
-            data_path=data_path,
-        )
-    except Exception:
-        val_ds = get_dataset(
-            dataset_name,
-            which="test",
-            num_trajectories=256,
-            data_path=data_path,
-        )
+    # try:
+    #     val_ds = get_dataset(
+    #         dataset_name,
+    #         which="val",
+    #         num_trajectories=256,
+    #         data_path=data_path,
+    #     )
+    # except Exception:
+    val_ds = get_dataset(
+        dataset_name,
+        which="test",
+        num_trajectories=256,
+        data_path=data_path,
+    )
 
     calib_loader = DataLoader(
         train_ds,
@@ -98,7 +98,8 @@ def build_poseidon_loaders(
     val_loader = DataLoader(
         val_ds,
         batch_size=val_batchsize,
-        shuffle=False,
+        #shuffle=False,
+        shuffle = True,
         num_workers=min(os.cpu_count() or 0, 16),
         pin_memory=True,
     )

@@ -82,6 +82,14 @@ def get_model_cache_name(cfg: PPQConfig) -> str:
     # For your current case:
     model_name = Path(cfg.model_path).name
     return f"{model_name}_layerio"
+
+def get_dataset_cache_name(cfg: PPQConfig) -> str:
+    """
+    Use clean dataset folder name, e.g.
+        dataset/NS-SVS -> NS-SVS-calib
+        dataset/NS-PwC -> NS-PwC-calib
+    """
+    return f"{Path(cfg.data_path).name}-calib"
     
 
 
@@ -92,15 +100,11 @@ def save_shared_frozen_calibration(
     calib_steps: int,
     dataset_name: str,
 ):
-    """
-    Save the shared frozen calibration dataset once at the top level:
-        ppq_artifacts/frozen_calibration_batches.pt
-        ppq_artifacts/calibration_meta.json
-    """
-    ensure_dir(artifacts_root)
+    save_root = artifacts_root / dataset_name
+    ensure_dir(save_root)
 
-    frozen_path = artifacts_root / "frozen_calibration_batches.pt"
-    meta_path = artifacts_root / "calibration_meta.json"
+    frozen_path = save_root / "frozen_calibration_batches.pt"
+    meta_path = save_root / "calibration_meta.json"
 
     torch.save(frozen_batches, frozen_path)
 
@@ -111,11 +115,12 @@ def save_shared_frozen_calibration(
         "num_calibration_samples": int(calib_batchsize * calib_steps),
         "num_frozen_batches": int(len(frozen_batches)),
     }
+
     with open(meta_path, "w") as f:
         json.dump(meta, f, indent=2)
 
-    print(f"[INFO] Saved shared frozen calibration -> {frozen_path}")
-    print(f"[INFO] Saved shared calibration meta -> {meta_path}")
+    print(f"[INFO] Saved frozen calibration -> {frozen_path}")
+    print(f"[INFO] Saved calibration meta -> {meta_path}")
 
     return frozen_path, meta_path
 
@@ -296,43 +301,61 @@ def main():
     model_cache_root = artifacts_root / model_cache_name
     ensure_dir(model_cache_root)
 
+    dataset_cache_name = get_dataset_cache_name(cfg)
+    dataset_cache_root = artifacts_root / dataset_cache_name
+
+    print("\n========== CACHE IO CONFIG ==========")
+    print("[DEBUG] cfg.model_path      =", cfg.model_path)
+    print("[DEBUG] cfg.data_path       =", cfg.data_path)
+    print("[DEBUG] cfg.dataset_name    =", cfg.dataset_name)
+    print("[DEBUG] cfg.quant_layer_path=", cfg.quant_layer_path)
+    print("[DEBUG] artifacts_root      =", artifacts_root)
+    print("[DEBUG] real artifacts_root =", artifacts_root.resolve())
+    print("[DEBUG] frozen save dir     =", dataset_cache_root)
+    print("[DEBUG] real frozen save dir=", dataset_cache_root.resolve())
+    print("[DEBUG] layerIO save dir    =", model_cache_root)
+    print("[DEBUG] real layerIO dir    =", model_cache_root.resolve())
+    print("====================================\n")
+
     # --------------------------------------------------
     # 1) Load model
     # --------------------------------------------------
     model, device = load_poseidon_model(cfg.model_path, cfg.device)
 
-    # # --------------------------------------------------
-    # # 2) Build calibration loader
-    # # --------------------------------------------------
-    # _calib_loader, _val_loader, calib_iter, _val_iter = build_poseidon_loaders(
-    #     dataset_name=cfg.dataset_name,
-    #     data_path=cfg.data_path,
-    #     calib_batchsize=calib_batchsize,
-    #     calib_steps=calib_steps,
-    #     val_batchsize=cfg.val_batchsize,
-    #     val_steps=cfg.val_steps,
-    # )
+    # --------------------------------------------------
+    # 2) Build calibration loader
+    # --------------------------------------------------
+    _calib_loader, _val_loader, calib_iter, _val_iter = build_poseidon_loaders(
+        dataset_name=cfg.dataset_name,
+        data_path=cfg.data_path,
+        calib_batchsize=calib_batchsize,
+        calib_steps=calib_steps,
+        val_batchsize=cfg.val_batchsize,
+        val_steps=cfg.val_steps,
+    )
 
     # # --------------------------------------------------
     # # 3) Freeze exact calibration dataset
     # # --------------------------------------------------
-    # frozen_batches, _ = freeze_batches(calib_iter)
+    frozen_batches, _ = freeze_batches(calib_iter)
 
 
-    frozen_batches = torch.load(cfg.artifacts_dir / "frozen_calibration_batches.pt")
+    # frozen_batches = torch.load(cfg.artifacts_dir / "frozen_calibration_batches.pt")
     # print(
     #     f"[INFO] Frozen calibration samples = "
     #     f"{len(frozen_batches)} x {calib_batchsize} = {len(frozen_batches) * calib_batchsize}"
     # )
-    print(f"[INFO] Loaded frozen calibration batches: {len(frozen_batches)}")
+    print(f"[INFO] created frozen calibration batches: {len(frozen_batches)}")
 
-    # frozen_path, calib_meta_path = save_shared_frozen_calibration(
-    #     frozen_batches=frozen_batches,
-    #     artifacts_root=artifacts_root,
-    #     calib_batchsize=calib_batchsize,
-    #     calib_steps=calib_steps,
-    #     dataset_name=cfg.dataset_name,
-    # )
+    dataset_cache_name = get_dataset_cache_name(cfg)
+
+    frozen_path, calib_meta_path = save_shared_frozen_calibration(
+        frozen_batches=frozen_batches,
+        artifacts_root=artifacts_root,
+        calib_batchsize=calib_batchsize,
+        calib_steps=calib_steps,
+        dataset_name=dataset_cache_name,
+    )
 
     # --------------------------------------------------
     # 4) Load candidate Linear layers
@@ -361,8 +384,8 @@ def main():
     #     "model_cache_name": model_cache_name,
     # }
 
-    shared_frozen_path = cfg.artifacts_dir / "frozen_calibration_batches.pt"
-    shared_calib_meta_path = cfg.artifacts_dir / "calibration_meta.json"
+    shared_frozen_path = frozen_path
+    shared_calib_meta_path = calib_meta_path
 
     run_meta = {
         "model_path": str(cfg.model_path),

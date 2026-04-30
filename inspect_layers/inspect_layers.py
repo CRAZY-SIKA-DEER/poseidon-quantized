@@ -54,6 +54,74 @@ quantize_layers has the same layer names as layer_info_filtered only because exc
 
 '''
 
+def print_linear_vs_whole_model(model, layer_info):
+    whole_model_params = sum(p.numel() for p in model.parameters())
+
+    linear_params = sum(
+        info["num_parameters"]
+        for info in layer_info.values()
+        if info["type"] == "Linear"
+    )
+
+    print("\n" + "=" * 80)
+    print("LINEAR PARAMS / WHOLE MODEL PARAMS")
+    print("=" * 80)
+    print(f"Whole model parameters: {whole_model_params:,}")
+    print(f"Quantizable Linear parameters: {linear_params:,}")
+    print(f"Ratio: {linear_params / whole_model_params:.6f}")
+    print("=" * 80 + "\n")
+
+# ========================
+# Extra: Parameter Breakdown Check
+# ========================
+def print_parameter_breakdown(layer_info):
+    total_params = 0
+    linear_params = 0
+    conv_params = 0
+    convT_params = 0
+
+    linear_layers = 0
+    conv_layers = 0
+    convT_layers = 0
+
+    for name, info in layer_info.items():
+        p = info['num_parameters']
+        total_params += p
+
+        if info['type'] == 'Linear':
+            linear_params += p
+            linear_layers += 1
+
+        elif info['type'] == 'Conv2d':
+            conv_params += p
+            conv_layers += 1
+
+        elif info['type'] == 'ConvTranspose2d':
+            convT_params += p
+            convT_layers += 1
+
+    print("\n" + "="*80)
+    print("PARAMETER BREAKDOWN")
+    print("="*80)
+
+    print(f"Total parameters (quantizable): {total_params:,}")
+
+    print(f"\n[Linear]")
+    print(f"  Layers: {linear_layers}")
+    print(f"  Params: {linear_params:,}")
+    print(f"  Ratio: {linear_params / total_params:.4f}")
+
+    print(f"\n[Conv2d]")
+    print(f"  Layers: {conv_layers}")
+    print(f"  Params: {conv_params:,}")
+    print(f"  Ratio: {conv_params / total_params:.4f}")
+
+    print(f"\n[ConvTranspose2d]")
+    print(f"  Layers: {convT_layers}")
+    print(f"  Params: {convT_params:,}")
+    print(f"  Ratio: {convT_params / total_params:.4f}")
+
+    print("="*80 + "\n")
 
 
 
@@ -278,51 +346,59 @@ if __name__ == "__main__":
     print("\n" + "="*80)
     print("OPTION 2: FILTERED (excluding norm/time layers)")
     print_architecture_summary(layer_info_filtered)
+
+    print("\nOPTION 1 BREAKDOWN (ALL)")
+    print_parameter_breakdown(layer_info_all)
+
+    print("\nOPTION 2 BREAKDOWN (FILTERED)")
+    print_parameter_breakdown(layer_info_filtered)
+
+    print_linear_vs_whole_model(model, layer_info_filtered)
     
     # Select layers for quantization
-    quantize_layers = select_layers_for_quantization(layer_info_filtered)
+    # quantize_layers = select_layers_for_quantization(layer_info_filtered)
     
-    # ========================
-    # Save to JSON (human-readable, can view in any text editor)
-    # ========================
-    print("\nSaving detailed layer info to JSON files...")
+    # # ========================
+    # # Save to JSON (human-readable, can view in any text editor)
+    # # ========================
+    # print("\nSaving detailed layer info to JSON files...")
 
-    # Build full paths under the script directory (inspect_layers/)
-    all_path = os.path.join(SCRIPT_DIR, f'{prefix}layer_info_all.json')
-    filtered_path = os.path.join(SCRIPT_DIR, f'{prefix}layer_info_filtered.json')
-    quant_list_path = os.path.join(SCRIPT_DIR, f'{prefix}quantize_layers.json')
-    quant_pt_path = os.path.join(SCRIPT_DIR, f'{prefix}quantize_layers.pt')
+    # # Build full paths under the script directory (inspect_layers/)
+    # all_path = os.path.join(SCRIPT_DIR, f'{prefix}layer_info_all.json')
+    # filtered_path = os.path.join(SCRIPT_DIR, f'{prefix}layer_info_filtered.json')
+    # quant_list_path = os.path.join(SCRIPT_DIR, f'{prefix}quantize_layers.json')
+    # quant_pt_path = os.path.join(SCRIPT_DIR, f'{prefix}quantize_layers.pt')
 
-    # Save all layers
-    with open(all_path, 'w') as f:
-        json.dump(layer_info_all, f, indent=2)
-    print(f"  ✓ Saved '{all_path}'")
+    # # Save all layers
+    # with open(all_path, 'w') as f:
+    #     json.dump(layer_info_all, f, indent=2)
+    # print(f"  ✓ Saved '{all_path}'")
 
-    # Save filtered layers
-    with open(filtered_path, 'w') as f:
-        json.dump(layer_info_filtered, f, indent=2)
-    print(f"  ✓ Saved '{filtered_path}'")
+    # # Save filtered layers
+    # with open(filtered_path, 'w') as f:
+    #     json.dump(layer_info_filtered, f, indent=2)
+    # print(f"  ✓ Saved '{filtered_path}'")
 
-    # Save selected layer names list
-    with open(quant_list_path, 'w') as f:
-        json.dump(quantize_layers, f, indent=2)
-    print(f"  ✓ Saved '{quant_list_path}'")
+    # # Save selected layer names list
+    # with open(quant_list_path, 'w') as f:
+    #     json.dump(quantize_layers, f, indent=2)
+    # print(f"  ✓ Saved '{quant_list_path}'")
     
-    # ========================
-    # Save lightweight .pt file (just layer names for later use)
-    # ========================
-    print("\nSaving layer names to lightweight .pt file...")
-    torch.save({
-        'quantize_layers': quantize_layers,
-        'layer_count': len(quantize_layers)
-    }, quant_pt_path)
-    print(f"  ✓ Saved '{quant_pt_path}' (lightweight, just names)")
+    # # ========================
+    # # Save lightweight .pt file (just layer names for later use)
+    # # ========================
+    # print("\nSaving layer names to lightweight .pt file...")
+    # torch.save({
+    #     'quantize_layers': quantize_layers,
+    #     'layer_count': len(quantize_layers)
+    # }, quant_pt_path)
+    # print(f"  ✓ Saved '{quant_pt_path}' (lightweight, just names)")
     
-    print("\n" + "="*80)
-    print("DONE! Files created:")
-    print(f'  - {prefix}layer_info_all.json (full details, all layers)')
-    print(f'  - {prefix}layer_info_filtered.json (full details, filtered)')
-    print(f'  - {prefix}quantize_layers.json (list of layer names to quantize)')
-    print(f'  - {prefix}quantize_layers.pt (lightweight, for code use)')
-    print("\nYou can open the JSON files in any text editor to see all layers!")
-    print("="*80 + "\n")
+    # print("\n" + "="*80)
+    # print("DONE! Files created:")
+    # print(f'  - {prefix}layer_info_all.json (full details, all layers)')
+    # print(f'  - {prefix}layer_info_filtered.json (full details, filtered)')
+    # print(f'  - {prefix}quantize_layers.json (list of layer names to quantize)')
+    # print(f'  - {prefix}quantize_layers.pt (lightweight, for code use)')
+    # print("\nYou can open the JSON files in any text editor to see all layers!")
+    # print("="*80 + "\n")
