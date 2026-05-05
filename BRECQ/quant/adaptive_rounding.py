@@ -3,6 +3,7 @@ from torch import nn
 from BRECQ.quant.quant_layer import UniformAffineQuantizer, round_ste
 
 
+
 class AdaRoundQuantizer(nn.Module):
     """
     Adaptive Rounding Quantizer, used to optimize the rounding policy

@@ -1,0 +1,4610 @@
+[
+  {
+    "batch_idx": 0,
+    "avg_bits_before": 7.999797638334316,
+    "avg_bits_after": 12.642997710824602,
+    "like_loss": 0.1436166763305664,
+    "prior_loss": 0.008924740366637707,
+    "total_loss": 0.1525414139032364,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 1,
+    "avg_bits_before": 12.642997710824602,
+    "avg_bits_after": 6.666202715333517,
+    "like_loss": 0.23214399814605713,
+    "prior_loss": 6574.44482421875,
+    "total_loss": 6574.6767578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 2,
+    "avg_bits_before": 6.666202715333517,
+    "avg_bits_after": 11.886185520095475,
+    "like_loss": 0.28706228733062744,
+    "prior_loss": 396.7301025390625,
+    "total_loss": 397.01715087890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 3,
+    "avg_bits_before": 11.886185520095475,
+    "avg_bits_after": 5.994189140660089,
+    "like_loss": 0.43957555294036865,
+    "prior_loss": 5108.91845703125,
+    "total_loss": 5109.35791015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 4,
+    "avg_bits_before": 5.994189140660089,
+    "avg_bits_after": 5.418156964438302,
+    "like_loss": 0.6626660823822021,
+    "prior_loss": 679.2833862304688,
+    "total_loss": 679.946044921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 5,
+    "avg_bits_before": 5.418156964438302,
+    "avg_bits_after": 5.079355412819391,
+    "like_loss": 0.9745811223983765,
+    "prior_loss": 854.715087890625,
+    "total_loss": 855.689697265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 6,
+    "avg_bits_before": 5.079355412819391,
+    "avg_bits_after": 4.843972601423477,
+    "like_loss": 1.6619911193847656,
+    "prior_loss": 991.3744506835938,
+    "total_loss": 993.0364379882812,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 7,
+    "avg_bits_before": 4.843972601423477,
+    "avg_bits_after": 4.667473005050958,
+    "like_loss": 3.1243393421173096,
+    "prior_loss": 1100.27734375,
+    "total_loss": 1103.4017333984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 8,
+    "avg_bits_before": 4.667473005050958,
+    "avg_bits_after": 4.529049128650126,
+    "like_loss": 2.6393284797668457,
+    "prior_loss": 1188.262939453125,
+    "total_loss": 1190.9022216796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 9,
+    "avg_bits_before": 4.529049128650126,
+    "avg_bits_after": 4.417145572322032,
+    "like_loss": 4.24660587310791,
+    "prior_loss": 1261.3746337890625,
+    "total_loss": 1265.6212158203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 10,
+    "avg_bits_before": 4.417145572322032,
+    "avg_bits_after": 4.32489685466166,
+    "like_loss": 3.722297430038452,
+    "prior_loss": 1322.0501708984375,
+    "total_loss": 1325.7724609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 11,
+    "avg_bits_before": 4.32489685466166,
+    "avg_bits_after": 4.24757809616897,
+    "like_loss": 2.8127713203430176,
+    "prior_loss": 1373.9786376953125,
+    "total_loss": 1376.7913818359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 12,
+    "avg_bits_before": 4.24757809616897,
+    "avg_bits_after": 4.18206733542568,
+    "like_loss": 3.777944564819336,
+    "prior_loss": 1418.1444091796875,
+    "total_loss": 1421.92236328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 13,
+    "avg_bits_before": 4.18206733542568,
+    "avg_bits_after": 4.126000603679844,
+    "like_loss": 3.962435245513916,
+    "prior_loss": 1456.4356689453125,
+    "total_loss": 1460.3980712890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 14,
+    "avg_bits_before": 4.126000603679844,
+    "avg_bits_after": 4.077662819697197,
+    "like_loss": 5.853199005126953,
+    "prior_loss": 1489.3763427734375,
+    "total_loss": 1495.2294921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 15,
+    "avg_bits_before": 4.077662819697197,
+    "avg_bits_after": 4.035696164446614,
+    "like_loss": 5.440211296081543,
+    "prior_loss": 1518.155517578125,
+    "total_loss": 1523.595703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 16,
+    "avg_bits_before": 4.035696164446614,
+    "avg_bits_after": 3.999122606741142,
+    "like_loss": 5.28518533706665,
+    "prior_loss": 1543.3980712890625,
+    "total_loss": 1548.6832275390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 17,
+    "avg_bits_before": 3.999122606741142,
+    "avg_bits_after": 3.9670459353113032,
+    "like_loss": 7.372222900390625,
+    "prior_loss": 1565.7806396484375,
+    "total_loss": 1573.15283203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 18,
+    "avg_bits_before": 3.9670459353113032,
+    "avg_bits_after": 3.9389045071782522,
+    "like_loss": 4.880824089050293,
+    "prior_loss": 1585.3382568359375,
+    "total_loss": 1590.2191162109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 19,
+    "avg_bits_before": 3.9389045071782522,
+    "avg_bits_after": 3.9141343866629734,
+    "like_loss": 5.559670448303223,
+    "prior_loss": 1602.6419677734375,
+    "total_loss": 1608.20166015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 20,
+    "avg_bits_before": 3.9141343866629734,
+    "avg_bits_after": 3.892292219665747,
+    "like_loss": 7.643728256225586,
+    "prior_loss": 1618.1201171875,
+    "total_loss": 1625.7637939453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 21,
+    "avg_bits_before": 3.892292219665747,
+    "avg_bits_after": 3.873013851698983,
+    "like_loss": 6.682987213134766,
+    "prior_loss": 1631.658447265625,
+    "total_loss": 1638.3414306640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 22,
+    "avg_bits_before": 3.873013851698983,
+    "avg_bits_after": 3.855952740833579,
+    "like_loss": 5.79829216003418,
+    "prior_loss": 1643.702392578125,
+    "total_loss": 1649.500732421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 23,
+    "avg_bits_before": 3.855952740833579,
+    "avg_bits_after": 3.840907282322114,
+    "like_loss": 7.794620513916016,
+    "prior_loss": 1654.4315185546875,
+    "total_loss": 1662.2261962890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 24,
+    "avg_bits_before": 3.840907282322114,
+    "avg_bits_after": 3.82763048220573,
+    "like_loss": 6.899577617645264,
+    "prior_loss": 1663.9190673828125,
+    "total_loss": 1670.818603515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 25,
+    "avg_bits_before": 3.82763048220573,
+    "avg_bits_after": 3.815848251191478,
+    "like_loss": 6.223304748535156,
+    "prior_loss": 1672.50244140625,
+    "total_loss": 1678.7257080078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 26,
+    "avg_bits_before": 3.815848251191478,
+    "avg_bits_after": 3.805453201782176,
+    "like_loss": 6.838130950927734,
+    "prior_loss": 1680.043212890625,
+    "total_loss": 1686.88134765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 27,
+    "avg_bits_before": 3.805453201782176,
+    "avg_bits_after": 3.796307230680689,
+    "like_loss": 7.509622097015381,
+    "prior_loss": 1686.7181396484375,
+    "total_loss": 1694.227783203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 28,
+    "avg_bits_before": 3.796307230680689,
+    "avg_bits_after": 3.788291390057642,
+    "like_loss": 9.643309593200684,
+    "prior_loss": 1692.6287841796875,
+    "total_loss": 1702.2720947265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 29,
+    "avg_bits_before": 3.788291390057642,
+    "avg_bits_after": 3.781260193747608,
+    "like_loss": 7.4701080322265625,
+    "prior_loss": 1698.0263671875,
+    "total_loss": 1705.4964599609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 30,
+    "avg_bits_before": 3.781260193747608,
+    "avg_bits_after": 3.7751740872108006,
+    "like_loss": 6.982993125915527,
+    "prior_loss": 1702.638916015625,
+    "total_loss": 1709.6219482421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 31,
+    "avg_bits_before": 3.7751740872108006,
+    "avg_bits_after": 3.769932015644885,
+    "like_loss": 11.86027717590332,
+    "prior_loss": 1706.7425537109375,
+    "total_loss": 1718.602783203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 32,
+    "avg_bits_before": 3.769932015644885,
+    "avg_bits_after": 3.7654432535115494,
+    "like_loss": 6.324540138244629,
+    "prior_loss": 1710.4171142578125,
+    "total_loss": 1716.74169921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 33,
+    "avg_bits_before": 3.7654432535115494,
+    "avg_bits_after": 3.7616603385217764,
+    "like_loss": 8.813304901123047,
+    "prior_loss": 1713.701416015625,
+    "total_loss": 1722.5147705078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 34,
+    "avg_bits_before": 3.7616603385217764,
+    "avg_bits_after": 3.7585055719904172,
+    "like_loss": 12.149455070495605,
+    "prior_loss": 1716.50439453125,
+    "total_loss": 1728.65380859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 35,
+    "avg_bits_before": 3.7585055719904172,
+    "avg_bits_after": 3.755909138403385,
+    "like_loss": 9.453529357910156,
+    "prior_loss": 1718.9962158203125,
+    "total_loss": 1728.44970703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 36,
+    "avg_bits_before": 3.755909138403385,
+    "avg_bits_after": 3.7538137878158286,
+    "like_loss": 11.443920135498047,
+    "prior_loss": 1721.3115234375,
+    "total_loss": 1732.7554931640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 37,
+    "avg_bits_before": 3.7538137878158286,
+    "avg_bits_after": 3.7522029718414722,
+    "like_loss": 10.792407989501953,
+    "prior_loss": 1723.1285400390625,
+    "total_loss": 1733.9208984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 38,
+    "avg_bits_before": 3.7522029718414722,
+    "avg_bits_after": 3.751073062543984,
+    "like_loss": 11.248800277709961,
+    "prior_loss": 1724.7227783203125,
+    "total_loss": 1735.9715576171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 39,
+    "avg_bits_before": 3.751073062543984,
+    "avg_bits_after": 3.7502600604750596,
+    "like_loss": 7.909494400024414,
+    "prior_loss": 1726.2823486328125,
+    "total_loss": 1734.19189453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 40,
+    "avg_bits_before": 3.7502600604750596,
+    "avg_bits_after": 3.7498475457328877,
+    "like_loss": 9.55125617980957,
+    "prior_loss": 1727.28076171875,
+    "total_loss": 1736.83203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 41,
+    "avg_bits_before": 3.7498475457328877,
+    "avg_bits_after": 3.749740779265665,
+    "like_loss": 6.367079257965088,
+    "prior_loss": 1728.373779296875,
+    "total_loss": 1734.7408447265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 42,
+    "avg_bits_before": 3.749740779265665,
+    "avg_bits_after": 3.749925036264113,
+    "like_loss": 7.315638065338135,
+    "prior_loss": 1729.20458984375,
+    "total_loss": 1736.520263671875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 43,
+    "avg_bits_before": 3.749925036264113,
+    "avg_bits_after": 3.7503961632426526,
+    "like_loss": 6.556035995483398,
+    "prior_loss": 1729.789794921875,
+    "total_loss": 1736.3458251953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 44,
+    "avg_bits_before": 3.7503961632426526,
+    "avg_bits_after": 3.751094192362743,
+    "like_loss": 8.6982421875,
+    "prior_loss": 1730.3095703125,
+    "total_loss": 1739.0078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 45,
+    "avg_bits_before": 3.751094192362743,
+    "avg_bits_after": 3.7519558332813547,
+    "like_loss": 6.82731819152832,
+    "prior_loss": 1730.725341796875,
+    "total_loss": 1737.5526123046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 46,
+    "avg_bits_before": 3.7519558332813547,
+    "avg_bits_after": 3.7530313435295626,
+    "like_loss": 13.697540283203125,
+    "prior_loss": 1731.0653076171875,
+    "total_loss": 1744.7628173828125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 47,
+    "avg_bits_before": 3.7530313435295626,
+    "avg_bits_after": 3.754191917771487,
+    "like_loss": 7.340298652648926,
+    "prior_loss": 1731.3253173828125,
+    "total_loss": 1738.6656494140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 48,
+    "avg_bits_before": 3.754191917771487,
+    "avg_bits_after": 3.755478441464332,
+    "like_loss": 8.637982368469238,
+    "prior_loss": 1731.318603515625,
+    "total_loss": 1739.95654296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 49,
+    "avg_bits_before": 3.755478441464332,
+    "avg_bits_after": 3.7568293625820957,
+    "like_loss": 9.743197441101074,
+    "prior_loss": 1731.4483642578125,
+    "total_loss": 1741.1915283203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 50,
+    "avg_bits_before": 3.7568293625820957,
+    "avg_bits_after": 3.758255854915854,
+    "like_loss": 11.846292495727539,
+    "prior_loss": 1731.426513671875,
+    "total_loss": 1743.2728271484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 51,
+    "avg_bits_before": 3.758255854915854,
+    "avg_bits_after": 3.7597164706311905,
+    "like_loss": 8.432672500610352,
+    "prior_loss": 1731.4095458984375,
+    "total_loss": 1739.8421630859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 52,
+    "avg_bits_before": 3.7597164706311905,
+    "avg_bits_after": 3.761183304376452,
+    "like_loss": 8.975648880004883,
+    "prior_loss": 1731.3345947265625,
+    "total_loss": 1740.310302734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 53,
+    "avg_bits_before": 3.761183304376452,
+    "avg_bits_after": 3.7626549660236406,
+    "like_loss": 7.202658653259277,
+    "prior_loss": 1731.19580078125,
+    "total_loss": 1738.3984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 54,
+    "avg_bits_before": 3.7626549660236406,
+    "avg_bits_after": 3.764155361726332,
+    "like_loss": 5.461764335632324,
+    "prior_loss": 1730.912353515625,
+    "total_loss": 1736.3741455078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 55,
+    "avg_bits_before": 3.764155361726332,
+    "avg_bits_after": 3.765715093450471,
+    "like_loss": 6.521909713745117,
+    "prior_loss": 1730.661376953125,
+    "total_loss": 1737.1832275390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 56,
+    "avg_bits_before": 3.765715093450471,
+    "avg_bits_after": 3.767277019594785,
+    "like_loss": 7.291783332824707,
+    "prior_loss": 1730.4119873046875,
+    "total_loss": 1737.7037353515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 57,
+    "avg_bits_before": 3.767277019594785,
+    "avg_bits_after": 3.7688389405544283,
+    "like_loss": 7.36106014251709,
+    "prior_loss": 1730.0823974609375,
+    "total_loss": 1737.4434814453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 58,
+    "avg_bits_before": 3.7688389405544283,
+    "avg_bits_after": 3.770441929958076,
+    "like_loss": 10.137825965881348,
+    "prior_loss": 1729.7412109375,
+    "total_loss": 1739.8790283203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 59,
+    "avg_bits_before": 3.770441929958076,
+    "avg_bits_after": 3.772052057374167,
+    "like_loss": 7.749841213226318,
+    "prior_loss": 1729.4263916015625,
+    "total_loss": 1737.17626953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 60,
+    "avg_bits_before": 3.772052057374167,
+    "avg_bits_after": 3.773654505147063,
+    "like_loss": 8.672872543334961,
+    "prior_loss": 1729.156982421875,
+    "total_loss": 1737.829833984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 61,
+    "avg_bits_before": 3.773654505147063,
+    "avg_bits_after": 3.7752290382368323,
+    "like_loss": 9.169722557067871,
+    "prior_loss": 1728.7901611328125,
+    "total_loss": 1737.9598388671875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 62,
+    "avg_bits_before": 3.7752290382368323,
+    "avg_bits_after": 3.776770591146107,
+    "like_loss": 6.600502967834473,
+    "prior_loss": 1728.4674072265625,
+    "total_loss": 1735.06787109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 63,
+    "avg_bits_before": 3.776770591146107,
+    "avg_bits_after": 3.778276975806399,
+    "like_loss": 10.185479164123535,
+    "prior_loss": 1728.08935546875,
+    "total_loss": 1738.2747802734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 64,
+    "avg_bits_before": 3.778276975806399,
+    "avg_bits_after": 3.7797669409767285,
+    "like_loss": 9.505266189575195,
+    "prior_loss": 1727.6767578125,
+    "total_loss": 1737.1820068359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 65,
+    "avg_bits_before": 3.7797669409767285,
+    "avg_bits_after": 3.781217456682421,
+    "like_loss": 7.479596138000488,
+    "prior_loss": 1727.3179931640625,
+    "total_loss": 1734.797607421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 66,
+    "avg_bits_before": 3.781217456682421,
+    "avg_bits_after": 3.7827084811507152,
+    "like_loss": 11.434452056884766,
+    "prior_loss": 1726.96630859375,
+    "total_loss": 1738.4007568359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 67,
+    "avg_bits_before": 3.7827084811507152,
+    "avg_bits_after": 3.7841341342689074,
+    "like_loss": 9.321138381958008,
+    "prior_loss": 1726.636962890625,
+    "total_loss": 1735.9581298828125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 68,
+    "avg_bits_before": 3.7841341342689074,
+    "avg_bits_after": 3.7855428007546017,
+    "like_loss": 8.043283462524414,
+    "prior_loss": 1726.2003173828125,
+    "total_loss": 1734.24365234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 69,
+    "avg_bits_before": 3.7855428007546017,
+    "avg_bits_after": 3.7869601612294965,
+    "like_loss": 8.959016799926758,
+    "prior_loss": 1725.80517578125,
+    "total_loss": 1734.76416015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 70,
+    "avg_bits_before": 3.7869601612294965,
+    "avg_bits_after": 3.7883668385150573,
+    "like_loss": 6.867956161499023,
+    "prior_loss": 1725.46875,
+    "total_loss": 1732.336669921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 71,
+    "avg_bits_before": 3.7883668385150573,
+    "avg_bits_after": 3.789762317013582,
+    "like_loss": 8.445566177368164,
+    "prior_loss": 1725.0531005859375,
+    "total_loss": 1733.4986572265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 72,
+    "avg_bits_before": 3.789762317013582,
+    "avg_bits_after": 3.7911993140234417,
+    "like_loss": 8.061959266662598,
+    "prior_loss": 1724.655517578125,
+    "total_loss": 1732.717529296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 73,
+    "avg_bits_before": 3.7911993140234417,
+    "avg_bits_after": 3.792651949642239,
+    "like_loss": 11.911145210266113,
+    "prior_loss": 1724.30517578125,
+    "total_loss": 1736.21630859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 74,
+    "avg_bits_before": 3.792651949642239,
+    "avg_bits_after": 3.794012769094227,
+    "like_loss": 8.588581085205078,
+    "prior_loss": 1723.933349609375,
+    "total_loss": 1732.52197265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 75,
+    "avg_bits_before": 3.794012769094227,
+    "avg_bits_after": 3.7953166153012323,
+    "like_loss": 7.866979598999023,
+    "prior_loss": 1723.5423583984375,
+    "total_loss": 1731.4093017578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 76,
+    "avg_bits_before": 3.7953166153012323,
+    "avg_bits_after": 3.796597338701984,
+    "like_loss": 8.001471519470215,
+    "prior_loss": 1723.09716796875,
+    "total_loss": 1731.0986328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 77,
+    "avg_bits_before": 3.796597338701984,
+    "avg_bits_after": 3.7978167308927984,
+    "like_loss": 8.02450180053711,
+    "prior_loss": 1722.747314453125,
+    "total_loss": 1730.7718505859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 78,
+    "avg_bits_before": 3.7978167308927984,
+    "avg_bits_after": 3.7990896844609017,
+    "like_loss": 13.373758316040039,
+    "prior_loss": 1722.388916015625,
+    "total_loss": 1735.7626953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 79,
+    "avg_bits_before": 3.7990896844609017,
+    "avg_bits_after": 3.800331240579533,
+    "like_loss": 6.985939979553223,
+    "prior_loss": 1721.9674072265625,
+    "total_loss": 1728.953369140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 80,
+    "avg_bits_before": 3.800331240579533,
+    "avg_bits_after": 3.801520237417085,
+    "like_loss": 6.835974216461182,
+    "prior_loss": 1721.6163330078125,
+    "total_loss": 1728.4522705078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 81,
+    "avg_bits_before": 3.801520237417085,
+    "avg_bits_after": 3.8026427441431343,
+    "like_loss": 8.412050247192383,
+    "prior_loss": 1721.263916015625,
+    "total_loss": 1729.676025390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 82,
+    "avg_bits_before": 3.8026427441431343,
+    "avg_bits_after": 3.803745910731787,
+    "like_loss": 9.337348937988281,
+    "prior_loss": 1720.8236083984375,
+    "total_loss": 1730.1610107421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 83,
+    "avg_bits_before": 3.803745910731787,
+    "avg_bits_after": 3.80488323605098,
+    "like_loss": 11.124238967895508,
+    "prior_loss": 1720.3851318359375,
+    "total_loss": 1731.5093994140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 84,
+    "avg_bits_before": 3.80488323605098,
+    "avg_bits_after": 3.80605107231497,
+    "like_loss": 7.319907188415527,
+    "prior_loss": 1719.9959716796875,
+    "total_loss": 1727.31591796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 85,
+    "avg_bits_before": 3.80605107231497,
+    "avg_bits_after": 3.8071862763400883,
+    "like_loss": 11.363264083862305,
+    "prior_loss": 1719.68115234375,
+    "total_loss": 1731.04443359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 86,
+    "avg_bits_before": 3.8071862763400883,
+    "avg_bits_after": 3.8082954800382645,
+    "like_loss": 8.200305938720703,
+    "prior_loss": 1719.2843017578125,
+    "total_loss": 1727.484619140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 87,
+    "avg_bits_before": 3.8082954800382645,
+    "avg_bits_after": 3.809372264451824,
+    "like_loss": 9.909244537353516,
+    "prior_loss": 1718.884765625,
+    "total_loss": 1728.7940673828125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 88,
+    "avg_bits_before": 3.809372264451824,
+    "avg_bits_after": 3.810424044752884,
+    "like_loss": 8.288763046264648,
+    "prior_loss": 1718.4793701171875,
+    "total_loss": 1726.7681884765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 89,
+    "avg_bits_before": 3.810424044752884,
+    "avg_bits_after": 3.8114905128695415,
+    "like_loss": 11.105596542358398,
+    "prior_loss": 1718.1005859375,
+    "total_loss": 1729.2061767578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 90,
+    "avg_bits_before": 3.8114905128695415,
+    "avg_bits_after": 3.812532105778571,
+    "like_loss": 9.871333122253418,
+    "prior_loss": 1717.818603515625,
+    "total_loss": 1727.68994140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 91,
+    "avg_bits_before": 3.812532105778571,
+    "avg_bits_after": 3.813630890108075,
+    "like_loss": 13.348526000976562,
+    "prior_loss": 1717.364013671875,
+    "total_loss": 1730.7125244140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 92,
+    "avg_bits_before": 3.813630890108075,
+    "avg_bits_after": 3.814613407989802,
+    "like_loss": 6.385769844055176,
+    "prior_loss": 1717.2083740234375,
+    "total_loss": 1723.5941162109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 93,
+    "avg_bits_before": 3.814613407989802,
+    "avg_bits_after": 3.8156003215443772,
+    "like_loss": 7.954676151275635,
+    "prior_loss": 1716.679931640625,
+    "total_loss": 1724.6346435546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 94,
+    "avg_bits_before": 3.8156003215443772,
+    "avg_bits_after": 3.816534368097123,
+    "like_loss": 10.76395034790039,
+    "prior_loss": 1716.371337890625,
+    "total_loss": 1727.13525390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 95,
+    "avg_bits_before": 3.816534368097123,
+    "avg_bits_after": 3.8174426122708924,
+    "like_loss": 7.866644859313965,
+    "prior_loss": 1715.936767578125,
+    "total_loss": 1723.803466796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 96,
+    "avg_bits_before": 3.8174426122708924,
+    "avg_bits_after": 3.8183593826649713,
+    "like_loss": 9.841327667236328,
+    "prior_loss": 1715.5889892578125,
+    "total_loss": 1725.4302978515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 97,
+    "avg_bits_before": 3.8183593826649713,
+    "avg_bits_after": 3.8192639319545023,
+    "like_loss": 8.033392906188965,
+    "prior_loss": 1715.16259765625,
+    "total_loss": 1723.196044921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 98,
+    "avg_bits_before": 3.8192639319545023,
+    "avg_bits_after": 3.8201620122928803,
+    "like_loss": 8.310108184814453,
+    "prior_loss": 1714.8013916015625,
+    "total_loss": 1723.1114501953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 99,
+    "avg_bits_before": 3.8201620122928803,
+    "avg_bits_after": 3.821056021323944,
+    "like_loss": 7.01841402053833,
+    "prior_loss": 1714.4696044921875,
+    "total_loss": 1721.488037109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 100,
+    "avg_bits_before": 3.821056021323944,
+    "avg_bits_after": 3.821946765460729,
+    "like_loss": 8.75587272644043,
+    "prior_loss": 1714.029296875,
+    "total_loss": 1722.78515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 101,
+    "avg_bits_before": 3.821946765460729,
+    "avg_bits_after": 3.822853993352801,
+    "like_loss": 11.15626049041748,
+    "prior_loss": 1713.6495361328125,
+    "total_loss": 1724.8057861328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 102,
+    "avg_bits_before": 3.822853993352801,
+    "avg_bits_after": 3.8237516264986016,
+    "like_loss": 10.28854751586914,
+    "prior_loss": 1713.3916015625,
+    "total_loss": 1723.68017578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 103,
+    "avg_bits_before": 3.8237516264986016,
+    "avg_bits_after": 3.8245327019035913,
+    "like_loss": 10.76008415222168,
+    "prior_loss": 1713.1285400390625,
+    "total_loss": 1723.888671875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 104,
+    "avg_bits_before": 3.8245327019035913,
+    "avg_bits_after": 3.82531289420304,
+    "like_loss": 8.063701629638672,
+    "prior_loss": 1712.658935546875,
+    "total_loss": 1720.72265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 105,
+    "avg_bits_before": 3.82531289420304,
+    "avg_bits_after": 3.8260717802368953,
+    "like_loss": 9.878363609313965,
+    "prior_loss": 1712.358154296875,
+    "total_loss": 1722.236572265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 106,
+    "avg_bits_before": 3.8260717802368953,
+    "avg_bits_after": 3.82678993992628,
+    "like_loss": 9.787050247192383,
+    "prior_loss": 1712.0369873046875,
+    "total_loss": 1721.8240966796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 107,
+    "avg_bits_before": 3.82678993992628,
+    "avg_bits_after": 3.827531092661234,
+    "like_loss": 11.814645767211914,
+    "prior_loss": 1711.6865234375,
+    "total_loss": 1723.501220703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 108,
+    "avg_bits_before": 3.827531092661234,
+    "avg_bits_after": 3.828269704297103,
+    "like_loss": 7.746512413024902,
+    "prior_loss": 1711.3590087890625,
+    "total_loss": 1719.10546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 109,
+    "avg_bits_before": 3.828269704297103,
+    "avg_bits_after": 3.8289787129332966,
+    "like_loss": 11.148458480834961,
+    "prior_loss": 1710.977783203125,
+    "total_loss": 1722.126220703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 110,
+    "avg_bits_before": 3.8289787129332966,
+    "avg_bits_after": 3.8296548218494113,
+    "like_loss": 10.930961608886719,
+    "prior_loss": 1710.7550048828125,
+    "total_loss": 1721.6859130859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 111,
+    "avg_bits_before": 3.8296548218494113,
+    "avg_bits_after": 3.8303337032927542,
+    "like_loss": 8.743269920349121,
+    "prior_loss": 1710.4105224609375,
+    "total_loss": 1719.15380859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 112,
+    "avg_bits_before": 3.8303337032927542,
+    "avg_bits_after": 3.8309867596446248,
+    "like_loss": 7.5492095947265625,
+    "prior_loss": 1710.0281982421875,
+    "total_loss": 1717.577392578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 113,
+    "avg_bits_before": 3.8309867596446248,
+    "avg_bits_after": 3.831632251573723,
+    "like_loss": 10.8555908203125,
+    "prior_loss": 1709.6741943359375,
+    "total_loss": 1720.52978515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 114,
+    "avg_bits_before": 3.831632251573723,
+    "avg_bits_after": 3.8322778932879715,
+    "like_loss": 9.29560375213623,
+    "prior_loss": 1709.333984375,
+    "total_loss": 1718.629638671875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 115,
+    "avg_bits_before": 3.8322778932879715,
+    "avg_bits_after": 3.832924876198727,
+    "like_loss": 9.46534252166748,
+    "prior_loss": 1709.05078125,
+    "total_loss": 1718.51611328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 116,
+    "avg_bits_before": 3.832924876198727,
+    "avg_bits_after": 3.833575813046728,
+    "like_loss": 10.389366149902344,
+    "prior_loss": 1708.7080078125,
+    "total_loss": 1719.097412109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 117,
+    "avg_bits_before": 3.833575813046728,
+    "avg_bits_after": 3.834210007869893,
+    "like_loss": 10.836938858032227,
+    "prior_loss": 1708.3707275390625,
+    "total_loss": 1719.2076416015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 118,
+    "avg_bits_before": 3.834210007869893,
+    "avg_bits_after": 3.834801361771865,
+    "like_loss": 9.006641387939453,
+    "prior_loss": 1708.0511474609375,
+    "total_loss": 1717.0577392578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 119,
+    "avg_bits_before": 3.834801361771865,
+    "avg_bits_after": 3.8353445504092196,
+    "like_loss": 8.453548431396484,
+    "prior_loss": 1707.845947265625,
+    "total_loss": 1716.2994384765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 120,
+    "avg_bits_before": 3.8353445504092196,
+    "avg_bits_after": 3.8358896739282633,
+    "like_loss": 13.080365180969238,
+    "prior_loss": 1707.4925537109375,
+    "total_loss": 1720.5728759765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 121,
+    "avg_bits_before": 3.8358896739282633,
+    "avg_bits_after": 3.8364748503705095,
+    "like_loss": 8.30311107635498,
+    "prior_loss": 1707.1669921875,
+    "total_loss": 1715.4700927734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 122,
+    "avg_bits_before": 3.8364748503705095,
+    "avg_bits_after": 3.8369221269835805,
+    "like_loss": 9.905929565429688,
+    "prior_loss": 1706.9718017578125,
+    "total_loss": 1716.877685546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 123,
+    "avg_bits_before": 3.8369221269835805,
+    "avg_bits_after": 3.837418320996318,
+    "like_loss": 11.293278694152832,
+    "prior_loss": 1706.744140625,
+    "total_loss": 1718.0374755859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 124,
+    "avg_bits_before": 3.837418320996318,
+    "avg_bits_after": 3.83792975973011,
+    "like_loss": 9.810312271118164,
+    "prior_loss": 1706.47412109375,
+    "total_loss": 1716.284423828125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 125,
+    "avg_bits_before": 3.83792975973011,
+    "avg_bits_after": 3.8384664039717378,
+    "like_loss": 13.355234146118164,
+    "prior_loss": 1706.1046142578125,
+    "total_loss": 1719.4598388671875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 126,
+    "avg_bits_before": 3.8384664039717378,
+    "avg_bits_after": 3.839061491033013,
+    "like_loss": 13.847261428833008,
+    "prior_loss": 1705.7923583984375,
+    "total_loss": 1719.6396484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 127,
+    "avg_bits_before": 3.839061491033013,
+    "avg_bits_after": 3.8396375383223202,
+    "like_loss": 10.609217643737793,
+    "prior_loss": 1705.5758056640625,
+    "total_loss": 1716.18505859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 128,
+    "avg_bits_before": 3.8396375383223202,
+    "avg_bits_after": 3.8401020920766866,
+    "like_loss": 9.872471809387207,
+    "prior_loss": 1705.3463134765625,
+    "total_loss": 1715.21875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 129,
+    "avg_bits_before": 3.8401020920766866,
+    "avg_bits_after": 3.8405391332274954,
+    "like_loss": 6.3714447021484375,
+    "prior_loss": 1705.0469970703125,
+    "total_loss": 1711.41845703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 130,
+    "avg_bits_before": 3.8405391332274954,
+    "avg_bits_after": 3.840992371558421,
+    "like_loss": 10.461394309997559,
+    "prior_loss": 1704.7529296875,
+    "total_loss": 1715.21435546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 131,
+    "avg_bits_before": 3.840992371558421,
+    "avg_bits_after": 3.8414481480996736,
+    "like_loss": 8.09630012512207,
+    "prior_loss": 1704.545166015625,
+    "total_loss": 1712.6414794921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 132,
+    "avg_bits_before": 3.8414481480996736,
+    "avg_bits_after": 3.8419253054672717,
+    "like_loss": 6.009734153747559,
+    "prior_loss": 1704.184326171875,
+    "total_loss": 1710.194091796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 133,
+    "avg_bits_before": 3.8419253054672717,
+    "avg_bits_after": 3.8423767631238763,
+    "like_loss": 9.595687866210938,
+    "prior_loss": 1703.8897705078125,
+    "total_loss": 1713.4854736328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 134,
+    "avg_bits_before": 3.8423767631238763,
+    "avg_bits_after": 3.842927525587831,
+    "like_loss": 8.79177188873291,
+    "prior_loss": 1703.6363525390625,
+    "total_loss": 1712.4281005859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 135,
+    "avg_bits_before": 3.842927525587831,
+    "avg_bits_after": 3.8434970662390984,
+    "like_loss": 8.451377868652344,
+    "prior_loss": 1703.4033203125,
+    "total_loss": 1711.854736328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 136,
+    "avg_bits_before": 3.8434970662390984,
+    "avg_bits_after": 3.844085842750851,
+    "like_loss": 12.42302417755127,
+    "prior_loss": 1703.093505859375,
+    "total_loss": 1715.5164794921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 137,
+    "avg_bits_before": 3.844085842750851,
+    "avg_bits_after": 3.844611604781523,
+    "like_loss": 15.708854675292969,
+    "prior_loss": 1702.85498046875,
+    "total_loss": 1718.5638427734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 138,
+    "avg_bits_before": 3.844611604781523,
+    "avg_bits_after": 3.8450220029249205,
+    "like_loss": 7.5155792236328125,
+    "prior_loss": 1702.6287841796875,
+    "total_loss": 1710.1444091796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 139,
+    "avg_bits_before": 3.8450220029249205,
+    "avg_bits_after": 3.8453809313957628,
+    "like_loss": 8.950936317443848,
+    "prior_loss": 1702.3878173828125,
+    "total_loss": 1711.3387451171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 140,
+    "avg_bits_before": 3.8453809313957628,
+    "avg_bits_after": 3.8457415094148306,
+    "like_loss": 6.442267417907715,
+    "prior_loss": 1702.111572265625,
+    "total_loss": 1708.5538330078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 141,
+    "avg_bits_before": 3.8457415094148306,
+    "avg_bits_after": 3.846064107418667,
+    "like_loss": 10.344253540039062,
+    "prior_loss": 1701.7655029296875,
+    "total_loss": 1712.1097412109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 142,
+    "avg_bits_before": 3.846064107418667,
+    "avg_bits_after": 3.846491589916724,
+    "like_loss": 9.15179443359375,
+    "prior_loss": 1701.515380859375,
+    "total_loss": 1710.667236328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 143,
+    "avg_bits_before": 3.846491589916724,
+    "avg_bits_after": 3.846974524071903,
+    "like_loss": 9.26343822479248,
+    "prior_loss": 1701.322998046875,
+    "total_loss": 1710.58642578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 144,
+    "avg_bits_before": 3.846974524071903,
+    "avg_bits_after": 3.847502970965777,
+    "like_loss": 13.666253089904785,
+    "prior_loss": 1701.029541015625,
+    "total_loss": 1714.69580078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 145,
+    "avg_bits_before": 3.847502970965777,
+    "avg_bits_after": 3.847935766333141,
+    "like_loss": 6.379312992095947,
+    "prior_loss": 1700.8822021484375,
+    "total_loss": 1707.261474609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 146,
+    "avg_bits_before": 3.847935766333141,
+    "avg_bits_after": 3.848349839562713,
+    "like_loss": 8.004477500915527,
+    "prior_loss": 1700.5858154296875,
+    "total_loss": 1708.59033203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 147,
+    "avg_bits_before": 3.848349839562713,
+    "avg_bits_after": 3.848728754191426,
+    "like_loss": 8.22802734375,
+    "prior_loss": 1700.3311767578125,
+    "total_loss": 1708.5592041015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 148,
+    "avg_bits_before": 3.848728754191426,
+    "avg_bits_after": 3.8490880853977005,
+    "like_loss": 8.200848579406738,
+    "prior_loss": 1700.125,
+    "total_loss": 1708.3258056640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 149,
+    "avg_bits_before": 3.8490880853977005,
+    "avg_bits_after": 3.849448603745604,
+    "like_loss": 7.70917272567749,
+    "prior_loss": 1699.856201171875,
+    "total_loss": 1707.5654296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 150,
+    "avg_bits_before": 3.849448603745604,
+    "avg_bits_after": 3.8498632574746154,
+    "like_loss": 6.946382999420166,
+    "prior_loss": 1699.552978515625,
+    "total_loss": 1706.4993896484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 151,
+    "avg_bits_before": 3.8498632574746154,
+    "avg_bits_after": 3.8502842054716986,
+    "like_loss": 7.667549133300781,
+    "prior_loss": 1699.248779296875,
+    "total_loss": 1706.9163818359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 152,
+    "avg_bits_before": 3.8502842054716986,
+    "avg_bits_after": 3.850675230321174,
+    "like_loss": 7.509448051452637,
+    "prior_loss": 1699.1009521484375,
+    "total_loss": 1706.6103515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 153,
+    "avg_bits_before": 3.850675230321174,
+    "avg_bits_after": 3.8510783633950334,
+    "like_loss": 11.406903266906738,
+    "prior_loss": 1698.9656982421875,
+    "total_loss": 1710.37255859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 154,
+    "avg_bits_before": 3.8510783633950334,
+    "avg_bits_after": 3.8515564321675715,
+    "like_loss": 12.134404182434082,
+    "prior_loss": 1698.751708984375,
+    "total_loss": 1710.8861083984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 155,
+    "avg_bits_before": 3.8515564321675715,
+    "avg_bits_after": 3.8518925235040586,
+    "like_loss": 8.056235313415527,
+    "prior_loss": 1698.6251220703125,
+    "total_loss": 1706.681396484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 156,
+    "avg_bits_before": 3.8518925235040586,
+    "avg_bits_after": 3.85222135811285,
+    "like_loss": 8.172323226928711,
+    "prior_loss": 1698.4735107421875,
+    "total_loss": 1706.6458740234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 157,
+    "avg_bits_before": 3.85222135811285,
+    "avg_bits_after": 3.852461604671719,
+    "like_loss": 7.563470840454102,
+    "prior_loss": 1698.0675048828125,
+    "total_loss": 1705.6309814453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 158,
+    "avg_bits_before": 3.852461604671719,
+    "avg_bits_after": 3.8527220447877104,
+    "like_loss": 8.018937110900879,
+    "prior_loss": 1697.903564453125,
+    "total_loss": 1705.9224853515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 159,
+    "avg_bits_before": 3.8527220447877104,
+    "avg_bits_after": 3.8530262072546,
+    "like_loss": 11.00245189666748,
+    "prior_loss": 1697.672119140625,
+    "total_loss": 1708.674560546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 160,
+    "avg_bits_before": 3.8530262072546,
+    "avg_bits_after": 3.8534313529483017,
+    "like_loss": 10.6259765625,
+    "prior_loss": 1697.4329833984375,
+    "total_loss": 1708.0589599609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 161,
+    "avg_bits_before": 3.8534313529483017,
+    "avg_bits_after": 3.853807567506796,
+    "like_loss": 13.745479583740234,
+    "prior_loss": 1697.2791748046875,
+    "total_loss": 1711.024658203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 162,
+    "avg_bits_before": 3.853807567506796,
+    "avg_bits_after": 3.8541884519888256,
+    "like_loss": 7.250779151916504,
+    "prior_loss": 1697.132568359375,
+    "total_loss": 1704.38330078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 163,
+    "avg_bits_before": 3.8541884519888256,
+    "avg_bits_after": 3.854502420593995,
+    "like_loss": 11.516380310058594,
+    "prior_loss": 1696.8916015625,
+    "total_loss": 1708.407958984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 164,
+    "avg_bits_before": 3.854502420593995,
+    "avg_bits_after": 3.8547871019057514,
+    "like_loss": 11.051918029785156,
+    "prior_loss": 1696.7529296875,
+    "total_loss": 1707.8048095703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 165,
+    "avg_bits_before": 3.8547871019057514,
+    "avg_bits_after": 3.8551542541432915,
+    "like_loss": 11.29351806640625,
+    "prior_loss": 1696.540771484375,
+    "total_loss": 1707.834228515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 166,
+    "avg_bits_before": 3.8551542541432915,
+    "avg_bits_after": 3.855446644667358,
+    "like_loss": 8.79599380493164,
+    "prior_loss": 1696.323974609375,
+    "total_loss": 1705.1199951171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 167,
+    "avg_bits_before": 3.855446644667358,
+    "avg_bits_after": 3.8556600937095777,
+    "like_loss": 8.595943450927734,
+    "prior_loss": 1696.170166015625,
+    "total_loss": 1704.76611328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 168,
+    "avg_bits_before": 3.8556600937095777,
+    "avg_bits_after": 3.8560568747153194,
+    "like_loss": 12.202815055847168,
+    "prior_loss": 1695.9490966796875,
+    "total_loss": 1708.15185546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 169,
+    "avg_bits_before": 3.8560568747153194,
+    "avg_bits_after": 3.8564356496434704,
+    "like_loss": 12.144685745239258,
+    "prior_loss": 1695.724365234375,
+    "total_loss": 1707.8690185546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 170,
+    "avg_bits_before": 3.8564356496434704,
+    "avg_bits_after": 3.8566822465074826,
+    "like_loss": 9.818743705749512,
+    "prior_loss": 1695.5809326171875,
+    "total_loss": 1705.399658203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 171,
+    "avg_bits_before": 3.8566822465074826,
+    "avg_bits_after": 3.8569129395142445,
+    "like_loss": 7.906292915344238,
+    "prior_loss": 1695.4073486328125,
+    "total_loss": 1703.3135986328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 172,
+    "avg_bits_before": 3.8569129395142445,
+    "avg_bits_after": 3.8571421502756422,
+    "like_loss": 12.082815170288086,
+    "prior_loss": 1695.2611083984375,
+    "total_loss": 1707.3438720703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 173,
+    "avg_bits_before": 3.8571421502756422,
+    "avg_bits_after": 3.857360105885389,
+    "like_loss": 11.43483829498291,
+    "prior_loss": 1694.9903564453125,
+    "total_loss": 1706.4251708984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 174,
+    "avg_bits_before": 3.857360105885389,
+    "avg_bits_after": 3.85761308911072,
+    "like_loss": 7.905288219451904,
+    "prior_loss": 1694.8922119140625,
+    "total_loss": 1702.7974853515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 175,
+    "avg_bits_before": 3.85761308911072,
+    "avg_bits_after": 3.8578825872234765,
+    "like_loss": 8.233738899230957,
+    "prior_loss": 1694.6820068359375,
+    "total_loss": 1702.915771484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 176,
+    "avg_bits_before": 3.8578825872234765,
+    "avg_bits_after": 3.858105609803369,
+    "like_loss": 7.113334655761719,
+    "prior_loss": 1694.4747314453125,
+    "total_loss": 1701.5880126953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 177,
+    "avg_bits_before": 3.858105609803369,
+    "avg_bits_after": 3.85850208297477,
+    "like_loss": 8.919218063354492,
+    "prior_loss": 1694.335205078125,
+    "total_loss": 1703.25439453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 178,
+    "avg_bits_before": 3.85850208297477,
+    "avg_bits_after": 3.858762467361782,
+    "like_loss": 8.292055130004883,
+    "prior_loss": 1694.2259521484375,
+    "total_loss": 1702.51806640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 179,
+    "avg_bits_before": 3.858762467361782,
+    "avg_bits_after": 3.859080440765934,
+    "like_loss": 8.040997505187988,
+    "prior_loss": 1694.0,
+    "total_loss": 1702.041015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 180,
+    "avg_bits_before": 3.859080440765934,
+    "avg_bits_after": 3.8593384786058067,
+    "like_loss": 8.544059753417969,
+    "prior_loss": 1693.90380859375,
+    "total_loss": 1702.4478759765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 181,
+    "avg_bits_before": 3.8593384786058067,
+    "avg_bits_after": 3.85958530950508,
+    "like_loss": 7.441552639007568,
+    "prior_loss": 1693.7669677734375,
+    "total_loss": 1701.20849609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 182,
+    "avg_bits_before": 3.85958530950508,
+    "avg_bits_after": 3.8598758053924467,
+    "like_loss": 8.095403671264648,
+    "prior_loss": 1693.6165771484375,
+    "total_loss": 1701.7120361328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 183,
+    "avg_bits_before": 3.8598758053924467,
+    "avg_bits_after": 3.860193092310179,
+    "like_loss": 13.376363754272461,
+    "prior_loss": 1693.3895263671875,
+    "total_loss": 1706.765869140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 184,
+    "avg_bits_before": 3.860193092310179,
+    "avg_bits_after": 3.860502959460079,
+    "like_loss": 9.389596939086914,
+    "prior_loss": 1693.2694091796875,
+    "total_loss": 1702.6590576171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 185,
+    "avg_bits_before": 3.860502959460079,
+    "avg_bits_after": 3.8606341968053526,
+    "like_loss": 11.617958068847656,
+    "prior_loss": 1693.2039794921875,
+    "total_loss": 1704.8218994140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 186,
+    "avg_bits_before": 3.8606341968053526,
+    "avg_bits_after": 3.8608864495383646,
+    "like_loss": 10.026266098022461,
+    "prior_loss": 1693.0653076171875,
+    "total_loss": 1703.091552734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 187,
+    "avg_bits_before": 3.8608864495383646,
+    "avg_bits_after": 3.8610856117343317,
+    "like_loss": 8.532485008239746,
+    "prior_loss": 1692.92138671875,
+    "total_loss": 1701.453857421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 188,
+    "avg_bits_before": 3.8610856117343317,
+    "avg_bits_after": 3.8613431115363097,
+    "like_loss": 11.604592323303223,
+    "prior_loss": 1692.814697265625,
+    "total_loss": 1704.4193115234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 189,
+    "avg_bits_before": 3.8613431115363097,
+    "avg_bits_after": 3.8614789605227045,
+    "like_loss": 7.830783843994141,
+    "prior_loss": 1692.8275146484375,
+    "total_loss": 1700.6583251953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 190,
+    "avg_bits_before": 3.8614789605227045,
+    "avg_bits_after": 3.8617126275982963,
+    "like_loss": 7.626575946807861,
+    "prior_loss": 1692.71533203125,
+    "total_loss": 1700.3419189453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 191,
+    "avg_bits_before": 3.8617126275982963,
+    "avg_bits_after": 3.861985683548528,
+    "like_loss": 10.61717414855957,
+    "prior_loss": 1692.533935546875,
+    "total_loss": 1703.151123046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 192,
+    "avg_bits_before": 3.861985683548528,
+    "avg_bits_after": 3.862257575175436,
+    "like_loss": 8.590304374694824,
+    "prior_loss": 1692.3697509765625,
+    "total_loss": 1700.9600830078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 193,
+    "avg_bits_before": 3.862257575175436,
+    "avg_bits_after": 3.8624766557776797,
+    "like_loss": 8.134819984436035,
+    "prior_loss": 1692.310302734375,
+    "total_loss": 1700.445068359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 194,
+    "avg_bits_before": 3.8624766557776797,
+    "avg_bits_after": 3.8627607784707987,
+    "like_loss": 13.316498756408691,
+    "prior_loss": 1692.1907958984375,
+    "total_loss": 1705.50732421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 195,
+    "avg_bits_before": 3.8627607784707987,
+    "avg_bits_after": 3.862972410936569,
+    "like_loss": 12.170482635498047,
+    "prior_loss": 1692.1749267578125,
+    "total_loss": 1704.345458984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 196,
+    "avg_bits_before": 3.862972410936569,
+    "avg_bits_after": 3.863207062871521,
+    "like_loss": 11.8584566116333,
+    "prior_loss": 1692.0587158203125,
+    "total_loss": 1703.9171142578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 197,
+    "avg_bits_before": 3.863207062871521,
+    "avg_bits_after": 3.863381769770678,
+    "like_loss": 6.0085673332214355,
+    "prior_loss": 1691.9593505859375,
+    "total_loss": 1697.9678955078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 198,
+    "avg_bits_before": 3.863381769770678,
+    "avg_bits_after": 3.863336391865304,
+    "like_loss": 7.845753192901611,
+    "prior_loss": 1691.9906005859375,
+    "total_loss": 1699.8363037109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 199,
+    "avg_bits_before": 3.863336391865304,
+    "avg_bits_after": 3.863499808781226,
+    "like_loss": 7.5000786781311035,
+    "prior_loss": 1691.8143310546875,
+    "total_loss": 1699.314453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 200,
+    "avg_bits_before": 3.863499808781226,
+    "avg_bits_after": 3.863647871381472,
+    "like_loss": 8.690561294555664,
+    "prior_loss": 1691.7169189453125,
+    "total_loss": 1700.407470703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 201,
+    "avg_bits_before": 3.863647871381472,
+    "avg_bits_after": 3.863917014766788,
+    "like_loss": 7.383634567260742,
+    "prior_loss": 1691.5679931640625,
+    "total_loss": 1698.95166015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 202,
+    "avg_bits_before": 3.863917014766788,
+    "avg_bits_after": 3.8641607191357212,
+    "like_loss": 7.258708953857422,
+    "prior_loss": 1691.455322265625,
+    "total_loss": 1698.7139892578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 203,
+    "avg_bits_before": 3.8641607191357212,
+    "avg_bits_after": 3.864411566684652,
+    "like_loss": 13.758498191833496,
+    "prior_loss": 1691.4349365234375,
+    "total_loss": 1705.1934814453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 204,
+    "avg_bits_before": 3.864411566684652,
+    "avg_bits_after": 3.8647783756431933,
+    "like_loss": 6.749245643615723,
+    "prior_loss": 1691.318115234375,
+    "total_loss": 1698.0673828125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 205,
+    "avg_bits_before": 3.8647783756431933,
+    "avg_bits_after": 3.864891445834442,
+    "like_loss": 8.21929931640625,
+    "prior_loss": 1691.2989501953125,
+    "total_loss": 1699.518310546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 206,
+    "avg_bits_before": 3.864891445834442,
+    "avg_bits_after": 3.8650475779302207,
+    "like_loss": 8.771965026855469,
+    "prior_loss": 1691.2901611328125,
+    "total_loss": 1700.0621337890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 207,
+    "avg_bits_before": 3.8650475779302207,
+    "avg_bits_after": 3.8651636395469624,
+    "like_loss": 7.316761493682861,
+    "prior_loss": 1691.239990234375,
+    "total_loss": 1698.5567626953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 208,
+    "avg_bits_before": 3.8651636395469624,
+    "avg_bits_after": 3.865313570623264,
+    "like_loss": 6.68342924118042,
+    "prior_loss": 1691.1343994140625,
+    "total_loss": 1697.81787109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 209,
+    "avg_bits_before": 3.865313570623264,
+    "avg_bits_after": 3.8655601689779466,
+    "like_loss": 9.185994148254395,
+    "prior_loss": 1690.9881591796875,
+    "total_loss": 1700.1741943359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 210,
+    "avg_bits_before": 3.8655601689779466,
+    "avg_bits_after": 3.865829332965013,
+    "like_loss": 13.384416580200195,
+    "prior_loss": 1690.92333984375,
+    "total_loss": 1704.3077392578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 211,
+    "avg_bits_before": 3.865829332965013,
+    "avg_bits_after": 3.8660165717454995,
+    "like_loss": 6.584869384765625,
+    "prior_loss": 1690.84130859375,
+    "total_loss": 1697.4261474609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 212,
+    "avg_bits_before": 3.8660165717454995,
+    "avg_bits_after": 3.8662162525866406,
+    "like_loss": 7.246902942657471,
+    "prior_loss": 1690.8363037109375,
+    "total_loss": 1698.083251953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 213,
+    "avg_bits_before": 3.8662162525866406,
+    "avg_bits_after": 3.866356691981439,
+    "like_loss": 9.239906311035156,
+    "prior_loss": 1690.7869873046875,
+    "total_loss": 1700.02685546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 214,
+    "avg_bits_before": 3.866356691981439,
+    "avg_bits_after": 3.866487421955706,
+    "like_loss": 8.607452392578125,
+    "prior_loss": 1690.7393798828125,
+    "total_loss": 1699.3468017578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 215,
+    "avg_bits_before": 3.866487421955706,
+    "avg_bits_after": 3.866717990945066,
+    "like_loss": 9.58956527709961,
+    "prior_loss": 1690.55810546875,
+    "total_loss": 1700.147705078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 216,
+    "avg_bits_before": 3.866717990945066,
+    "avg_bits_after": 3.866939642441909,
+    "like_loss": 12.685574531555176,
+    "prior_loss": 1690.5447998046875,
+    "total_loss": 1703.2303466796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 217,
+    "avg_bits_before": 3.866939642441909,
+    "avg_bits_after": 3.8670953658465756,
+    "like_loss": 8.790343284606934,
+    "prior_loss": 1690.584716796875,
+    "total_loss": 1699.375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 218,
+    "avg_bits_before": 3.8670953658465756,
+    "avg_bits_after": 3.867247896410185,
+    "like_loss": 11.151248931884766,
+    "prior_loss": 1690.5589599609375,
+    "total_loss": 1701.710205078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 219,
+    "avg_bits_before": 3.867247896410185,
+    "avg_bits_after": 3.8673806254318803,
+    "like_loss": 8.313773155212402,
+    "prior_loss": 1690.461181640625,
+    "total_loss": 1698.77490234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 220,
+    "avg_bits_before": 3.8673806254318803,
+    "avg_bits_after": 3.867538672519479,
+    "like_loss": 8.613401412963867,
+    "prior_loss": 1690.4251708984375,
+    "total_loss": 1699.03857421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 221,
+    "avg_bits_before": 3.867538672519479,
+    "avg_bits_after": 3.867548640088188,
+    "like_loss": 9.007891654968262,
+    "prior_loss": 1690.411376953125,
+    "total_loss": 1699.4193115234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 222,
+    "avg_bits_before": 3.867548640088188,
+    "avg_bits_after": 3.867843637545134,
+    "like_loss": 9.704144477844238,
+    "prior_loss": 1690.3851318359375,
+    "total_loss": 1700.0892333984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 223,
+    "avg_bits_before": 3.867843637545134,
+    "avg_bits_after": 3.86791845117144,
+    "like_loss": 8.899507522583008,
+    "prior_loss": 1690.364990234375,
+    "total_loss": 1699.2645263671875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 224,
+    "avg_bits_before": 3.86791845117144,
+    "avg_bits_after": 3.8681087090256225,
+    "like_loss": 9.772200584411621,
+    "prior_loss": 1690.3587646484375,
+    "total_loss": 1700.1309814453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 225,
+    "avg_bits_before": 3.8681087090256225,
+    "avg_bits_after": 3.8683763693214317,
+    "like_loss": 7.314017295837402,
+    "prior_loss": 1690.2103271484375,
+    "total_loss": 1697.5242919921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 226,
+    "avg_bits_before": 3.8683763693214317,
+    "avg_bits_after": 3.868508256150888,
+    "like_loss": 10.679584503173828,
+    "prior_loss": 1690.0477294921875,
+    "total_loss": 1700.727294921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 227,
+    "avg_bits_before": 3.868508256150888,
+    "avg_bits_after": 3.8687379002912654,
+    "like_loss": 11.264015197753906,
+    "prior_loss": 1690.0679931640625,
+    "total_loss": 1701.33203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 228,
+    "avg_bits_before": 3.8687379002912654,
+    "avg_bits_after": 3.8688918769234717,
+    "like_loss": 7.402359962463379,
+    "prior_loss": 1690.02880859375,
+    "total_loss": 1697.43115234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 229,
+    "avg_bits_before": 3.8688918769234717,
+    "avg_bits_after": 3.8690597039116827,
+    "like_loss": 8.466379165649414,
+    "prior_loss": 1689.94677734375,
+    "total_loss": 1698.4132080078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 230,
+    "avg_bits_before": 3.8690597039116827,
+    "avg_bits_after": 3.8692153490156938,
+    "like_loss": 7.770243167877197,
+    "prior_loss": 1689.82177734375,
+    "total_loss": 1697.592041015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 231,
+    "avg_bits_before": 3.8692153490156938,
+    "avg_bits_after": 3.8693191253123564,
+    "like_loss": 8.576973915100098,
+    "prior_loss": 1689.7889404296875,
+    "total_loss": 1698.365966796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 232,
+    "avg_bits_before": 3.8693191253123564,
+    "avg_bits_after": 3.869468009178661,
+    "like_loss": 6.088082790374756,
+    "prior_loss": 1689.7401123046875,
+    "total_loss": 1695.8282470703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 233,
+    "avg_bits_before": 3.869468009178661,
+    "avg_bits_after": 3.869632740495588,
+    "like_loss": 9.760101318359375,
+    "prior_loss": 1689.6610107421875,
+    "total_loss": 1699.421142578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 234,
+    "avg_bits_before": 3.869632740495588,
+    "avg_bits_after": 3.8699022996550343,
+    "like_loss": 8.155668258666992,
+    "prior_loss": 1689.556396484375,
+    "total_loss": 1697.7120361328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 235,
+    "avg_bits_before": 3.8699022996550343,
+    "avg_bits_after": 3.8699306828910496,
+    "like_loss": 11.50539779663086,
+    "prior_loss": 1689.6019287109375,
+    "total_loss": 1701.1072998046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 236,
+    "avg_bits_before": 3.8699306828910496,
+    "avg_bits_after": 3.870161773550493,
+    "like_loss": 11.866523742675781,
+    "prior_loss": 1689.60400390625,
+    "total_loss": 1701.4705810546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 237,
+    "avg_bits_before": 3.870161773550493,
+    "avg_bits_after": 3.870269535132048,
+    "like_loss": 7.990784645080566,
+    "prior_loss": 1689.5687255859375,
+    "total_loss": 1697.5595703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 238,
+    "avg_bits_before": 3.870269535132048,
+    "avg_bits_after": 3.870385912568643,
+    "like_loss": 7.905876636505127,
+    "prior_loss": 1689.5809326171875,
+    "total_loss": 1697.48681640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 239,
+    "avg_bits_before": 3.870385912568643,
+    "avg_bits_after": 3.8704305836877153,
+    "like_loss": 7.690173149108887,
+    "prior_loss": 1689.52294921875,
+    "total_loss": 1697.213134765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 240,
+    "avg_bits_before": 3.8704305836877153,
+    "avg_bits_after": 3.8705522308528675,
+    "like_loss": 8.867341995239258,
+    "prior_loss": 1689.4061279296875,
+    "total_loss": 1698.2734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 241,
+    "avg_bits_before": 3.8705522308528675,
+    "avg_bits_after": 3.8707269012741676,
+    "like_loss": 10.772361755371094,
+    "prior_loss": 1689.3355712890625,
+    "total_loss": 1700.10791015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 242,
+    "avg_bits_before": 3.8707269012741676,
+    "avg_bits_after": 3.870827831309875,
+    "like_loss": 8.475103378295898,
+    "prior_loss": 1689.423583984375,
+    "total_loss": 1697.898681640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 243,
+    "avg_bits_before": 3.870827831309875,
+    "avg_bits_after": 3.8709300247525884,
+    "like_loss": 10.015447616577148,
+    "prior_loss": 1689.4375,
+    "total_loss": 1699.4530029296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 244,
+    "avg_bits_before": 3.8709300247525884,
+    "avg_bits_after": 3.871088817457831,
+    "like_loss": 9.596583366394043,
+    "prior_loss": 1689.306396484375,
+    "total_loss": 1698.9029541015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 245,
+    "avg_bits_before": 3.871088817457831,
+    "avg_bits_after": 3.8711481547381017,
+    "like_loss": 8.216581344604492,
+    "prior_loss": 1689.249755859375,
+    "total_loss": 1697.46630859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 246,
+    "avg_bits_before": 3.8711481547381017,
+    "avg_bits_after": 3.8713625593070837,
+    "like_loss": 12.245221138000488,
+    "prior_loss": 1689.1285400390625,
+    "total_loss": 1701.373779296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 247,
+    "avg_bits_before": 3.8713625593070837,
+    "avg_bits_after": 3.8715965694632812,
+    "like_loss": 9.840900421142578,
+    "prior_loss": 1689.0587158203125,
+    "total_loss": 1698.899658203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 248,
+    "avg_bits_before": 3.8715965694632812,
+    "avg_bits_after": 3.871696444778844,
+    "like_loss": 8.9684476852417,
+    "prior_loss": 1688.961181640625,
+    "total_loss": 1697.9296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 249,
+    "avg_bits_before": 3.871696444778844,
+    "avg_bits_after": 3.8717750322591344,
+    "like_loss": 14.1569242477417,
+    "prior_loss": 1688.958984375,
+    "total_loss": 1703.115966796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 250,
+    "avg_bits_before": 3.8717750322591344,
+    "avg_bits_after": 3.871831774981579,
+    "like_loss": 10.203516006469727,
+    "prior_loss": 1688.892333984375,
+    "total_loss": 1699.0958251953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 251,
+    "avg_bits_before": 3.871831774981579,
+    "avg_bits_after": 3.8719536570409177,
+    "like_loss": 10.343990325927734,
+    "prior_loss": 1688.76953125,
+    "total_loss": 1699.113525390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 252,
+    "avg_bits_before": 3.8719536570409177,
+    "avg_bits_after": 3.8719784762036937,
+    "like_loss": 8.010411262512207,
+    "prior_loss": 1688.791015625,
+    "total_loss": 1696.8013916015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 253,
+    "avg_bits_before": 3.8719784762036937,
+    "avg_bits_after": 3.8721462467370404,
+    "like_loss": 9.979299545288086,
+    "prior_loss": 1688.634521484375,
+    "total_loss": 1698.61376953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 254,
+    "avg_bits_before": 3.8721462467370404,
+    "avg_bits_after": 3.872284857468199,
+    "like_loss": 14.751986503601074,
+    "prior_loss": 1688.625,
+    "total_loss": 1703.376953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 255,
+    "avg_bits_before": 3.872284857468199,
+    "avg_bits_after": 3.8724389973576065,
+    "like_loss": 10.212727546691895,
+    "prior_loss": 1688.728759765625,
+    "total_loss": 1698.9415283203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 256,
+    "avg_bits_before": 3.8724389973576065,
+    "avg_bits_after": 3.872602944665123,
+    "like_loss": 7.424042224884033,
+    "prior_loss": 1688.587158203125,
+    "total_loss": 1696.01123046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 257,
+    "avg_bits_before": 3.872602944665123,
+    "avg_bits_after": 3.8727022931788375,
+    "like_loss": 6.64217472076416,
+    "prior_loss": 1688.56396484375,
+    "total_loss": 1695.2061767578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 258,
+    "avg_bits_before": 3.8727022931788375,
+    "avg_bits_after": 3.872746009033337,
+    "like_loss": 7.992820739746094,
+    "prior_loss": 1688.5809326171875,
+    "total_loss": 1696.57373046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 259,
+    "avg_bits_before": 3.872746009033337,
+    "avg_bits_after": 3.8729926650635846,
+    "like_loss": 6.855836391448975,
+    "prior_loss": 1688.4774169921875,
+    "total_loss": 1695.333251953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 260,
+    "avg_bits_before": 3.8729926650635846,
+    "avg_bits_after": 3.873174230272971,
+    "like_loss": 9.017313003540039,
+    "prior_loss": 1688.39013671875,
+    "total_loss": 1697.407470703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 261,
+    "avg_bits_before": 3.873174230272971,
+    "avg_bits_after": 3.873409585255878,
+    "like_loss": 6.8353705406188965,
+    "prior_loss": 1688.3729248046875,
+    "total_loss": 1695.208251953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 262,
+    "avg_bits_before": 3.873409585255878,
+    "avg_bits_after": 3.873517154067136,
+    "like_loss": 9.661664009094238,
+    "prior_loss": 1688.39990234375,
+    "total_loss": 1698.0615234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 263,
+    "avg_bits_before": 3.873517154067136,
+    "avg_bits_after": 3.873616409071622,
+    "like_loss": 8.526391983032227,
+    "prior_loss": 1688.502197265625,
+    "total_loss": 1697.028564453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 264,
+    "avg_bits_before": 3.873616409071622,
+    "avg_bits_after": 3.8737852524294456,
+    "like_loss": 7.254668712615967,
+    "prior_loss": 1688.4169921875,
+    "total_loss": 1695.671630859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 265,
+    "avg_bits_before": 3.8737852524294456,
+    "avg_bits_after": 3.8738726497946736,
+    "like_loss": 8.276840209960938,
+    "prior_loss": 1688.3446044921875,
+    "total_loss": 1696.6214599609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 266,
+    "avg_bits_before": 3.8738726497946736,
+    "avg_bits_after": 3.8739901992063372,
+    "like_loss": 8.345949172973633,
+    "prior_loss": 1688.2633056640625,
+    "total_loss": 1696.6092529296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 267,
+    "avg_bits_before": 3.8739901992063372,
+    "avg_bits_after": 3.8740746967468374,
+    "like_loss": 7.607710838317871,
+    "prior_loss": 1688.2491455078125,
+    "total_loss": 1695.8568115234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 268,
+    "avg_bits_before": 3.8740746967468374,
+    "avg_bits_after": 3.8741747954101147,
+    "like_loss": 10.561114311218262,
+    "prior_loss": 1688.1905517578125,
+    "total_loss": 1698.751708984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 269,
+    "avg_bits_before": 3.8741747954101147,
+    "avg_bits_after": 3.8743426108246233,
+    "like_loss": 11.050960540771484,
+    "prior_loss": 1688.151611328125,
+    "total_loss": 1699.2025146484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 270,
+    "avg_bits_before": 3.8743426108246233,
+    "avg_bits_after": 3.874534277662696,
+    "like_loss": 9.02499771118164,
+    "prior_loss": 1688.1275634765625,
+    "total_loss": 1697.152587890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 271,
+    "avg_bits_before": 3.874534277662696,
+    "avg_bits_after": 3.8746441380055514,
+    "like_loss": 9.801413536071777,
+    "prior_loss": 1688.055908203125,
+    "total_loss": 1697.8572998046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 272,
+    "avg_bits_before": 3.8746441380055514,
+    "avg_bits_after": 3.8747273940517464,
+    "like_loss": 8.85395622253418,
+    "prior_loss": 1688.060791015625,
+    "total_loss": 1696.914794921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 273,
+    "avg_bits_before": 3.8747273940517464,
+    "avg_bits_after": 3.8748632666344585,
+    "like_loss": 11.657811164855957,
+    "prior_loss": 1688.0421142578125,
+    "total_loss": 1699.699951171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 274,
+    "avg_bits_before": 3.8748632666344585,
+    "avg_bits_after": 3.874959766347788,
+    "like_loss": 9.461877822875977,
+    "prior_loss": 1688.0299072265625,
+    "total_loss": 1697.4918212890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 275,
+    "avg_bits_before": 3.874959766347788,
+    "avg_bits_after": 3.8750113418104863,
+    "like_loss": 6.476855278015137,
+    "prior_loss": 1688.0665283203125,
+    "total_loss": 1694.5433349609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 276,
+    "avg_bits_before": 3.8750113418104863,
+    "avg_bits_after": 3.8750179384193575,
+    "like_loss": 5.941387176513672,
+    "prior_loss": 1688.027587890625,
+    "total_loss": 1693.968994140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 277,
+    "avg_bits_before": 3.8750179384193575,
+    "avg_bits_after": 3.8751217300871974,
+    "like_loss": 14.477849960327148,
+    "prior_loss": 1688.076904296875,
+    "total_loss": 1702.5548095703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 278,
+    "avg_bits_before": 3.8751217300871974,
+    "avg_bits_after": 3.8753223047525474,
+    "like_loss": 5.869007110595703,
+    "prior_loss": 1688.0595703125,
+    "total_loss": 1693.9285888671875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 279,
+    "avg_bits_before": 3.8753223047525474,
+    "avg_bits_after": 3.8754323205662624,
+    "like_loss": 11.513797760009766,
+    "prior_loss": 1687.97216796875,
+    "total_loss": 1699.4859619140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 280,
+    "avg_bits_before": 3.8754323205662624,
+    "avg_bits_after": 3.875556754716435,
+    "like_loss": 7.642481327056885,
+    "prior_loss": 1688.0299072265625,
+    "total_loss": 1695.67236328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 281,
+    "avg_bits_before": 3.875556754716435,
+    "avg_bits_after": 3.8756288848892964,
+    "like_loss": 6.569672584533691,
+    "prior_loss": 1687.9503173828125,
+    "total_loss": 1694.52001953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 282,
+    "avg_bits_before": 3.8756288848892964,
+    "avg_bits_after": 3.8757542077529186,
+    "like_loss": 12.60820484161377,
+    "prior_loss": 1688.0791015625,
+    "total_loss": 1700.687255859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 283,
+    "avg_bits_before": 3.8757542077529186,
+    "avg_bits_after": 3.87582336281597,
+    "like_loss": 8.167844772338867,
+    "prior_loss": 1688.1519775390625,
+    "total_loss": 1696.31982421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 284,
+    "avg_bits_before": 3.87582336281597,
+    "avg_bits_after": 3.8758189536205,
+    "like_loss": 8.994194030761719,
+    "prior_loss": 1688.2489013671875,
+    "total_loss": 1697.2430419921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 285,
+    "avg_bits_before": 3.8758189536205,
+    "avg_bits_after": 3.87586826283387,
+    "like_loss": 7.04913854598999,
+    "prior_loss": 1688.1343994140625,
+    "total_loss": 1695.18359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 286,
+    "avg_bits_before": 3.87586826283387,
+    "avg_bits_after": 3.875917413981711,
+    "like_loss": 7.984309196472168,
+    "prior_loss": 1688.060302734375,
+    "total_loss": 1696.0445556640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 287,
+    "avg_bits_before": 3.875917413981711,
+    "avg_bits_after": 3.8760075626881303,
+    "like_loss": 8.464104652404785,
+    "prior_loss": 1688.0399169921875,
+    "total_loss": 1696.5040283203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 288,
+    "avg_bits_before": 3.8760075626881303,
+    "avg_bits_after": 3.876160921380639,
+    "like_loss": 6.206933975219727,
+    "prior_loss": 1687.9818115234375,
+    "total_loss": 1694.188720703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 289,
+    "avg_bits_before": 3.876160921380639,
+    "avg_bits_after": 3.876275092092804,
+    "like_loss": 7.1851959228515625,
+    "prior_loss": 1687.953125,
+    "total_loss": 1695.1383056640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 290,
+    "avg_bits_before": 3.876275092092804,
+    "avg_bits_after": 3.8765063497890293,
+    "like_loss": 10.410104751586914,
+    "prior_loss": 1687.910400390625,
+    "total_loss": 1698.320556640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 291,
+    "avg_bits_before": 3.8765063497890293,
+    "avg_bits_after": 3.8766500970671434,
+    "like_loss": 9.506635665893555,
+    "prior_loss": 1687.882568359375,
+    "total_loss": 1697.38916015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 292,
+    "avg_bits_before": 3.8766500970671434,
+    "avg_bits_after": 3.876769473212199,
+    "like_loss": 11.051318168640137,
+    "prior_loss": 1687.859375,
+    "total_loss": 1698.91064453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 293,
+    "avg_bits_before": 3.876769473212199,
+    "avg_bits_after": 3.876883304046833,
+    "like_loss": 8.099149703979492,
+    "prior_loss": 1687.8077392578125,
+    "total_loss": 1695.9068603515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 294,
+    "avg_bits_before": 3.876883304046833,
+    "avg_bits_after": 3.8770221039741033,
+    "like_loss": 8.578988075256348,
+    "prior_loss": 1687.614501953125,
+    "total_loss": 1696.1934814453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 295,
+    "avg_bits_before": 3.8770221039741033,
+    "avg_bits_after": 3.877031366948948,
+    "like_loss": 6.660470008850098,
+    "prior_loss": 1687.5609130859375,
+    "total_loss": 1694.221435546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 296,
+    "avg_bits_before": 3.877031366948948,
+    "avg_bits_after": 3.877124246076601,
+    "like_loss": 12.929179191589355,
+    "prior_loss": 1687.4615478515625,
+    "total_loss": 1700.3907470703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 297,
+    "avg_bits_before": 3.877124246076601,
+    "avg_bits_after": 3.877326300354523,
+    "like_loss": 9.99627685546875,
+    "prior_loss": 1687.26171875,
+    "total_loss": 1697.258056640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 298,
+    "avg_bits_before": 3.877326300354523,
+    "avg_bits_after": 3.8774524435311393,
+    "like_loss": 9.607320785522461,
+    "prior_loss": 1687.1328125,
+    "total_loss": 1696.7401123046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 299,
+    "avg_bits_before": 3.8774524435311393,
+    "avg_bits_after": 3.8776797211823806,
+    "like_loss": 15.192426681518555,
+    "prior_loss": 1687.09521484375,
+    "total_loss": 1702.28759765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 300,
+    "avg_bits_before": 3.8776797211823806,
+    "avg_bits_after": 3.877707979780918,
+    "like_loss": 7.876245498657227,
+    "prior_loss": 1687.1697998046875,
+    "total_loss": 1695.0460205078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 301,
+    "avg_bits_before": 3.877707979780918,
+    "avg_bits_after": 3.8777823516731766,
+    "like_loss": 7.346718788146973,
+    "prior_loss": 1687.0313720703125,
+    "total_loss": 1694.3780517578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 302,
+    "avg_bits_before": 3.8777823516731766,
+    "avg_bits_after": 3.877879741249857,
+    "like_loss": 10.540483474731445,
+    "prior_loss": 1686.99853515625,
+    "total_loss": 1697.5390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 303,
+    "avg_bits_before": 3.877879741249857,
+    "avg_bits_after": 3.877886791301074,
+    "like_loss": 9.87993049621582,
+    "prior_loss": 1687.0015869140625,
+    "total_loss": 1696.8814697265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 304,
+    "avg_bits_before": 3.877886791301074,
+    "avg_bits_after": 3.8779826464099103,
+    "like_loss": 6.777610778808594,
+    "prior_loss": 1686.9813232421875,
+    "total_loss": 1693.7589111328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 305,
+    "avg_bits_before": 3.8779826464099103,
+    "avg_bits_after": 3.8780814570701194,
+    "like_loss": 7.046845436096191,
+    "prior_loss": 1686.924560546875,
+    "total_loss": 1693.971435546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 306,
+    "avg_bits_before": 3.8780814570701194,
+    "avg_bits_after": 3.87823705844287,
+    "like_loss": 12.230940818786621,
+    "prior_loss": 1686.927734375,
+    "total_loss": 1699.15869140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 307,
+    "avg_bits_before": 3.87823705844287,
+    "avg_bits_after": 3.878296729301111,
+    "like_loss": 6.66213846206665,
+    "prior_loss": 1686.8485107421875,
+    "total_loss": 1693.5106201171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 308,
+    "avg_bits_before": 3.878296729301111,
+    "avg_bits_after": 3.878475745986069,
+    "like_loss": 8.939234733581543,
+    "prior_loss": 1686.7607421875,
+    "total_loss": 1695.699951171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 309,
+    "avg_bits_before": 3.878475745986069,
+    "avg_bits_after": 3.8785562807207685,
+    "like_loss": 7.956876754760742,
+    "prior_loss": 1686.7269287109375,
+    "total_loss": 1694.683837890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 310,
+    "avg_bits_before": 3.8785562807207685,
+    "avg_bits_after": 3.878630976864971,
+    "like_loss": 11.178667068481445,
+    "prior_loss": 1686.8055419921875,
+    "total_loss": 1697.9842529296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 311,
+    "avg_bits_before": 3.878630976864971,
+    "avg_bits_after": 3.878725369847826,
+    "like_loss": 12.17271614074707,
+    "prior_loss": 1686.7373046875,
+    "total_loss": 1698.9100341796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 312,
+    "avg_bits_before": 3.878725369847826,
+    "avg_bits_after": 3.8788030501711206,
+    "like_loss": 10.73991584777832,
+    "prior_loss": 1686.7779541015625,
+    "total_loss": 1697.517822265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 313,
+    "avg_bits_before": 3.8788030501711206,
+    "avg_bits_after": 3.8787880602333433,
+    "like_loss": 7.772243499755859,
+    "prior_loss": 1686.7738037109375,
+    "total_loss": 1694.5460205078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 314,
+    "avg_bits_before": 3.8787880602333433,
+    "avg_bits_after": 3.8788664367199677,
+    "like_loss": 7.053970813751221,
+    "prior_loss": 1686.730712890625,
+    "total_loss": 1693.78466796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 315,
+    "avg_bits_before": 3.8788664367199677,
+    "avg_bits_after": 3.8789126426523213,
+    "like_loss": 7.393741607666016,
+    "prior_loss": 1686.7659912109375,
+    "total_loss": 1694.1597900390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 316,
+    "avg_bits_before": 3.8789126426523213,
+    "avg_bits_after": 3.8789894428148486,
+    "like_loss": 11.121530532836914,
+    "prior_loss": 1686.685791015625,
+    "total_loss": 1697.807373046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 317,
+    "avg_bits_before": 3.8789894428148486,
+    "avg_bits_after": 3.8791746754726684,
+    "like_loss": 9.390470504760742,
+    "prior_loss": 1686.628173828125,
+    "total_loss": 1696.0186767578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 318,
+    "avg_bits_before": 3.8791746754726684,
+    "avg_bits_after": 3.879228480751185,
+    "like_loss": 9.752045631408691,
+    "prior_loss": 1686.639404296875,
+    "total_loss": 1696.3914794921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 319,
+    "avg_bits_before": 3.879228480751185,
+    "avg_bits_after": 3.879351018826114,
+    "like_loss": 6.423320770263672,
+    "prior_loss": 1686.555908203125,
+    "total_loss": 1692.979248046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 320,
+    "avg_bits_before": 3.879351018826114,
+    "avg_bits_after": 3.879409413318786,
+    "like_loss": 7.25593900680542,
+    "prior_loss": 1686.46337890625,
+    "total_loss": 1693.7193603515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 321,
+    "avg_bits_before": 3.879409413318786,
+    "avg_bits_after": 3.8795199152598974,
+    "like_loss": 6.927709579467773,
+    "prior_loss": 1686.4117431640625,
+    "total_loss": 1693.3394775390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 322,
+    "avg_bits_before": 3.8795199152598974,
+    "avg_bits_after": 3.879631702904274,
+    "like_loss": 13.096102714538574,
+    "prior_loss": 1686.392578125,
+    "total_loss": 1699.4886474609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 323,
+    "avg_bits_before": 3.879631702904274,
+    "avg_bits_after": 3.8798391894008355,
+    "like_loss": 10.586357116699219,
+    "prior_loss": 1686.3505859375,
+    "total_loss": 1696.9368896484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 324,
+    "avg_bits_before": 3.8798391894008355,
+    "avg_bits_after": 3.879860882784053,
+    "like_loss": 9.430784225463867,
+    "prior_loss": 1686.3671875,
+    "total_loss": 1695.7979736328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 325,
+    "avg_bits_before": 3.879860882784053,
+    "avg_bits_after": 3.8800052502059716,
+    "like_loss": 14.564310073852539,
+    "prior_loss": 1686.2593994140625,
+    "total_loss": 1700.82373046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 326,
+    "avg_bits_before": 3.8800052502059716,
+    "avg_bits_after": 3.8800306072876065,
+    "like_loss": 11.785369873046875,
+    "prior_loss": 1686.18212890625,
+    "total_loss": 1697.967529296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 327,
+    "avg_bits_before": 3.8800306072876065,
+    "avg_bits_after": 3.8800790168728,
+    "like_loss": 8.112074851989746,
+    "prior_loss": 1686.1727294921875,
+    "total_loss": 1694.2847900390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 328,
+    "avg_bits_before": 3.8800790168728,
+    "avg_bits_after": 3.880021144166135,
+    "like_loss": 8.738713264465332,
+    "prior_loss": 1686.22900390625,
+    "total_loss": 1694.9677734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 329,
+    "avg_bits_before": 3.880021144166135,
+    "avg_bits_after": 3.880097941769782,
+    "like_loss": 7.563521862030029,
+    "prior_loss": 1686.1461181640625,
+    "total_loss": 1693.7095947265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 330,
+    "avg_bits_before": 3.880097941769782,
+    "avg_bits_after": 3.880226468473213,
+    "like_loss": 10.433402061462402,
+    "prior_loss": 1685.9765625,
+    "total_loss": 1696.409912109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 331,
+    "avg_bits_before": 3.880226468473213,
+    "avg_bits_after": 3.8803641505804767,
+    "like_loss": 8.427078247070312,
+    "prior_loss": 1685.9073486328125,
+    "total_loss": 1694.33447265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 332,
+    "avg_bits_before": 3.8803641505804767,
+    "avg_bits_after": 3.88045510408089,
+    "like_loss": 8.734501838684082,
+    "prior_loss": 1685.855712890625,
+    "total_loss": 1694.5902099609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 333,
+    "avg_bits_before": 3.88045510408089,
+    "avg_bits_after": 3.880631915791166,
+    "like_loss": 6.090601921081543,
+    "prior_loss": 1685.787353515625,
+    "total_loss": 1691.8779296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 334,
+    "avg_bits_before": 3.880631915791166,
+    "avg_bits_after": 3.8807636345195204,
+    "like_loss": 10.023453712463379,
+    "prior_loss": 1685.7421875,
+    "total_loss": 1695.765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 335,
+    "avg_bits_before": 3.8807636345195204,
+    "avg_bits_after": 3.8808572221777777,
+    "like_loss": 9.271835327148438,
+    "prior_loss": 1685.71875,
+    "total_loss": 1694.9906005859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 336,
+    "avg_bits_before": 3.8808572221777777,
+    "avg_bits_after": 3.881229873440267,
+    "like_loss": 16.29148292541504,
+    "prior_loss": 1685.62890625,
+    "total_loss": 1701.92041015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 337,
+    "avg_bits_before": 3.881229873440267,
+    "avg_bits_after": 3.8810627283614334,
+    "like_loss": 7.292119979858398,
+    "prior_loss": 1686.0482177734375,
+    "total_loss": 1693.34033203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 338,
+    "avg_bits_before": 3.8810627283614334,
+    "avg_bits_after": 3.8809409657922465,
+    "like_loss": 8.050586700439453,
+    "prior_loss": 1685.8621826171875,
+    "total_loss": 1693.9127197265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 339,
+    "avg_bits_before": 3.8809409657922465,
+    "avg_bits_after": 3.880756172675259,
+    "like_loss": 10.107561111450195,
+    "prior_loss": 1685.897216796875,
+    "total_loss": 1696.0047607421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 340,
+    "avg_bits_before": 3.880756172675259,
+    "avg_bits_after": 3.880606585805346,
+    "like_loss": 9.626363754272461,
+    "prior_loss": 1685.7723388671875,
+    "total_loss": 1695.398681640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 341,
+    "avg_bits_before": 3.880606585805346,
+    "avg_bits_after": 3.880708283849097,
+    "like_loss": 13.166008949279785,
+    "prior_loss": 1685.740966796875,
+    "total_loss": 1698.906982421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 342,
+    "avg_bits_before": 3.880708283849097,
+    "avg_bits_after": 3.880932011347285,
+    "like_loss": 8.50363540649414,
+    "prior_loss": 1685.7335205078125,
+    "total_loss": 1694.2371826171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 343,
+    "avg_bits_before": 3.880932011347285,
+    "avg_bits_after": 3.8808700564458096,
+    "like_loss": 8.196863174438477,
+    "prior_loss": 1685.7998046875,
+    "total_loss": 1693.9967041015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 344,
+    "avg_bits_before": 3.8808700564458096,
+    "avg_bits_after": 3.881047948006787,
+    "like_loss": 6.8851141929626465,
+    "prior_loss": 1685.7335205078125,
+    "total_loss": 1692.61865234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 345,
+    "avg_bits_before": 3.881047948006787,
+    "avg_bits_after": 3.8811539622487117,
+    "like_loss": 7.455422401428223,
+    "prior_loss": 1685.5758056640625,
+    "total_loss": 1693.03125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 346,
+    "avg_bits_before": 3.8811539622487117,
+    "avg_bits_after": 3.881277002969782,
+    "like_loss": 9.960367202758789,
+    "prior_loss": 1685.5203857421875,
+    "total_loss": 1695.480712890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 347,
+    "avg_bits_before": 3.881277002969782,
+    "avg_bits_after": 3.8814076075954693,
+    "like_loss": 7.892674446105957,
+    "prior_loss": 1685.5,
+    "total_loss": 1693.3927001953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 348,
+    "avg_bits_before": 3.8814076075954693,
+    "avg_bits_after": 3.8816475115856646,
+    "like_loss": 8.328570365905762,
+    "prior_loss": 1685.313720703125,
+    "total_loss": 1693.642333984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 349,
+    "avg_bits_before": 3.8816475115856646,
+    "avg_bits_after": 3.881800535375249,
+    "like_loss": 9.030298233032227,
+    "prior_loss": 1685.16455078125,
+    "total_loss": 1694.19482421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 350,
+    "avg_bits_before": 3.881800535375249,
+    "avg_bits_after": 3.8817901201922798,
+    "like_loss": 6.753991603851318,
+    "prior_loss": 1685.23095703125,
+    "total_loss": 1691.9849853515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 351,
+    "avg_bits_before": 3.8817901201922798,
+    "avg_bits_after": 3.881922579053296,
+    "like_loss": 8.617778778076172,
+    "prior_loss": 1685.17138671875,
+    "total_loss": 1693.7891845703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 352,
+    "avg_bits_before": 3.881922579053296,
+    "avg_bits_after": 3.8819820578383375,
+    "like_loss": 8.707987785339355,
+    "prior_loss": 1685.1895751953125,
+    "total_loss": 1693.8975830078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 353,
+    "avg_bits_before": 3.8819820578383375,
+    "avg_bits_after": 3.882133099424448,
+    "like_loss": 7.336381912231445,
+    "prior_loss": 1685.15234375,
+    "total_loss": 1692.48876953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 354,
+    "avg_bits_before": 3.882133099424448,
+    "avg_bits_after": 3.882252614460934,
+    "like_loss": 11.234123229980469,
+    "prior_loss": 1685.0543212890625,
+    "total_loss": 1696.2884521484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 355,
+    "avg_bits_before": 3.882252614460934,
+    "avg_bits_after": 3.8824506074095417,
+    "like_loss": 11.414478302001953,
+    "prior_loss": 1684.993896484375,
+    "total_loss": 1696.4083251953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 356,
+    "avg_bits_before": 3.8824506074095417,
+    "avg_bits_after": 3.8824669569795915,
+    "like_loss": 11.738298416137695,
+    "prior_loss": 1685.0433349609375,
+    "total_loss": 1696.7816162109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 357,
+    "avg_bits_before": 3.8824669569795915,
+    "avg_bits_after": 3.8825525514006918,
+    "like_loss": 6.471784591674805,
+    "prior_loss": 1685.05810546875,
+    "total_loss": 1691.5299072265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 358,
+    "avg_bits_before": 3.8825525514006918,
+    "avg_bits_after": 3.8825332709982567,
+    "like_loss": 8.584847450256348,
+    "prior_loss": 1684.943359375,
+    "total_loss": 1693.5281982421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 359,
+    "avg_bits_before": 3.8825332709982567,
+    "avg_bits_after": 3.882566825004407,
+    "like_loss": 8.498855590820312,
+    "prior_loss": 1684.871337890625,
+    "total_loss": 1693.3702392578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 360,
+    "avg_bits_before": 3.882566825004407,
+    "avg_bits_after": 3.882551111173407,
+    "like_loss": 8.380874633789062,
+    "prior_loss": 1684.91015625,
+    "total_loss": 1693.291015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 361,
+    "avg_bits_before": 3.882551111173407,
+    "avg_bits_after": 3.882573825768582,
+    "like_loss": 7.20361328125,
+    "prior_loss": 1684.9691162109375,
+    "total_loss": 1692.1727294921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 362,
+    "avg_bits_before": 3.882573825768582,
+    "avg_bits_after": 3.882806687551474,
+    "like_loss": 5.923512935638428,
+    "prior_loss": 1684.927978515625,
+    "total_loss": 1690.8514404296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 363,
+    "avg_bits_before": 3.882806687551474,
+    "avg_bits_after": 3.883004029229584,
+    "like_loss": 8.154953956604004,
+    "prior_loss": 1684.733154296875,
+    "total_loss": 1692.8880615234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 364,
+    "avg_bits_before": 3.883004029229584,
+    "avg_bits_after": 3.8830769996761076,
+    "like_loss": 9.471648216247559,
+    "prior_loss": 1684.66259765625,
+    "total_loss": 1694.13427734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 365,
+    "avg_bits_before": 3.8830769996761076,
+    "avg_bits_after": 3.883228518588745,
+    "like_loss": 9.075431823730469,
+    "prior_loss": 1684.586181640625,
+    "total_loss": 1693.66162109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 366,
+    "avg_bits_before": 3.883228518588745,
+    "avg_bits_after": 3.8833351810871504,
+    "like_loss": 6.593838691711426,
+    "prior_loss": 1684.595947265625,
+    "total_loss": 1691.1898193359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 367,
+    "avg_bits_before": 3.8833351810871504,
+    "avg_bits_after": 3.8833602074538978,
+    "like_loss": 11.867076873779297,
+    "prior_loss": 1684.60498046875,
+    "total_loss": 1696.4720458984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 368,
+    "avg_bits_before": 3.8833602074538978,
+    "avg_bits_after": 3.883477950574141,
+    "like_loss": 7.285308837890625,
+    "prior_loss": 1684.6400146484375,
+    "total_loss": 1691.92529296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 369,
+    "avg_bits_before": 3.883477950574141,
+    "avg_bits_after": 3.88348891587597,
+    "like_loss": 9.36475944519043,
+    "prior_loss": 1684.5533447265625,
+    "total_loss": 1693.9180908203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 370,
+    "avg_bits_before": 3.88348891587597,
+    "avg_bits_after": 3.8835245355257952,
+    "like_loss": 8.847739219665527,
+    "prior_loss": 1684.472412109375,
+    "total_loss": 1693.3201904296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 371,
+    "avg_bits_before": 3.8835245355257952,
+    "avg_bits_after": 3.883637035881033,
+    "like_loss": 9.562379837036133,
+    "prior_loss": 1684.310302734375,
+    "total_loss": 1693.8726806640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 372,
+    "avg_bits_before": 3.883637035881033,
+    "avg_bits_after": 3.8837134683069854,
+    "like_loss": 9.24434757232666,
+    "prior_loss": 1684.2049560546875,
+    "total_loss": 1693.4493408203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 373,
+    "avg_bits_before": 3.8837134683069854,
+    "avg_bits_after": 3.8837986895166416,
+    "like_loss": 12.107755661010742,
+    "prior_loss": 1684.1466064453125,
+    "total_loss": 1696.25439453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 374,
+    "avg_bits_before": 3.8837986895166416,
+    "avg_bits_after": 3.883949378094717,
+    "like_loss": 16.453556060791016,
+    "prior_loss": 1684.16552734375,
+    "total_loss": 1700.619140625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 375,
+    "avg_bits_before": 3.883949378094717,
+    "avg_bits_after": 3.8839157555729646,
+    "like_loss": 8.481388092041016,
+    "prior_loss": 1684.229736328125,
+    "total_loss": 1692.711181640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 376,
+    "avg_bits_before": 3.8839157555729646,
+    "avg_bits_after": 3.8838974658323018,
+    "like_loss": 10.6806640625,
+    "prior_loss": 1684.166748046875,
+    "total_loss": 1694.847412109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 377,
+    "avg_bits_before": 3.8838974658323018,
+    "avg_bits_after": 3.8838140954471707,
+    "like_loss": 9.801179885864258,
+    "prior_loss": 1684.2655029296875,
+    "total_loss": 1694.066650390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 378,
+    "avg_bits_before": 3.8838140954471707,
+    "avg_bits_after": 3.8838354578431966,
+    "like_loss": 9.500239372253418,
+    "prior_loss": 1684.2391357421875,
+    "total_loss": 1693.7393798828125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 379,
+    "avg_bits_before": 3.8838354578431966,
+    "avg_bits_after": 3.883879178592168,
+    "like_loss": 10.59589672088623,
+    "prior_loss": 1684.1883544921875,
+    "total_loss": 1694.7843017578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 380,
+    "avg_bits_before": 3.883879178592168,
+    "avg_bits_after": 3.884009539083224,
+    "like_loss": 10.119000434875488,
+    "prior_loss": 1684.196533203125,
+    "total_loss": 1694.3155517578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 381,
+    "avg_bits_before": 3.884009539083224,
+    "avg_bits_after": 3.884151251368213,
+    "like_loss": 11.813859939575195,
+    "prior_loss": 1684.2303466796875,
+    "total_loss": 1696.044189453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 382,
+    "avg_bits_before": 3.884151251368213,
+    "avg_bits_after": 3.8842116870757697,
+    "like_loss": 7.0633721351623535,
+    "prior_loss": 1684.2869873046875,
+    "total_loss": 1691.350341796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 383,
+    "avg_bits_before": 3.8842116870757697,
+    "avg_bits_after": 3.8843284765893835,
+    "like_loss": 8.918500900268555,
+    "prior_loss": 1684.168212890625,
+    "total_loss": 1693.086669921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 384,
+    "avg_bits_before": 3.8843284765893835,
+    "avg_bits_after": 3.884333627380956,
+    "like_loss": 10.961626052856445,
+    "prior_loss": 1684.1177978515625,
+    "total_loss": 1695.0794677734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 385,
+    "avg_bits_before": 3.884333627380956,
+    "avg_bits_after": 3.884386795487325,
+    "like_loss": 6.94394063949585,
+    "prior_loss": 1684.0521240234375,
+    "total_loss": 1690.99609375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 386,
+    "avg_bits_before": 3.884386795487325,
+    "avg_bits_after": 3.8844624184403207,
+    "like_loss": 10.975897789001465,
+    "prior_loss": 1683.95361328125,
+    "total_loss": 1694.9295654296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 387,
+    "avg_bits_before": 3.8844624184403207,
+    "avg_bits_after": 3.884804906327746,
+    "like_loss": 15.453353881835938,
+    "prior_loss": 1683.80078125,
+    "total_loss": 1699.254150390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 388,
+    "avg_bits_before": 3.884804906327746,
+    "avg_bits_after": 3.8848105846058174,
+    "like_loss": 8.167614936828613,
+    "prior_loss": 1683.865966796875,
+    "total_loss": 1692.0335693359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 389,
+    "avg_bits_before": 3.8848105846058174,
+    "avg_bits_after": 3.8848197364307957,
+    "like_loss": 6.772597789764404,
+    "prior_loss": 1683.8009033203125,
+    "total_loss": 1690.573486328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 390,
+    "avg_bits_before": 3.8848197364307957,
+    "avg_bits_after": 3.8847749609336715,
+    "like_loss": 12.495307922363281,
+    "prior_loss": 1683.815185546875,
+    "total_loss": 1696.310546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 391,
+    "avg_bits_before": 3.8847749609336715,
+    "avg_bits_after": 3.884828630049245,
+    "like_loss": 7.184690475463867,
+    "prior_loss": 1683.7423095703125,
+    "total_loss": 1690.927001953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 392,
+    "avg_bits_before": 3.884828630049245,
+    "avg_bits_after": 3.884837794204931,
+    "like_loss": 10.554763793945312,
+    "prior_loss": 1683.7047119140625,
+    "total_loss": 1694.259521484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 393,
+    "avg_bits_before": 3.884837794204931,
+    "avg_bits_after": 3.884929951635688,
+    "like_loss": 5.449451446533203,
+    "prior_loss": 1683.6826171875,
+    "total_loss": 1689.132080078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 394,
+    "avg_bits_before": 3.884929951635688,
+    "avg_bits_after": 3.8849233288015976,
+    "like_loss": 9.503120422363281,
+    "prior_loss": 1683.6851806640625,
+    "total_loss": 1693.1883544921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 395,
+    "avg_bits_before": 3.8849233288015976,
+    "avg_bits_after": 3.8850917915957672,
+    "like_loss": 12.052602767944336,
+    "prior_loss": 1683.625732421875,
+    "total_loss": 1695.6783447265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 396,
+    "avg_bits_before": 3.8850917915957672,
+    "avg_bits_after": 3.8852425186294055,
+    "like_loss": 7.590950012207031,
+    "prior_loss": 1683.506103515625,
+    "total_loss": 1691.0970458984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 397,
+    "avg_bits_before": 3.8852425186294055,
+    "avg_bits_after": 3.8853312052604148,
+    "like_loss": 9.38782787322998,
+    "prior_loss": 1683.4154052734375,
+    "total_loss": 1692.80322265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 398,
+    "avg_bits_before": 3.8853312052604148,
+    "avg_bits_after": 3.8852469298928307,
+    "like_loss": 7.159143447875977,
+    "prior_loss": 1683.52197265625,
+    "total_loss": 1690.68115234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 399,
+    "avg_bits_before": 3.8852469298928307,
+    "avg_bits_after": 3.8852992731737386,
+    "like_loss": 7.7286057472229,
+    "prior_loss": 1683.5361328125,
+    "total_loss": 1691.2647705078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 400,
+    "avg_bits_before": 3.8852992731737386,
+    "avg_bits_after": 3.885389167338842,
+    "like_loss": 5.847504615783691,
+    "prior_loss": 1683.4718017578125,
+    "total_loss": 1689.3193359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 401,
+    "avg_bits_before": 3.885389167338842,
+    "avg_bits_after": 3.8855503750749283,
+    "like_loss": 8.635390281677246,
+    "prior_loss": 1683.3565673828125,
+    "total_loss": 1691.991943359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 402,
+    "avg_bits_before": 3.8855503750749283,
+    "avg_bits_after": 3.8857627250106574,
+    "like_loss": 9.79391098022461,
+    "prior_loss": 1683.2196044921875,
+    "total_loss": 1693.0135498046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 403,
+    "avg_bits_before": 3.8857627250106574,
+    "avg_bits_after": 3.885806739750807,
+    "like_loss": 11.016702651977539,
+    "prior_loss": 1683.21875,
+    "total_loss": 1694.2354736328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 404,
+    "avg_bits_before": 3.885806739750807,
+    "avg_bits_after": 3.8859761413273706,
+    "like_loss": 9.27742862701416,
+    "prior_loss": 1683.172607421875,
+    "total_loss": 1692.4500732421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 405,
+    "avg_bits_before": 3.8859761413273706,
+    "avg_bits_after": 3.8859984536305805,
+    "like_loss": 7.325451374053955,
+    "prior_loss": 1683.0897216796875,
+    "total_loss": 1690.4151611328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 406,
+    "avg_bits_before": 3.8859984536305805,
+    "avg_bits_after": 3.886036262357974,
+    "like_loss": 9.374406814575195,
+    "prior_loss": 1683.0411376953125,
+    "total_loss": 1692.41552734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 407,
+    "avg_bits_before": 3.886036262357974,
+    "avg_bits_after": 3.8860296707594983,
+    "like_loss": 12.07957649230957,
+    "prior_loss": 1683.0233154296875,
+    "total_loss": 1695.1029052734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 408,
+    "avg_bits_before": 3.8860296707594983,
+    "avg_bits_after": 3.8861338242673624,
+    "like_loss": 6.728940486907959,
+    "prior_loss": 1683.052001953125,
+    "total_loss": 1689.7808837890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 409,
+    "avg_bits_before": 3.8861338242673624,
+    "avg_bits_after": 3.8860923817771083,
+    "like_loss": 7.91241979598999,
+    "prior_loss": 1682.9635009765625,
+    "total_loss": 1690.8759765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 410,
+    "avg_bits_before": 3.8860923817771083,
+    "avg_bits_after": 3.8861402580204865,
+    "like_loss": 6.951232433319092,
+    "prior_loss": 1682.88134765625,
+    "total_loss": 1689.83251953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 411,
+    "avg_bits_before": 3.8861402580204865,
+    "avg_bits_after": 3.886133914216409,
+    "like_loss": 10.777836799621582,
+    "prior_loss": 1683.0379638671875,
+    "total_loss": 1693.8157958984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 412,
+    "avg_bits_before": 3.886133914216409,
+    "avg_bits_after": 3.8861943922322433,
+    "like_loss": 6.586638927459717,
+    "prior_loss": 1683.042724609375,
+    "total_loss": 1689.62939453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 413,
+    "avg_bits_before": 3.8861943922322433,
+    "avg_bits_after": 3.8863586722798114,
+    "like_loss": 6.269196510314941,
+    "prior_loss": 1683.02880859375,
+    "total_loss": 1689.2979736328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 414,
+    "avg_bits_before": 3.8863586722798114,
+    "avg_bits_after": 3.886540728122838,
+    "like_loss": 7.906006813049316,
+    "prior_loss": 1682.864501953125,
+    "total_loss": 1690.7705078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 415,
+    "avg_bits_before": 3.886540728122838,
+    "avg_bits_after": 3.886667150579987,
+    "like_loss": 12.316827774047852,
+    "prior_loss": 1682.8297119140625,
+    "total_loss": 1695.146484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 416,
+    "avg_bits_before": 3.886667150579987,
+    "avg_bits_after": 3.886804298771262,
+    "like_loss": 14.030654907226562,
+    "prior_loss": 1682.7860107421875,
+    "total_loss": 1696.816650390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 417,
+    "avg_bits_before": 3.886804298771262,
+    "avg_bits_after": 3.886983420248175,
+    "like_loss": 14.281486511230469,
+    "prior_loss": 1682.798583984375,
+    "total_loss": 1697.080078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 418,
+    "avg_bits_before": 3.886983420248175,
+    "avg_bits_after": 3.8867933115862976,
+    "like_loss": 7.899925231933594,
+    "prior_loss": 1682.869384765625,
+    "total_loss": 1690.769287109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 419,
+    "avg_bits_before": 3.8867933115862976,
+    "avg_bits_after": 3.886694311347195,
+    "like_loss": 9.266849517822266,
+    "prior_loss": 1682.7249755859375,
+    "total_loss": 1691.9918212890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 420,
+    "avg_bits_before": 3.886694311347195,
+    "avg_bits_after": 3.886627943847226,
+    "like_loss": 11.19749641418457,
+    "prior_loss": 1682.6795654296875,
+    "total_loss": 1693.8770751953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 421,
+    "avg_bits_before": 3.886627943847226,
+    "avg_bits_after": 3.8866018289059325,
+    "like_loss": 6.803531169891357,
+    "prior_loss": 1682.652099609375,
+    "total_loss": 1689.4556884765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 422,
+    "avg_bits_before": 3.8866018289059325,
+    "avg_bits_after": 3.886618827372766,
+    "like_loss": 5.606046676635742,
+    "prior_loss": 1682.727783203125,
+    "total_loss": 1688.3338623046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 423,
+    "avg_bits_before": 3.886618827372766,
+    "avg_bits_after": 3.886873718096886,
+    "like_loss": 8.910253524780273,
+    "prior_loss": 1682.6319580078125,
+    "total_loss": 1691.542236328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 424,
+    "avg_bits_before": 3.886873718096886,
+    "avg_bits_after": 3.8870537394439366,
+    "like_loss": 12.301788330078125,
+    "prior_loss": 1682.552734375,
+    "total_loss": 1694.8544921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 425,
+    "avg_bits_before": 3.8870537394439366,
+    "avg_bits_after": 3.8872624271594707,
+    "like_loss": 6.617059707641602,
+    "prior_loss": 1682.4559326171875,
+    "total_loss": 1689.072998046875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 426,
+    "avg_bits_before": 3.8872624271594707,
+    "avg_bits_after": 3.887337174146739,
+    "like_loss": 10.177842140197754,
+    "prior_loss": 1682.464599609375,
+    "total_loss": 1692.6424560546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 427,
+    "avg_bits_before": 3.887337174146739,
+    "avg_bits_after": 3.8873537215519427,
+    "like_loss": 7.676959991455078,
+    "prior_loss": 1682.4583740234375,
+    "total_loss": 1690.1353759765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 428,
+    "avg_bits_before": 3.8873537215519427,
+    "avg_bits_after": 3.8872981524881838,
+    "like_loss": 9.875177383422852,
+    "prior_loss": 1682.5087890625,
+    "total_loss": 1692.3839111328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 429,
+    "avg_bits_before": 3.8872981524881838,
+    "avg_bits_after": 3.8873110778333797,
+    "like_loss": 6.727649688720703,
+    "prior_loss": 1682.507568359375,
+    "total_loss": 1689.2352294921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 430,
+    "avg_bits_before": 3.8873110778333797,
+    "avg_bits_after": 3.887533603476959,
+    "like_loss": 11.2784423828125,
+    "prior_loss": 1682.3677978515625,
+    "total_loss": 1693.646240234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 431,
+    "avg_bits_before": 3.887533603476959,
+    "avg_bits_after": 3.8875428123301963,
+    "like_loss": 6.614218235015869,
+    "prior_loss": 1682.331298828125,
+    "total_loss": 1688.945556640625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 432,
+    "avg_bits_before": 3.8875428123301963,
+    "avg_bits_after": 3.8875094524729805,
+    "like_loss": 10.125563621520996,
+    "prior_loss": 1682.3687744140625,
+    "total_loss": 1692.494384765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 433,
+    "avg_bits_before": 3.8875094524729805,
+    "avg_bits_after": 3.8875873397326095,
+    "like_loss": 9.319278717041016,
+    "prior_loss": 1682.3011474609375,
+    "total_loss": 1691.6204833984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 434,
+    "avg_bits_before": 3.8875873397326095,
+    "avg_bits_after": 3.8876683823362432,
+    "like_loss": 8.195483207702637,
+    "prior_loss": 1682.241943359375,
+    "total_loss": 1690.4373779296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 435,
+    "avg_bits_before": 3.8876683823362432,
+    "avg_bits_after": 3.887752159353867,
+    "like_loss": 10.947681427001953,
+    "prior_loss": 1682.188720703125,
+    "total_loss": 1693.1363525390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 436,
+    "avg_bits_before": 3.887752159353867,
+    "avg_bits_after": 3.8878960668564924,
+    "like_loss": 6.261049270629883,
+    "prior_loss": 1681.97021484375,
+    "total_loss": 1688.2313232421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 437,
+    "avg_bits_before": 3.8878960668564924,
+    "avg_bits_after": 3.887921692673489,
+    "like_loss": 9.451875686645508,
+    "prior_loss": 1681.933349609375,
+    "total_loss": 1691.38525390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 438,
+    "avg_bits_before": 3.887921692673489,
+    "avg_bits_after": 3.8880184010114385,
+    "like_loss": 8.081348419189453,
+    "prior_loss": 1681.92236328125,
+    "total_loss": 1690.003662109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 439,
+    "avg_bits_before": 3.8880184010114385,
+    "avg_bits_after": 3.888078888639608,
+    "like_loss": 7.062189102172852,
+    "prior_loss": 1681.8507080078125,
+    "total_loss": 1688.912841796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 440,
+    "avg_bits_before": 3.888078888639608,
+    "avg_bits_after": 3.8881495289838246,
+    "like_loss": 7.967902183532715,
+    "prior_loss": 1681.7628173828125,
+    "total_loss": 1689.730712890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 441,
+    "avg_bits_before": 3.8881495289838246,
+    "avg_bits_after": 3.888217163881221,
+    "like_loss": 11.703653335571289,
+    "prior_loss": 1681.7529296875,
+    "total_loss": 1693.45654296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 442,
+    "avg_bits_before": 3.888217163881221,
+    "avg_bits_after": 3.888383252569519,
+    "like_loss": 7.737278938293457,
+    "prior_loss": 1681.6826171875,
+    "total_loss": 1689.419921875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 443,
+    "avg_bits_before": 3.888383252569519,
+    "avg_bits_after": 3.8884621140009616,
+    "like_loss": 7.179354667663574,
+    "prior_loss": 1681.575927734375,
+    "total_loss": 1688.7552490234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 444,
+    "avg_bits_before": 3.8884621140009616,
+    "avg_bits_after": 3.88852667867506,
+    "like_loss": 12.410612106323242,
+    "prior_loss": 1681.5855712890625,
+    "total_loss": 1693.9962158203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 445,
+    "avg_bits_before": 3.88852667867506,
+    "avg_bits_after": 3.8886932072426257,
+    "like_loss": 9.901477813720703,
+    "prior_loss": 1681.52734375,
+    "total_loss": 1691.4288330078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 446,
+    "avg_bits_before": 3.8886932072426257,
+    "avg_bits_after": 3.888676002487541,
+    "like_loss": 10.876537322998047,
+    "prior_loss": 1681.5357666015625,
+    "total_loss": 1692.412353515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 447,
+    "avg_bits_before": 3.888676002487541,
+    "avg_bits_after": 3.888645262785514,
+    "like_loss": 7.817058563232422,
+    "prior_loss": 1681.60791015625,
+    "total_loss": 1689.4249267578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 448,
+    "avg_bits_before": 3.888645262785514,
+    "avg_bits_after": 3.888671862721419,
+    "like_loss": 9.188652038574219,
+    "prior_loss": 1681.6043701171875,
+    "total_loss": 1690.79296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 449,
+    "avg_bits_before": 3.888671862721419,
+    "avg_bits_after": 3.8887638755664784,
+    "like_loss": 11.614486694335938,
+    "prior_loss": 1681.49658203125,
+    "total_loss": 1693.111083984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 450,
+    "avg_bits_before": 3.8887638755664784,
+    "avg_bits_after": 3.8887556261215037,
+    "like_loss": 7.8857831954956055,
+    "prior_loss": 1681.541748046875,
+    "total_loss": 1689.427490234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 451,
+    "avg_bits_before": 3.8887556261215037,
+    "avg_bits_after": 3.888803863012214,
+    "like_loss": 10.162315368652344,
+    "prior_loss": 1681.4439697265625,
+    "total_loss": 1691.6063232421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 452,
+    "avg_bits_before": 3.888803863012214,
+    "avg_bits_after": 3.8889284098208177,
+    "like_loss": 7.726794242858887,
+    "prior_loss": 1681.3687744140625,
+    "total_loss": 1689.0955810546875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 453,
+    "avg_bits_before": 3.8889284098208177,
+    "avg_bits_after": 3.8889907243434276,
+    "like_loss": 13.088454246520996,
+    "prior_loss": 1681.3341064453125,
+    "total_loss": 1694.422607421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 454,
+    "avg_bits_before": 3.8889907243434276,
+    "avg_bits_after": 3.888990735398974,
+    "like_loss": 11.413211822509766,
+    "prior_loss": 1681.471923828125,
+    "total_loss": 1692.8851318359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 455,
+    "avg_bits_before": 3.888990735398974,
+    "avg_bits_after": 3.8891160472506185,
+    "like_loss": 8.352560043334961,
+    "prior_loss": 1681.488525390625,
+    "total_loss": 1689.841064453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 456,
+    "avg_bits_before": 3.8891160472506185,
+    "avg_bits_after": 3.88904706550835,
+    "like_loss": 8.36515998840332,
+    "prior_loss": 1681.33154296875,
+    "total_loss": 1689.6966552734375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 457,
+    "avg_bits_before": 3.88904706550835,
+    "avg_bits_after": 3.8889930603158325,
+    "like_loss": 11.485509872436523,
+    "prior_loss": 1681.2841796875,
+    "total_loss": 1692.7696533203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 458,
+    "avg_bits_before": 3.8889930603158325,
+    "avg_bits_after": 3.8889979337960194,
+    "like_loss": 7.634535312652588,
+    "prior_loss": 1681.224609375,
+    "total_loss": 1688.859130859375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 459,
+    "avg_bits_before": 3.8889979337960194,
+    "avg_bits_after": 3.88897287859538,
+    "like_loss": 7.200136661529541,
+    "prior_loss": 1681.28857421875,
+    "total_loss": 1688.48876953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 460,
+    "avg_bits_before": 3.88897287859538,
+    "avg_bits_after": 3.889187604000057,
+    "like_loss": 10.525245666503906,
+    "prior_loss": 1681.1763916015625,
+    "total_loss": 1691.70166015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 461,
+    "avg_bits_before": 3.889187604000057,
+    "avg_bits_after": 3.8892789601347606,
+    "like_loss": 9.526333808898926,
+    "prior_loss": 1681.0987548828125,
+    "total_loss": 1690.6251220703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 462,
+    "avg_bits_before": 3.8892789601347606,
+    "avg_bits_after": 3.8894299691859766,
+    "like_loss": 5.924009799957275,
+    "prior_loss": 1681.044189453125,
+    "total_loss": 1686.9681396484375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 463,
+    "avg_bits_before": 3.8894299691859766,
+    "avg_bits_after": 3.8896062281422674,
+    "like_loss": 12.375919342041016,
+    "prior_loss": 1680.9581298828125,
+    "total_loss": 1693.3341064453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 464,
+    "avg_bits_before": 3.8896062281422674,
+    "avg_bits_after": 3.889814381981492,
+    "like_loss": 6.606323719024658,
+    "prior_loss": 1680.9307861328125,
+    "total_loss": 1687.537109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 465,
+    "avg_bits_before": 3.889814381981492,
+    "avg_bits_after": 3.8897908240317283,
+    "like_loss": 8.518912315368652,
+    "prior_loss": 1680.8377685546875,
+    "total_loss": 1689.356689453125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 466,
+    "avg_bits_before": 3.8897908240317283,
+    "avg_bits_after": 3.889882042196946,
+    "like_loss": 8.994258880615234,
+    "prior_loss": 1680.7052001953125,
+    "total_loss": 1689.699462890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 467,
+    "avg_bits_before": 3.889882042196946,
+    "avg_bits_after": 3.8898415129352912,
+    "like_loss": 13.31605339050293,
+    "prior_loss": 1680.6905517578125,
+    "total_loss": 1694.006591796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 468,
+    "avg_bits_before": 3.8898415129352912,
+    "avg_bits_after": 3.8899245535593776,
+    "like_loss": 10.405927658081055,
+    "prior_loss": 1680.6927490234375,
+    "total_loss": 1691.0986328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 469,
+    "avg_bits_before": 3.8899245535593776,
+    "avg_bits_after": 3.889866766714864,
+    "like_loss": 13.572505950927734,
+    "prior_loss": 1680.80615234375,
+    "total_loss": 1694.378662109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 470,
+    "avg_bits_before": 3.889866766714864,
+    "avg_bits_after": 3.8899370164326235,
+    "like_loss": 10.734746932983398,
+    "prior_loss": 1680.819580078125,
+    "total_loss": 1691.5543212890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 471,
+    "avg_bits_before": 3.8899370164326235,
+    "avg_bits_after": 3.8898661316324565,
+    "like_loss": 8.48173999786377,
+    "prior_loss": 1680.8994140625,
+    "total_loss": 1689.381103515625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 472,
+    "avg_bits_before": 3.8898661316324565,
+    "avg_bits_after": 3.889721041713067,
+    "like_loss": 7.533929347991943,
+    "prior_loss": 1680.8123779296875,
+    "total_loss": 1688.3463134765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 473,
+    "avg_bits_before": 3.889721041713067,
+    "avg_bits_after": 3.8897825463861633,
+    "like_loss": 7.640024185180664,
+    "prior_loss": 1680.7451171875,
+    "total_loss": 1688.3851318359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 474,
+    "avg_bits_before": 3.8897825463861633,
+    "avg_bits_after": 3.889908989060724,
+    "like_loss": 10.596077919006348,
+    "prior_loss": 1680.6400146484375,
+    "total_loss": 1691.236083984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 475,
+    "avg_bits_before": 3.889908989060724,
+    "avg_bits_after": 3.8900590918496585,
+    "like_loss": 7.610869407653809,
+    "prior_loss": 1680.59814453125,
+    "total_loss": 1688.208984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 476,
+    "avg_bits_before": 3.8900590918496585,
+    "avg_bits_after": 3.890200453199235,
+    "like_loss": 7.712584495544434,
+    "prior_loss": 1680.44580078125,
+    "total_loss": 1688.1583251953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 477,
+    "avg_bits_before": 3.890200453199235,
+    "avg_bits_after": 3.8903593518969046,
+    "like_loss": 7.390189170837402,
+    "prior_loss": 1680.3243408203125,
+    "total_loss": 1687.7144775390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 478,
+    "avg_bits_before": 3.8903593518969046,
+    "avg_bits_after": 3.8904349975569508,
+    "like_loss": 7.492021083831787,
+    "prior_loss": 1680.268798828125,
+    "total_loss": 1687.7608642578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 479,
+    "avg_bits_before": 3.8904349975569508,
+    "avg_bits_after": 3.8905985599711777,
+    "like_loss": 6.22162389755249,
+    "prior_loss": 1680.2423095703125,
+    "total_loss": 1686.4639892578125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 480,
+    "avg_bits_before": 3.8905985599711777,
+    "avg_bits_after": 3.890645217645144,
+    "like_loss": 6.014042377471924,
+    "prior_loss": 1680.11572265625,
+    "total_loss": 1686.1297607421875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 481,
+    "avg_bits_before": 3.890645217645144,
+    "avg_bits_after": 3.8907869611960892,
+    "like_loss": 10.320951461791992,
+    "prior_loss": 1680.009765625,
+    "total_loss": 1690.3306884765625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 482,
+    "avg_bits_before": 3.8907869611960892,
+    "avg_bits_after": 3.8910759822097534,
+    "like_loss": 16.56278419494629,
+    "prior_loss": 1679.97314453125,
+    "total_loss": 1696.535888671875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 483,
+    "avg_bits_before": 3.8910759822097534,
+    "avg_bits_after": 3.89116021725299,
+    "like_loss": 12.177083969116211,
+    "prior_loss": 1680.0635986328125,
+    "total_loss": 1692.24072265625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 484,
+    "avg_bits_before": 3.89116021725299,
+    "avg_bits_after": 3.8908925625962096,
+    "like_loss": 6.482925891876221,
+    "prior_loss": 1680.15478515625,
+    "total_loss": 1686.6376953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 485,
+    "avg_bits_before": 3.8908925625962096,
+    "avg_bits_after": 3.8905023712571407,
+    "like_loss": 9.783097267150879,
+    "prior_loss": 1680.13330078125,
+    "total_loss": 1689.9163818359375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 486,
+    "avg_bits_before": 3.8905023712571407,
+    "avg_bits_after": 3.890448939014237,
+    "like_loss": 13.531198501586914,
+    "prior_loss": 1679.9317626953125,
+    "total_loss": 1693.4630126953125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 487,
+    "avg_bits_before": 3.890448939014237,
+    "avg_bits_after": 3.8904483206536353,
+    "like_loss": 7.214419841766357,
+    "prior_loss": 1679.9195556640625,
+    "total_loss": 1687.134033203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 488,
+    "avg_bits_before": 3.8904483206536353,
+    "avg_bits_after": 3.8905015079512197,
+    "like_loss": 8.032361030578613,
+    "prior_loss": 1679.960205078125,
+    "total_loss": 1687.9925537109375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 489,
+    "avg_bits_before": 3.8905015079512197,
+    "avg_bits_after": 3.8905343317848136,
+    "like_loss": 9.042145729064941,
+    "prior_loss": 1679.8612060546875,
+    "total_loss": 1688.9033203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 490,
+    "avg_bits_before": 3.8905343317848136,
+    "avg_bits_after": 3.89067207926529,
+    "like_loss": 14.057748794555664,
+    "prior_loss": 1679.836181640625,
+    "total_loss": 1693.8939208984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 491,
+    "avg_bits_before": 3.89067207926529,
+    "avg_bits_after": 3.8907983018535623,
+    "like_loss": 10.90847396850586,
+    "prior_loss": 1679.76220703125,
+    "total_loss": 1690.670654296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 492,
+    "avg_bits_before": 3.8907983018535623,
+    "avg_bits_after": 3.891044998597941,
+    "like_loss": 8.918608665466309,
+    "prior_loss": 1679.68310546875,
+    "total_loss": 1688.6016845703125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 493,
+    "avg_bits_before": 3.891044998597941,
+    "avg_bits_after": 3.8911012552583424,
+    "like_loss": 8.95357894897461,
+    "prior_loss": 1679.568603515625,
+    "total_loss": 1688.522216796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 494,
+    "avg_bits_before": 3.8911012552583424,
+    "avg_bits_after": 3.8912924555437938,
+    "like_loss": 12.607107162475586,
+    "prior_loss": 1679.408203125,
+    "total_loss": 1692.0152587890625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 495,
+    "avg_bits_before": 3.8912924555437938,
+    "avg_bits_after": 3.891258001151684,
+    "like_loss": 9.58810043334961,
+    "prior_loss": 1679.4163818359375,
+    "total_loss": 1689.0045166015625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 496,
+    "avg_bits_before": 3.891258001151684,
+    "avg_bits_after": 3.891389385607303,
+    "like_loss": 9.943352699279785,
+    "prior_loss": 1679.397216796875,
+    "total_loss": 1689.340576171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 497,
+    "avg_bits_before": 3.891389385607303,
+    "avg_bits_after": 3.89141743553843,
+    "like_loss": 14.69996452331543,
+    "prior_loss": 1679.38720703125,
+    "total_loss": 1694.087158203125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 498,
+    "avg_bits_before": 3.89141743553843,
+    "avg_bits_after": 3.891505025358083,
+    "like_loss": 12.480600357055664,
+    "prior_loss": 1679.3623046875,
+    "total_loss": 1691.8428955078125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 499,
+    "avg_bits_before": 3.891505025358083,
+    "avg_bits_after": 3.8915701195905257,
+    "like_loss": 10.176606178283691,
+    "prior_loss": 1679.277587890625,
+    "total_loss": 1689.4542236328125,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 500,
+    "avg_bits_before": 3.8915701195905257,
+    "avg_bits_after": 3.8914768441211405,
+    "like_loss": 7.566845417022705,
+    "prior_loss": 1679.2882080078125,
+    "total_loss": 1686.8551025390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 501,
+    "avg_bits_before": 3.8914768441211405,
+    "avg_bits_after": 3.891467989584554,
+    "like_loss": 11.680675506591797,
+    "prior_loss": 1679.245361328125,
+    "total_loss": 1690.926025390625,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 502,
+    "avg_bits_before": 3.891467989584554,
+    "avg_bits_after": 3.8914226882246408,
+    "like_loss": 7.777393341064453,
+    "prior_loss": 1679.2669677734375,
+    "total_loss": 1687.0443115234375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 503,
+    "avg_bits_before": 3.8914226882246408,
+    "avg_bits_after": 3.8916513990629387,
+    "like_loss": 6.581334590911865,
+    "prior_loss": 1679.1641845703125,
+    "total_loss": 1685.7454833984375,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 504,
+    "avg_bits_before": 3.8916513990629387,
+    "avg_bits_after": 3.891695754821185,
+    "like_loss": 9.250837326049805,
+    "prior_loss": 1679.1431884765625,
+    "total_loss": 1688.39404296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 505,
+    "avg_bits_before": 3.891695754821185,
+    "avg_bits_after": 3.8918816092504103,
+    "like_loss": 7.120332717895508,
+    "prior_loss": 1679.0504150390625,
+    "total_loss": 1686.1707763671875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 506,
+    "avg_bits_before": 3.8918816092504103,
+    "avg_bits_after": 3.8920374274978173,
+    "like_loss": 8.328283309936523,
+    "prior_loss": 1679.026123046875,
+    "total_loss": 1687.3543701171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 507,
+    "avg_bits_before": 3.8920374274978173,
+    "avg_bits_after": 3.8921683818351043,
+    "like_loss": 7.7308502197265625,
+    "prior_loss": 1679.08056640625,
+    "total_loss": 1686.8114013671875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 508,
+    "avg_bits_before": 3.8921683818351043,
+    "avg_bits_after": 3.892212224231654,
+    "like_loss": 6.88839864730835,
+    "prior_loss": 1679.0177001953125,
+    "total_loss": 1685.9061279296875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 509,
+    "avg_bits_before": 3.892212224231654,
+    "avg_bits_after": 3.8923415688533587,
+    "like_loss": 10.586997985839844,
+    "prior_loss": 1678.892333984375,
+    "total_loss": 1689.4793701171875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 510,
+    "avg_bits_before": 3.8923415688533587,
+    "avg_bits_after": 3.892473721455508,
+    "like_loss": 10.315917015075684,
+    "prior_loss": 1678.768798828125,
+    "total_loss": 1689.084716796875,
+    "lr": 0.00091
+  },
+  {
+    "batch_idx": 511,
+    "avg_bits_before": 3.892473721455508,
+    "avg_bits_after": 3.892680978629225,
+    "like_loss": 15.914266586303711,
+    "prior_loss": 1678.63671875,
+    "total_loss": 1694.551025390625,
+    "lr": 0.00091
+  }
+]

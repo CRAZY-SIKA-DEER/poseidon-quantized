@@ -794,7 +794,7 @@ def compute_sapq_loss_with_prior_global(
         prior_scale=prior_scale,
     )
 
-    prior_weight = 1e-10
+    prior_weight = 1
     total_loss = like_loss + prior_weight * prior_loss
     return total_loss, like_loss, prior_loss
 
@@ -845,6 +845,6 @@ def compute_sapq_loss_with_prior(
         prior_scale=prior_scale,
     )
 
-    prior_weight = 1e-10
+    prior_weight = 1e-4
     total_loss = like_loss + prior_weight * prior_loss
     return total_loss, like_loss, prior_loss

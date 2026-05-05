@@ -30,26 +30,7 @@ conda activate ppq
 #   --test_before_calibration
 
 
-# # for Fisher Diagonal
-# python BRECQ/quant/main_poseidon_brecq.py \
-#   --model_path models/NS-PwC-L \
-#   --dataset_name fluids.incompressible.PiecewiseConstants \
-#   --data_path dataset/NS-PwC \
-#   --device cuda \
-#   --n_bits_w 4 \
-#   --channel_wise \
-#   --calib_batchsize 2 \
-#   --calib_steps 2 \
-#   --val_batchsize 2 \
-#   --val_steps 2 \
-#   --batch_size_recon 2 \
-#   --iters_w 10 \
-#   --opt_mode fisher_diag \
-#   --test_before_calibration
-
-
-
-# # for Fisher Full
+# for Fisher Diagonal
 python BRECQ/quant/main_poseidon_brecq.py \
   --model_path models/NS-PwC-L \
   --dataset_name fluids.incompressible.PiecewiseConstants \
@@ -63,5 +44,24 @@ python BRECQ/quant/main_poseidon_brecq.py \
   --val_steps 2 \
   --batch_size_recon 2 \
   --iters_w 10 \
-  --opt_mode fisher_full \
+  --opt_mode fisher_diag \
   --test_before_calibration
+
+
+
+# # for Fisher Full
+# python BRECQ/quant/main_poseidon_brecq.py \
+#   --model_path models/NS-PwC-L \
+#   --dataset_name fluids.incompressible.PiecewiseConstants \
+#   --data_path dataset/NS-PwC \
+#   --device cuda \
+#   --n_bits_w 4 \
+#   --channel_wise \
+#   --calib_batchsize 2 \
+#   --calib_steps 2 \
+#   --val_batchsize 2 \
+#   --val_steps 2 \
+#   --batch_size_recon 2 \
+#   --iters_w 10 \
+#   --opt_mode fisher_full \
+#   --test_before_calibration

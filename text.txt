@@ -1,0 +1,81 @@
+========== RESULTS ==========
+
+[FP]
+L1: 4.575972e+01
+RelL1: 1.748931e-01
+continuity: 2.111509e-02
+rel_continuity: 7.532804e-03
+vorticity: 3.497303e-02
+rel_vorticity: 8.291626e-03
+sobo_s01: 2.054971e-02
+sobo_s012: 3.598879e+00
+
+[network_block_sens_sobo]
+L1: 4.587703e+01
+RelL1: 1.755465e-01
+continuity: 2.113080e-02
+rel_continuity: 7.538433e-03
+vorticity: 3.505616e-02
+rel_vorticity: 8.322125e-03
+sobo_s01: 2.060825e-02
+sobo_s012: 3.613559e+00
+
+[network_block_sens]
+L1: 4.590338e+01
+RelL1: 1.756418e-01
+continuity: 2.114406e-02
+rel_continuity: 7.543189e-03
+vorticity: 3.515682e-02
+rel_vorticity: 8.342151e-03
+sobo_s01: 2.069191e-02
+sobo_s012: 3.633117e+00
+
+[network_block_no_sens]
+L1: 4.653381e+01
+RelL1: 1.781127e-01
+continuity: 2.114253e-02
+rel_continuity: 7.542717e-03
+vorticity: 3.538660e-02
+rel_vorticity: 8.399826e-03
+sobo_s01: 2.083369e-02
+sobo_s012: 3.651561e+00
+
+[block_ppq]
+L1: 5.849682e+01
+RelL1: 2.237232e-01
+continuity: 2.160903e-02
+rel_continuity: 7.710344e-03
+vorticity: 3.853518e-02
+rel_vorticity: 9.142510e-03
+sobo_s01: 2.328562e-02
+sobo_s012: 3.896224e+00
+
+[block_sens]
+L1: 6.012901e+01
+RelL1: 2.299731e-01
+continuity: 2.155725e-02
+rel_continuity: 7.691517e-03
+vorticity: 3.794973e-02
+rel_vorticity: 8.997703e-03
+sobo_s01: 2.298726e-02
+sobo_s012: 3.865567e+00
+
+[block_no_sens]
+L1: 5.848380e+01
+RelL1: 2.238223e-01
+continuity: 2.155234e-02
+rel_continuity: 7.689788e-03
+vorticity: 3.831338e-02
+rel_vorticity: 9.081397e-03
+sobo_s01: 2.323606e-02
+sobo_s012: 3.899503e+00
+
+[layer_ppq]
+L1: 1.417757e+02
+RelL1: 5.428192e-01
+continuity: 4.596516e-02
+rel_continuity: 1.642776e-02
+vorticity: 9.997214e-02
+rel_vorticity: 2.371651e-02
+sobo_s01: 6.953333e-02
+sobo_s012: 1.480693e+01

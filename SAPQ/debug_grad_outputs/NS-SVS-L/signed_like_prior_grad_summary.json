@@ -1,0 +1,102 @@
+[
+  {
+    "batch_idx": 0,
+    "grad_type": "likelihood",
+    "num_layers": 533,
+    "mean_grad_mean": 0.0006369103958937267,
+    "mean_grad_abs_mean": 0.0012720805143135038,
+    "mean_frac_push_bits_up": 0.515164202529986,
+    "mean_frac_push_bits_down": 0.47576274534103796,
+    "loss": 0.008553743362426758
+  },
+  {
+    "batch_idx": 0,
+    "grad_type": "prior",
+    "num_layers": 533,
+    "mean_grad_mean": 3.0344555480842517,
+    "mean_grad_abs_mean": 3.0344555480842517,
+    "mean_frac_push_bits_up": 1.4657598499061914e-05,
+    "mean_frac_push_bits_down": 0.0,
+    "loss": 0.013165390118956566
+  },
+  {
+    "batch_idx": 1,
+    "grad_type": "likelihood",
+    "num_layers": 533,
+    "mean_grad_mean": 0.0022278881516136374,
+    "mean_grad_abs_mean": 0.005436418986657993,
+    "mean_frac_push_bits_up": 0.5104560603791285,
+    "mean_frac_push_bits_down": 0.4805221903586924,
+    "loss": 0.03086376190185547
+  },
+  {
+    "batch_idx": 1,
+    "grad_type": "prior",
+    "num_layers": 533,
+    "mean_grad_mean": 3.0344555480842517,
+    "mean_grad_abs_mean": 3.0344555480842517,
+    "mean_frac_push_bits_up": 1.4657598499061914e-05,
+    "mean_frac_push_bits_down": 0.0,
+    "loss": 0.013165390118956566
+  },
+  {
+    "batch_idx": 2,
+    "grad_type": "likelihood",
+    "num_layers": 533,
+    "mean_grad_mean": 0.002340156903951424,
+    "mean_grad_abs_mean": 0.005005912891377706,
+    "mean_frac_push_bits_up": 0.5056178308114773,
+    "mean_frac_push_bits_down": 0.4853201103702495,
+    "loss": 0.02785515785217285
+  },
+  {
+    "batch_idx": 2,
+    "grad_type": "prior",
+    "num_layers": 533,
+    "mean_grad_mean": 3.0344555480842517,
+    "mean_grad_abs_mean": 3.0344555480842517,
+    "mean_frac_push_bits_up": 1.4657598499061914e-05,
+    "mean_frac_push_bits_down": 0.0,
+    "loss": 0.013165390118956566
+  },
+  {
+    "batch_idx": 3,
+    "grad_type": "likelihood",
+    "num_layers": 533,
+    "mean_grad_mean": 0.0018634112785880501,
+    "mean_grad_abs_mean": 0.003669206217252538,
+    "mean_frac_push_bits_up": 0.511711727331548,
+    "mean_frac_push_bits_down": 0.4792335427332998,
+    "loss": 0.021785259246826172
+  },
+  {
+    "batch_idx": 3,
+    "grad_type": "prior",
+    "num_layers": 533,
+    "mean_grad_mean": 3.0344555480842517,
+    "mean_grad_abs_mean": 3.0344555480842517,
+    "mean_frac_push_bits_up": 1.4657598499061914e-05,
+    "mean_frac_push_bits_down": 0.0,
+    "loss": 0.013165390118956566
+  },
+  {
+    "batch_idx": 4,
+    "grad_type": "likelihood",
+    "num_layers": 533,
+    "mean_grad_mean": 0.0008970346822443576,
+    "mean_grad_abs_mean": 0.00210630525236695,
+    "mean_frac_push_bits_up": 0.5160854935198743,
+    "mean_frac_push_bits_down": 0.4748671047291657,
+    "loss": 0.012305974960327148
+  },
+  {
+    "batch_idx": 4,
+    "grad_type": "prior",
+    "num_layers": 533,
+    "mean_grad_mean": 3.0344555480842517,
+    "mean_grad_abs_mean": 3.0344555480842517,
+    "mean_frac_push_bits_up": 1.4657598499061914e-05,
+    "mean_frac_push_bits_down": 0.0,
+    "loss": 0.013165390118956566
+  }
+]

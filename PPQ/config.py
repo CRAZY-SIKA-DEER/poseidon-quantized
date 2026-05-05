@@ -78,8 +78,8 @@ class PPQConfig:
     # PPQ optimization
     # -------------------------
     weight_only: bool = True
-    num_epochs: int = 10
-    num_mc_samples: int = 10
+    num_epochs: int = 5
+    num_mc_samples: int = 5 #10
     base_lr: float = 9.1e-4
     eta: float = 1e-6
     gamma_list: list[float] = field(default_factory=lambda: [0.0])
@@ -88,7 +88,7 @@ class PPQConfig:
     init_bits: int = 8
     bmax_bits: int = 20
 
-    log_every: int = 10
+    log_every: int = 1
     updates_per_batch: int = 1
     eval_every: int = 1
 

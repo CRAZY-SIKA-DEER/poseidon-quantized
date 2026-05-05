@@ -195,6 +195,7 @@ class SAPQTrainerGlobal:
         optimizer = optim.Adam(params, lr=cfg.base_lr)
 
         history = []
+        batch_update_history = []
 
         print(
             f"\nStarting global SAPQ optimization: epochs={cfg.num_epochs}, "
@@ -252,6 +253,34 @@ class SAPQTrainerGlobal:
                         device=self.device,
                         weight_only=cfg.weight_only,
                     )
+
+                    if epoch == 1:
+                        with torch.no_grad():
+                            avg_bits_update = compute_avg_bits(
+                                step_sizes_dict=step_sizes_dict,
+                                ranges_dict=ranges_dict,
+                                channel_weights=self.channel_weights,
+                            )
+
+                        batch_update_history.append(
+                            {
+                                "epoch": int(epoch),
+                                "batch_idx": int(batch_idx),
+                                "total_loss": float(total_loss.item()),
+                                "likelihood_loss": float(like_loss.item()),
+                                "prior_loss": float(prior_loss.item()),
+                                "avg_bits_after_update": float(avg_bits_update),
+                                "lr": float(lr_epoch),
+                            }
+                        )
+
+                        if batch_idx % 1 == 0:
+                            print(
+                                f"[BATCH-UPDATE] epoch={epoch} "
+                                f"batch={batch_idx:04d} "
+                                f"AvgBits={avg_bits_update:.4f} "
+                                f"Like={like_loss.item():.6f}"
+                            )
 
             # --------------------------------------------------
             # Epoch-end avg bits
@@ -315,5 +344,13 @@ class SAPQTrainerGlobal:
                 and epoch % cfg.eval_every == 0
             ):
                 eval_callback(epoch, step_sizes_dict, ranges_dict)
+
+        if len(batch_update_history) > 0:
+            history.append(
+                {
+                    "type": "batch_update_history_epoch1",
+                    "records": batch_update_history,
+                }
+            )
 
         return step_sizes_dict, ranges_dict, history

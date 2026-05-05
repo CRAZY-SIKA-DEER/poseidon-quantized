@@ -200,9 +200,10 @@ def main():
     #exp_subdir = cfg.prior_mode
     cfg.prior_mode = os.environ.get("SAPQ_PRIOR_MODE", "block_sens")
 
-    cfg.num_epochs = 9
-    cfg.min_epochs = 4
-    cfg.early_stop_bits = 4.0
+    cfg.num_epochs = 20
+    cfg.min_epochs = 1
+    cfg.eval_every = None
+    cfg.early_stop_bits = 1.0
 
     model_tag = Path(cfg.model_path).name
     dataset_tag = Path(cfg.data_path).name
@@ -241,19 +242,29 @@ def main():
 
 
 
-    # Load fixed frozen calibration dataset from disk
-    frozen_batches = load_frozen_calibration_batches(cfg, device=device)
+    # # Load fixed frozen calibration dataset from disk
+    # frozen_batches = load_frozen_calibration_batches(cfg, device=device)
 
-    def frozen_iter():
-        for batch in frozen_batches:
+    # def frozen_iter():
+    #     for batch in frozen_batches:
+    #         yield batch
+    # Use calib_iter built from build_poseidon_loaders
+    def sapq_calib_iter():
+        for batch in calib_iter():
             yield batch
 
-    print(f"[INFO] Frozen calibration batches: {len(frozen_batches)}")
+    print(
+        f"[INFO] Using live calib_iter: "
+        f"calib_batchsize={cfg.calib_batchsize}, calib_steps={cfg.calib_steps}"
+    )
+
+    #print(f"[INFO] Frozen calibration batches: {len(frozen_batches)}")
 
     ranges_dict = maybe_load_or_compute_ranges(
         cfg=cfg,
         model=model,
-        frozen_iter=frozen_iter,
+        #frozen_iter=frozen_iter,
+        frozen_iter = sapq_calib_iter,
         candidate_layers=candidate_layers,
         device=device,
     )
@@ -307,7 +318,8 @@ def main():
 
     print("Starting global SAPQ training...")
     step_sizes_dict, ranges_dict, history = trainer.train(
-        dataloader=frozen_iter,
+        #dataloader=frozen_iter,
+        dataloader = sapq_calib_iter,
         ranges_dict=ranges_dict,
         sens_dict=sens_dict,
         eval_callback=eval_callback if cfg.eval_every is not None else None,
@@ -369,6 +381,7 @@ def main():
     out_dir = (
         Path(cfg.repo_root)
         / "sapq_experiments"
+        / "initialize8target4"
         / model_tag
         / dataset_tag
         / f"network_{cfg.prior_mode}_sobo"
@@ -439,7 +452,10 @@ def main():
                     "dataset_name": cfg.dataset_name,
                     "quant_layer_path": str(cfg.quant_layer_path),
                     "num_candidate_layers": len(candidate_layers),
-                    "num_frozen_batches": len(frozen_batches),
+                    #"num_frozen_batches": len(frozen_batches),
+                    "calib_batchsize": cfg.calib_batchsize,
+                    "calib_steps": cfg.calib_steps,
+                    "num_calib_samples": cfg.calib_batchsize * cfg.calib_steps,
                     "likelihood_mode": "network_global",
                     "prior_mode": str(getattr(cfg, "prior_mode", "block_sens")),
                     "exp_name": cfg.prior_mode,

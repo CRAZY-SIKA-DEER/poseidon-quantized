@@ -95,20 +95,91 @@ def build_brecq_model(fp_model, adaround_path: Path, device, n_bits_w: int):
     return qnn
 
 
+# def compute_uniform_minmax_steps(model: nn.Module, layer_names, num_bits: int, device):
+#     """
+#     Per-channel min-max uniform affine weight quantization step:
+
+#         step = (w_max - w_min) / (2^bits - 1)
+
+#     For Linear weight shape [out_features, in_features],
+#     each output channel gets one step size.
+#     """
+#     model = model.to(device).eval()
+#     name2mod = dict(model.named_modules())
+
+#     steps = {}
+#     denom = (2 ** num_bits) - 1
+
+#     with torch.no_grad():
+#         for name in layer_names:
+#             mod = name2mod.get(name, None)
+#             if not isinstance(mod, nn.Linear):
+#                 continue
+
+#             w = mod.weight.detach().to(device)
+#             w_flat = w.view(w.size(0), -1)
+
+#             w_min = w_flat.min(dim=1).values
+#             w_max = w_flat.max(dim=1).values
+
+#             step = (w_max - w_min) / float(denom)
+#             step = torch.clamp(step, min=1e-8)
+
+#             steps[name] = (step.cpu(), None)
+
+#     return steps
+
+
+
+# def compute_uniform_minmax_steps(model: nn.Module, layer_names, num_bits: int, device):
+#     """
+#     Per-channel uniform symmetric weight quantization step:
+
+#         step = max(abs(w_min), abs(w_max)) / (2^(bits-1) - 1)
+
+#     For Linear weight shape [out_features, in_features],
+#     each output channel gets one step size.
+#     """
+#     model = model.to(device).eval()
+#     name2mod = dict(model.named_modules())
+
+#     steps = {}
+#     qmax = (2 ** (num_bits - 1)) - 1
+
+#     with torch.no_grad():
+#         for name in layer_names:
+#             mod = name2mod.get(name, None)
+#             if not isinstance(mod, nn.Linear):
+#                 continue
+
+#             w = mod.weight.detach().to(device)
+#             w_flat = w.view(w.size(0), -1)
+
+#             max_abs = w_flat.abs().max(dim=1).values
+
+#             step = max_abs / float(qmax)
+#             step = torch.clamp(step, min=1e-8)
+
+#             steps[name] = (step.cpu(), None)
+
+#     return steps
+
+
 def compute_uniform_minmax_steps(model: nn.Module, layer_names, num_bits: int, device):
     """
-    Per-channel min-max uniform affine weight quantization step:
+    Per-channel uniform affine weight quantization.
 
         step = (w_max - w_min) / (2^bits - 1)
+        zero = w_min
 
-    For Linear weight shape [out_features, in_features],
-    each output channel gets one step size.
+        q  = round((w - zero) / step)
+        wq = q * step + zero
     """
     model = model.to(device).eval()
     name2mod = dict(model.named_modules())
 
     steps = {}
-    denom = (2 ** num_bits) - 1
+    qmax = (2 ** num_bits) - 1
 
     with torch.no_grad():
         for name in layer_names:
@@ -122,12 +193,18 @@ def compute_uniform_minmax_steps(model: nn.Module, layer_names, num_bits: int, d
             w_min = w_flat.min(dim=1).values
             w_max = w_flat.max(dim=1).values
 
-            step = (w_max - w_min) / float(denom)
+            step = (w_max - w_min) / float(qmax)
             step = torch.clamp(step, min=1e-8)
 
-            steps[name] = (step.cpu(), None)
+            steps[name] = {
+                "step": step.cpu(),
+                "zero": w_min.cpu(),
+                "qmin": 0,
+                "qmax": qmax,
+            }
 
     return steps
+
 
 
 
@@ -446,7 +523,9 @@ def main():
             / model_tag
             / dataset_tag
             / "network_block_sens_sobo"
+            / "8"
             / "raw"
+            / "epoch_3"
             / "sapq_global_step_sizes.pt"
         ),
         "PPQ": (
@@ -459,9 +538,9 @@ def main():
         ),
     }
 
-    brecq_bits_list = [4, 8]
-    brecq_iters_list = [100, 1000, 5000, 10000]
-    uniform_bits_list = [4, 8, 16]
+    brecq_bits_list = [8]
+    brecq_iters_list = [10000]
+    uniform_bits_list = [8]
 
     brecq_paths = {}
     for bits in brecq_bits_list:
