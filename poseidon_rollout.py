@@ -174,6 +174,7 @@ def main():
     parser.add_argument("--ppq_steps", type=str, default=None)
     parser.add_argument("--repo_root", type=str, default=None)
     parser.add_argument("--brecq_iters", type=int, default=10000)
+    parser.add_argument("--save_npz", type=str, default=None)
     args = parser.parse_args()
     repo_root = Path(args.repo_root) if args.repo_root is not None else Path(args.model_path).parents[1]
     model_tag = Path(args.model_path).name
@@ -231,7 +232,7 @@ def main():
             / "adaround_state.pt"
         )
 
-    methods.append((f"BRECQ-w{bits}", "brecq", (bits, brecq_path)))
+        methods.append((f"BRECQ-w{bits}", "brecq", (bits, brecq_path)))
 
     for method_name, method_type, method_value in methods:
         print(f"\n[INFO] Running rollout: {method_name}")
@@ -310,6 +311,26 @@ def main():
     labels = labels[: first_preds.shape[0]]
 
     delta_t = (args.final_time - args.initial_time) // args.ar_steps
+
+    if args.save_npz is not None:
+        save_dict = {}
+
+        for method_name, preds in all_preds.items():
+            save_dict[f"pred_{method_name}"] = preds
+
+        save_dict["gt"] = labels
+        save_dict["times"] = np.array(
+            [
+                args.initial_time + (step + 1) * delta_t
+                for step in range(args.ar_steps)
+            ],
+            dtype=np.int64,
+        )
+        save_dict["methods"] = np.array(list(all_preds.keys()))
+
+        np.savez_compressed(args.save_npz, **save_dict)
+
+        print(f"\n[INFO] Saved rollout arrays -> {args.save_npz}")
 
     print("\n========== ROLLOUT RESULTS ==========")
 
