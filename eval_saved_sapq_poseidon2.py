@@ -459,13 +459,26 @@ def eval_model_all_metrics(
                 pm = pm.to(device)
             y = y.to(device)
 
-            out = model(
+            # First inference: x0 -> out1
+            out1 = model(
                 pixel_values=x,
                 time=t,
                 pixel_mask=pm,
                 labels=y,
                 return_dict=True,
             ).output
+
+            # Second inference: out1 -> out2
+            out2 = model(
+                pixel_values=out1,
+                time=t,
+                pixel_mask=pm,
+                labels=y,
+                return_dict=True,
+            ).output
+
+            # Evaluate second-step prediction for now
+            out = out2
 
             pred_np = out.detach().cpu().numpy()
             y_np = y.detach().cpu().numpy()

@@ -114,3 +114,6 @@ metric_table_with_increase.xlsx
 
 # Core dumps
 core
+aurora_artifacts/
+SAPQ/debug_first_epoch_grads_out/
+SBPQ/

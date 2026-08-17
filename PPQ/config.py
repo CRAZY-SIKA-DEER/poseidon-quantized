@@ -71,21 +71,21 @@ class PPQConfig:
     # -------------------------
     calib_batchsize: int = 2
     calib_steps: int = 512 #256 #512 #128  #64
-    val_batchsize: int = 2
-    val_steps: int = 512
+    val_batchsize: int = 512
+    val_steps: int = 2
 
     # -------------------------#
     # PPQ optimization
     # -------------------------
     weight_only: bool = True
-    num_epochs: int = 5
+    num_epochs: int = 21
     num_mc_samples: int = 5 #10
     base_lr: float = 9.1e-4
     eta: float = 1e-6
     gamma_list: list[float] = field(default_factory=lambda: [0.0])
 
     percentile_prob: float = 1e-4
-    init_bits: int = 8
+    init_bits: int = 9
     bmax_bits: int = 20
 
     log_every: int = 1
@@ -129,7 +129,7 @@ class PPQConfig:
     sensitivity_v_idx: int = 2
 
     min_epochs: int = 10
-    max_epochs: int = 20
+    max_epochs: int = 25
     early_stop_bits: float = 4.0
 
 

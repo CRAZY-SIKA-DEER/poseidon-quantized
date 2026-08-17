@@ -200,7 +200,7 @@ def main():
     #exp_subdir = cfg.prior_mode
     cfg.prior_mode = os.environ.get("SAPQ_PRIOR_MODE", "block_sens")
 
-    cfg.num_epochs = 20
+    cfg.num_epochs = 21
     cfg.min_epochs = 1
     cfg.eval_every = None
     cfg.early_stop_bits = 1.0

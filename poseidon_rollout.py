@@ -160,6 +160,106 @@ def build_brecq_model(fp_model, adaround_path: Path, device, n_bits_w: int):
     return qnn
 
 
+def denormalize_tensor(x: torch.Tensor, constants, dataset_name: str = ""):
+    dataset_name = dataset_name.lower()
+
+    mean = torch.as_tensor(constants["mean"], dtype=x.dtype, device=x.device).flatten()
+    std = torch.as_tensor(constants["std"], dtype=x.dtype, device=x.device).flatten()
+
+    if x.ndim == 4:
+        mean = mean.view(1, -1, 1, 1)
+        std = std.view(1, -1, 1, 1)
+    elif x.ndim == 3:
+        mean = mean.view(-1, 1, 1)
+        std = std.view(-1, 1, 1)
+
+    return x * std + mean
+
+
+def spatial_first_order_sobolev(pred, target, constants):
+    pred = denormalize_tensor(pred, constants)
+    target = denormalize_tensor(target, constants)
+
+    pred_np = pred.detach().cpu().numpy()
+    target_np = target.detach().cpu().numpy()
+
+    s0_err = float(np.mean(np.abs(pred_np - target_np)))
+    s0_norm = float(np.mean(np.abs(target_np)))
+
+    dx_pred = pred_np[..., :, 1:] - pred_np[..., :, :-1]
+    dx_tgt = target_np[..., :, 1:] - target_np[..., :, :-1]
+
+    dy_pred = pred_np[..., 1:, :] - pred_np[..., :-1, :]
+    dy_tgt = target_np[..., 1:, :] - target_np[..., :-1, :]
+
+    s1_err = float(np.mean(np.abs(dx_pred - dx_tgt)) + np.mean(np.abs(dy_pred - dy_tgt)))
+    s1_norm = float(np.mean(np.abs(dx_tgt)) + np.mean(np.abs(dy_tgt)))
+
+    sob = s0_err + s1_err
+    rel_sob = sob / (s0_norm + s1_norm + 1e-12)
+
+    return sob, rel_sob
+
+
+def spatial_grads_np(f, dx=1.0 / 128, dy=1.0 / 128):
+    original_ndim = f.ndim
+    if original_ndim == 2:
+        f = f[np.newaxis, ...]
+
+    dy_f = np.zeros_like(f)
+    dx_f = np.zeros_like(f)
+
+    dy_f[..., 1:-1, :] = (f[..., 2:, :] - f[..., :-2, :]) / (2 * dy)
+    dx_f[..., :, 1:-1] = (f[..., :, 2:] - f[..., :, :-2]) / (2 * dx)
+
+    dy_f[..., 0, :] = (f[..., 1, :] - f[..., 0, :]) / dy
+    dy_f[..., -1, :] = (f[..., -1, :] - f[..., -2, :]) / dy
+
+    dx_f[..., :, 0] = (f[..., :, 1] - f[..., :, 0]) / dx
+    dx_f[..., :, -1] = (f[..., :, -1] - f[..., :, -2]) / dx
+
+    if original_ndim == 2:
+        return dy_f[0], dx_f[0]
+
+    return dy_f, dx_f
+
+
+def ns_physical_metrics(pred, target, constants):
+    pred = denormalize_tensor(pred, constants)
+    target = denormalize_tensor(target, constants)
+
+    pred_np = pred.detach().cpu().numpy()
+    target_np = target.detach().cpu().numpy()
+
+    pred_np = np.swapaxes(pred_np, -2, -1)
+    target_np = np.swapaxes(target_np, -2, -1)
+
+    c_dim = 1 if pred_np.ndim == 4 else 0
+
+    if pred_np.shape[c_dim] == 3:
+        u_idx, v_idx = 0, 1
+    else:
+        u_idx, v_idx = 1, 2
+
+    u_pred, v_pred = pred_np[:, u_idx], pred_np[:, v_idx]
+    u_gt, v_gt = target_np[:, u_idx], target_np[:, v_idx]
+
+    _, du_dx = spatial_grads_np(u_pred)
+    dv_dy, _ = spatial_grads_np(v_pred)
+    div = float(np.mean(np.abs(du_dx + dv_dy)))
+
+    _, dv_dx = spatial_grads_np(v_pred)
+    du_dy, _ = spatial_grads_np(u_pred)
+    vort_pred = dv_dx - du_dy
+
+    _, dv_dx_gt = spatial_grads_np(v_gt)
+    du_dy_gt, _ = spatial_grads_np(u_gt)
+    vort_gt = dv_dx_gt - du_dy_gt
+
+    vort = float(np.mean(np.abs(vort_pred - vort_gt)))
+
+    return div, vort
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", type=str, required=True)
@@ -202,6 +302,9 @@ def main():
         final_time=args.final_time,
         dataset_kwargs={},
     )
+
+    constants = test_ds.constants
+    is_ns = "incompressible" in args.dataset.lower()
 
     # Optional: limit number of trajectories
     if args.num_trajectories is not None:
@@ -346,11 +449,24 @@ def main():
             l1 = float(np.mean(lp_error(pred_step, gt_step, p=1)))
             rel_l1 = float(np.mean(relative_lp_error(pred_step, gt_step, p=1, return_percent=True)))
 
-            print(
+            pred_t = torch.from_numpy(pred_step)
+            gt_t = torch.from_numpy(gt_step)
+
+            sob, rel_sob = spatial_first_order_sobolev(pred_t, gt_t, constants)
+
+            line = (
                 f"t={curr_time:03d} | "
                 f"L1={l1:.6e} | "
-                f"RelL1={rel_l1:.6e}"
+                f"RelL1={rel_l1:.6e} | "
+                f"Sob1={sob:.6e} | "
+                f"RelSob1={rel_sob:.6e}"
             )
+
+            if is_ns:
+                div, vort = ns_physical_metrics(pred_t, gt_t, constants)
+                line += f" | Div={div:.6e} | Vort={vort:.6e}"
+
+            print(line)
 
 
 if __name__ == "__main__":

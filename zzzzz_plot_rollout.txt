@@ -1,0 +1,114 @@
+```bash
+# =========================================================
+# NS-PwC
+# =========================================================
+python poseidon_rollout.py \
+  --model_path /home/u6ey/yiheng.u6ey/poseidon-quantized/models/NS-PwC-L \
+  --data_path /home/u6ey/yiheng.u6ey/poseidon-quantized/dataset/NS-PwC \
+  --dataset fluids.incompressible.PiecewiseConstants \
+  --initial_time 0 \
+  --final_time 15 \
+  --ar_steps 3 \
+  --batch_size 1 \
+  --num_trajectories 1 \
+  --repo_root /home/u6ey/yiheng.u6ey/poseidon-quantized \
+  --brecq_iters 10000 \
+  --sapq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/sapq_experiments/NS-PwC-L/NS-PwC/network_block_sens_sobo/raw/sapq_global_step_sizes.pt \
+  --ppq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/ppq_experiments/NS-PwC-L/NS-PwC/layerwise_ppq/sapq_layerwise_step_sizes.pt \
+  --save_npz /home/u6ey/yiheng.u6ey/poseidon-quantized/rollout_nspwc_all_methods.npz
+
+
+# =========================================================
+# NS-SVS
+# =========================================================
+python poseidon_rollout.py \
+  --model_path /home/u6ey/yiheng.u6ey/poseidon-quantized/models/NS-SVS-L \
+  --data_path /home/u6ey/yiheng.u6ey/poseidon-quantized/dataset/NS-SVS \
+  --dataset fluids.incompressible.VortexSheet \
+  --initial_time 0 \
+  --final_time 15 \
+  --ar_steps 3 \
+  --batch_size 1 \
+  --num_trajectories 1 \
+  --repo_root /home/u6ey/yiheng.u6ey/poseidon-quantized \
+  --brecq_iters 10000 \
+  --sapq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/sapq_experiments/NS-SVS-L/NS-SVS/network_block_sens_sobo/raw/sapq_global_step_sizes.pt \
+  --ppq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/ppq_experiments/NS-SVS-L/NS-SVS/layerwise_ppq/sapq_layerwise_step_sizes.pt \
+  --save_npz /home/u6ey/yiheng.u6ey/poseidon-quantized/rollout_nssvs_all_methods.npz
+
+
+# =========================================================
+# NS-BB
+# =========================================================
+python poseidon_rollout.py \
+  --model_path /home/u6ey/yiheng.u6ey/poseidon-quantized/models/NS-BB-L \
+  --data_path /home/u6ey/yiheng.u6ey/poseidon-quantized/dataset/NS-BB \
+  --dataset fluids.incompressible.BrownianBridge \
+  --initial_time 0 \
+  --final_time 15 \
+  --ar_steps 3 \
+  --batch_size 1 \
+  --num_trajectories 1 \
+  --repo_root /home/u6ey/yiheng.u6ey/poseidon-quantized \
+  --brecq_iters 10000 \
+  --sapq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/sapq_experiments/NS-BB-L/NS-BB/network_block_sens_sobo/raw/sapq_global_step_sizes.pt \
+  --ppq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/ppq_experiments/NS-BB-L/NS-BB/layerwise_ppq/sapq_layerwise_step_sizes.pt \
+  --save_npz /home/u6ey/yiheng.u6ey/poseidon-quantized/rollout_nsbb_all_methods.npz
+
+
+# =========================================================
+# CE-RPUI
+# =========================================================
+python poseidon_rollout.py \
+  --model_path /home/u6ey/yiheng.u6ey/poseidon-quantized/models/CE-RPUI-L \
+  --data_path /home/u6ey/yiheng.u6ey/poseidon-quantized/dataset/CE-RPUI \
+  --dataset fluids.compressible.RiemannKelvinHelmholtz \
+  --initial_time 0 \
+  --final_time 15 \
+  --ar_steps 3 \
+  --batch_size 1 \
+  --num_trajectories 1 \
+  --repo_root /home/u6ey/yiheng.u6ey/poseidon-quantized \
+  --brecq_iters 10000 \
+  --sapq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/sapq_experiments/CE-RPUI-L/CE-RPUI/network_block_sens_sobo/raw/sapq_global_step_sizes.pt \
+  --ppq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/ppq_experiments/CE-RPUI-L/CE-RPUI/layerwise_ppq/sapq_layerwise_step_sizes.pt \
+  --save_npz /home/u6ey/yiheng.u6ey/poseidon-quantized/rollout_cerpui_all_methods.npz
+
+
+# =========================================================
+# Wave-Layer
+# =========================================================
+python poseidon_rollout.py \
+  --model_path /home/u6ey/yiheng.u6ey/poseidon-quantized/models/Wave-Layer-L \
+  --data_path /home/u6ey/yiheng.u6ey/poseidon-quantized/dataset/Wave-Layer \
+  --dataset wave.Layer \
+  --initial_time 0 \
+  --final_time 15 \
+  --ar_steps 3 \
+  --batch_size 1 \
+  --num_trajectories 1 \
+  --repo_root /home/u6ey/yiheng.u6ey/poseidon-quantized \
+  --brecq_iters 10000 \
+  --sapq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/sapq_experiments/Wave-Layer-L/Wave-Layer/network_block_sens_sobo/raw/sapq_global_step_sizes.pt \
+  --ppq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/ppq_experiments/Wave-Layer-L/Wave-Layer/layerwise_ppq/sapq_layerwise_step_sizes.pt \
+  --save_npz /home/u6ey/yiheng.u6ey/poseidon-quantized/rollout_wavelayer_all_methods.npz
+
+
+# =========================================================
+# Wave-Gauss
+# =========================================================
+python poseidon_rollout.py \
+  --model_path /home/u6ey/yiheng.u6ey/poseidon-quantized/models/Wave-Gauss-L \
+  --data_path /home/u6ey/yiheng.u6ey/poseidon-quantized/dataset/Wave-Gauss \
+  --dataset wave.Gaussians \
+  --initial_time 0 \
+  --final_time 15 \
+  --ar_steps 3 \
+  --batch_size 1 \
+  --num_trajectories 1 \
+  --repo_root /home/u6ey/yiheng.u6ey/poseidon-quantized \
+  --brecq_iters 10000 \
+  --sapq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/sapq_experiments/Wave-Gauss-L/Wave-Gauss/network_block_sens_sobo/raw/sapq_global_step_sizes.pt \
+  --ppq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/ppq_experiments/Wave-Gauss-L/Wave-Gauss/layerwise_ppq/sapq_layerwise_step_sizes.pt \
+  --save_npz /home/u6ey/yiheng.u6ey/poseidon-quantized/rollout_wavegauss_all_methods.npz
+```

@@ -64,7 +64,7 @@ class AdaRoundQuantizer(nn.Module):
     def init_alpha(self, x: torch.Tensor):
         x_floor = torch.floor(x / self.delta)
         if self.round_mode == 'learned_hard_sigmoid':
-            print('Init alpha to be FP32')
+            #print('Init alpha to be FP32')
             rest = (x / self.delta) - x_floor  # rest of rounding [0, 1)
             alpha = -torch.log((self.zeta - self.gamma) / (rest - self.gamma) - 1)  # => sigmoid(alpha) = rest
             self.alpha = nn.Parameter(alpha)

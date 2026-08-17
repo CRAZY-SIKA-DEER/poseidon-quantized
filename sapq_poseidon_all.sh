@@ -11,10 +11,10 @@ mkdir -p logs
 
 RUN_LIST=(
    "NS-SVS-L|NS-SVS|fluids.incompressible.VortexSheet"
-#   "NS-BB-L|NS-BB|fluids.incompressible.BrownianBridge"
-#   "CE-RPUI-L|CE-RPUI|fluids.compressible.RiemannKelvinHelmholtz"
-#   "Wave-Gauss-L|Wave-Gauss|wave.Gaussians"
-#   "Wave-Layer-L|Wave-Layer|wave.Layer"
+   "NS-BB-L|NS-BB|fluids.incompressible.BrownianBridge"
+   "CE-RPUI-L|CE-RPUI|fluids.compressible.RiemannKelvinHelmholtz"
+   "Wave-Gauss-L|Wave-Gauss|wave.Gaussians"
+   "Wave-Layer-L|Wave-Layer|wave.Layer"
 )
 
 for item in "${RUN_LIST[@]}"; do

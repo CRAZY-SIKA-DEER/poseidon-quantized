@@ -163,3 +163,42 @@ BRECQ-w8-iters100    | L1=2.941487e+02 | RelL1=1.186827e+00 | Sob1=1.183062e+00 
 BRECQ-w8-iters1000   | L1=2.744726e+02 | RelL1=1.099410e+00 | Sob1=8.112412e-01 | RelSob1=4.619785e-04
 BRECQ-w8-iters5000   | L1=2.711482e+02 | RelL1=1.087657e+00 | Sob1=7.679097e-01 | RelSob1=4.340200e-04
 BRECQ-w8-iters10000  | L1=2.764968e+02 | RelL1=1.097917e+00 | Sob1=7.447922e-01 | RelSob1=4.224991e-04
+
+
+========== running command ==========
+python poseidon_rollout.py   --model_path /home/u6ey/yiheng.u6ey/poseidon-quantized/models/NS-PwC-L   --data_path /home/u6ey/yiheng.u6ey/poseidon-quantized/dataset/NS-PwC   --dataset fluids.incompressible.PiecewiseConstants   --initial_time 0   --final_time 15   --ar_steps 3   --batch_size 16   --num_trajectories 20   --sapq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/sapq_experiments/NS-PwC-L/NS-PwC/network_block_sens_sobo/raw/sapq_global_step_sizes.pt   --ppq_steps /home/u6ey/yiheng.u6ey/poseidon-quantized/ppq_experiments/NS-PwC-L/NS-PwC/layerwise_ppq/sapq_layerwise_step_sizes.pt --repo_root /home/u6ey/yiheng.u6ey/poseidon-quantized  --brecq_iters 10000
+========== running command ==========
+
+
+
+
+
+----- FP -----
+t=005 | L1=4.407697e+01 | RelL1=1.651551e-01
+t=010 | L1=7.272771e+01 | RelL1=2.697309e-01
+t=015 | L1=1.088479e+02 | RelL1=4.042100e-01
+
+----- Uniform-w8 -----
+t=005 | L1=5.564310e+01 | RelL1=2.091020e-01
+t=010 | L1=9.259021e+01 | RelL1=3.438600e-01
+t=015 | L1=1.323766e+02 | RelL1=4.896155e-01
+
+----- Uniform-w4 -----
+t=005 | L1=4.484641e+03 | RelL1=1.703381e+01
+t=010 | L1=7.197055e+03 | RelL1=2.733523e+01
+t=015 | L1=9.018159e+03 | RelL1=3.423244e+01
+
+----- SAPQ -----
+t=005 | L1=4.535568e+01 | RelL1=1.707031e-01
+t=010 | L1=7.631693e+01 | RelL1=2.851678e-01
+t=015 | L1=1.165487e+02 | RelL1=4.360916e-01
+
+----- PPQ -----
+t=005 | L1=1.358247e+02 | RelL1=5.142328e-01
+t=010 | L1=2.446187e+02 | RelL1=9.197156e-01
+t=015 | L1=3.598986e+02 | RelL1=1.349755e+00
+
+----- BRECQ-w4 -----
+t=005 | L1=8.854470e+02 | RelL1=3.389273e+00
+t=010 | L1=1.313333e+03 | RelL1=5.008979e+00
+t=015 | L1=1.742000e+03 | RelL1=6.619098e+00
